@@ -25,7 +25,7 @@ This works as follows (for Linux/Unix/Mac):
 
 ```bash
 # change into generated directory structure
-cd <MyFmuName>/build/cmake
+cd <MyFmuName>/build
 # build the FMU in release mode
 ./build.sh release
 # deploy the FMU, e.g. package the FMU in the zipped directory structure

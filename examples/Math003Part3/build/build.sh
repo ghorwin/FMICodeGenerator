@@ -12,10 +12,13 @@
 #   [off|omp]					openmp (gcc and icc)
 #   [verbose]					enable cmake to call verbose makefiles
 
+# FMU-specific variables - set by code generator
+FMU_SHARED_LIB_NAME=libMath003Part3
+FMU_TARGET_LIB_NAME=Math003Part3
+
+BUILD_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 CMAKELISTSDIR=$(pwd)/../projects/cmake
 BUILDDIR="bb"
-
-
 
 # set defaults
 CMAKE_BUILD_TYPE=" -DCMAKE_BUILD_TYPE:STRING=RelWithDebInfo"
@@ -128,45 +131,15 @@ if [ ! -d $BUILDDIR ]; then
 fi
 
 cd $BUILDDIR && cmake $CMAKE_OPTIONS $CMAKE_BUILD_TYPE $CMAKE_COMPILER_OPTIONS $CMAKELISTSDIR && make -j$MAKE_CPUCOUNT &&
-cd $CMAKELISTSDIR &&
+cd $BUILD_SCRIPT_DIR &&
 mkdir -p ../bin/release &&
-if [ -e $BUILDDIR/MasterSimulator/MasterSimulator ]; then
-  echo "*** Copying MasterSimulator to bin/release ***" &&
-  cp $BUILDDIR/MasterSimulator/MasterSimulator ../../bin/release/MasterSimulator
+# copy for Linux/Unix builds
+if [ -e $BUILDDIR/$FMU_SHARED_LIB_NAME.so ]; then
+  cp $BUILDDIR/$FMU_SHARED_LIB_NAME.so ../bin/release/$FMU_TARGET_LIB_NAME.so &&
+  echo "Copied $FMU_TARGET_LIB_NAME.so to bin/release ***"
 fi &&
-if [ -e $BUILDDIR/MasterSimulatorUI/MasterSimulatorUI ]; then
-  echo "*** Copying MasterSimulatorUI to bin/release ***" &&
-  cp $BUILDDIR/MasterSimulatorUI/MasterSimulatorUI ../../bin/release/MasterSimulatorUI
-fi &&
-if [ -e $BUILDDIR/MasterSimulatorUI/MasterSimulatorUI.app ]; then
-  if [ -e ../../bin/release/MasterSimulatorUI.app ]; then
-    rm -rf ../../bin/release/MasterSimulatorUI.app
-  fi &&
-  echo "*** Copying MasterSimulatorUI.app to bin/release ***" &&
-  cp -r $BUILDDIR/MasterSimulatorUI/MasterSimulatorUI.app ../../bin/release/MasterSimulatorUI.app
-fi &&
-
-echo "*** Copying TestFMUs to bin/release ***" &&
-if [ -e $BUILDDIR/MasterSimulatorUI/MasterSimulatorUI.app ]; then
-  cp $BUILDDIR/Math003Part1/libMath003Part1.dylib ../../bin/release/libMath003Part1.dylib &&
-  cp $BUILDDIR/Math003Part2/libMath003Part2.dylib ../../bin/release/libMath003Part2.dylib &&
-  cp $BUILDDIR/Math003Part3/libMath003Part3.dylib ../../bin/release/libMath003Part3.dylib &&
-  cp $BUILDDIR/LotkaVolterraPrey/libLotkaVolterraPrey.dylib ../../bin/release/libLotkaVolterraPrey.dylib &&
-  cp $BUILDDIR/LotkaVolterraPredator/libLotkaVolterraPredator.dylib ../../bin/release/libLotkaVolterraPredator.dylib
-else
-  cp $BUILDDIR/Math003Part1/libMath003Part1.so ../../bin/release/libMath003Part1.so &&
-  cp $BUILDDIR/Math003Part2/libMath003Part2.so ../../bin/release/libMath003Part2.so &&
-  cp $BUILDDIR/Math003Part3/libMath003Part3.so ../../bin/release/libMath003Part3.so &&
-  cp $BUILDDIR/LotkaVolterraPrey/libLotkaVolterraPrey.so ../../bin/release/libLotkaVolterraPrey.so &&
-  cp $BUILDDIR/LotkaVolterraPredator/libLotkaVolterraPredator.so ../../bin/release/libLotkaVolterraPredator.so
-fi &&
-
-echo "*** Build MasterSimulator ***" &&
-if [[ $SKIP_TESTS = "false"  ]];
-then
-./run_tests.sh
+# copy for Mac builds
+if [ -e $BUILDDIR/$FMU_SHARED_LIB_NAME.dylib ]; then
+  cp $BUILDDIR/$FMU_SHARED_LIB_NAME.dylib ../bin/release/$FMU_TARGET_LIB_NAME.dylib &&
+  echo "Copied $FMU_TARGET_LIB_NAME.dylib to bin/release ***"
 fi
-
-echo "*** Generating TEST FMUs ***" &&
-(cd ../../TestFMUs;./generate_FMUs.sh)
-

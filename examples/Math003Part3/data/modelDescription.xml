@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fmiModelDescription
+	fmiVersion="2.0"
+	modelName="Part3"
+	guid="{471a3b52-4923-44d8-ab4a-fcdb813c7324}"
+	description="Part3 of Math003 Test Case"
+	generationTool="C++ Code using FMI support functions from IBK@TU Dresden"
+	generationDateAndTime="2018-08-01T12:49:19Z"
+	variableNamingConvention="structured"
+	numberOfEventIndicators="0">
+
+	<!-- The following properties are the defaults and can be omitted
+		needsExecutionTool="false"
+		canBeInstantiatedOnlyOncePerProcess="false"
+		providesDirectionalDerivative="false"
+
+		CoSim only:
+		canRunAsynchronuously = "false"
+
+	-->
+
+	<ModelExchange
+		modelIdentifier="Part3"
+		completedlntegratorStepNotNeeded="true"
+		canNotUseMemoryManagementFunctions="true"
+		canGetAndSetFMUstate="true"
+		canSerializeFMUstate="true"
+	/>
+
+	<CoSimulation
+		modelIdentifier="Part3"
+		canHandleVariableCommunicationStepSize="true"
+		canInterpolateInputs="false"
+		maxOutputDerivativeOrder="0"
+		canNotUseMemoryManagementFunctions="true"
+		canGetAndSetFMUstate="true"
+		canSerializeFMUstate="true"
+	/>
+
+	<LogCategories>
+		<Category name="logStatusWarning" />
+		<Category name="logStatusError" />
+		<Category name="logAll" />
+		<Category name="logFmi2Call" />
+	</LogCategories>
+
+	<DefaultExperiment startTime="0.0" stopTime="10.0" tolerance="1e-06"/>
+
+	<ModelVariables>
+
+		<!-- For input variables we need to give a 'start' attribute -->
+		<!-- For output variables with initial="exact" we need to give a 'start' attribute -->
+
+		<!-- Index of variable = "1" -->
+		<ScalarVariable
+			name="x3"
+			valueReference="3"
+			variability="continuous"
+			causality="input">
+			<Real start="0.0"/>
+		</ScalarVariable>
+
+		<!-- Index of variable = "2" -->
+		<ScalarVariable
+			name="x4"
+			valueReference="4"
+			variability="continuous"
+			causality="output"
+			initial="exact">
+			<Real start="0.0"/>
+		</ScalarVariable>
+
+	</ModelVariables>
+
+	<ModelStructure>
+		<Outputs>
+			<!-- dependencies must be defined for all output quantities. 'dependencyKind' is only needed
+				when some dependencies are constant factors or parameters.
+			-->
+			<Unknown index="2" dependencies="1"/>
+		</Outputs>
+	</ModelStructure>
+
+</fmiModelDescription>
+

@@ -135,11 +135,11 @@ cd $BUILD_SCRIPT_DIR &&
 mkdir -p ../bin/release &&
 # copy for Linux/Unix builds
 if [ -e $BUILDDIR/$FMU_SHARED_LIB_NAME.so ]; then
-  cp $BUILDDIR/$FMU_SHARED_LIB_NAME.so.$FMU_SHARED_LIB_VERSION ../bin/release/$FMU_SHARED_LIB_NAME.so$FMU_SHARED_LIB_VERSION &&
+  cp $BUILDDIR/$FMU_SHARED_LIB_NAME.so.$FMU_SHARED_LIB_VERSION ../bin/release/$FMU_SHARED_LIB_NAME.so.$FMU_SHARED_LIB_VERSION &&
   echo "Copied $FMU_SHARED_LIB_NAME.so.$FMU_SHARED_LIB_VERSION to bin/release ***"
 fi &&
 # copy for Mac builds
 if [ -e $BUILDDIR/$FMU_SHARED_LIB_NAME.dylib ]; then
-  cp $BUILDDIR/$FMU_SHARED_LIB_NAME.dylib.$FMU_SHARED_LIB_VERSION ../bin/release/$FMU_SHARED_LIB_NAME.dylib.$FMU_SHARED_LIB_VERSION &&
-  echo "Copied $FMU_SHARED_LIB_NAME.dylib.$FMU_SHARED_LIB_VERSION to bin/release ***"
+  cp $BUILDDIR/$FMU_SHARED_LIB_NAME.$FMU_SHARED_LIB_VERSION.dylib ../bin/release/$FMU_SHARED_LIB_NAME.$FMU_SHARED_LIB_VERSION.dylib &&
+  echo "Copied $FMU_SHARED_LIB_NAME.$FMU_SHARED_LIB_VERSION.dylib to bin/release ***"
 fi

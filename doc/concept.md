@@ -9,4 +9,6 @@
 ## Program Details
   * Make a new directory
   * Copy all the files from user#s directory
-  *
+
+To do
+create sub-dirv data/template

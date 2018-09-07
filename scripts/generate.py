@@ -1,6 +1,8 @@
 import os
 import sys
 import shutil
+import uuid
+
 
 #create new root folder with the name given in "New_Name"
 def create_folder(adrs):
@@ -17,6 +19,11 @@ def rename_folders_files(cwd, oldpath, targetdir, oldname, newname):
     dst = ""
     shutil.copytree(cwd + "/" + oldpath + "/"+ oldname, targetdir)
     print("Copying directory structure into new root directory!!!!")
+    
+    # generate global unique identifier ID
+    guid=uuid.uuid1()
+    
+        
     for root, dircs, files in os.walk(targetdir):
         for dirc in dircs:
             if oldname in dirc:
@@ -27,13 +34,32 @@ def rename_folders_files(cwd, oldpath, targetdir, oldname, newname):
             #else:
                 #print("no match")
         for file in files:
+            
+            # compose full file path
             src = os.path.join(root,file)
+            
+            # read file into memory, variable 'data'
             fobj=open(src,'r')
             data=fobj.read()
             fobj.close()
+
+            # generic data adjustment
+            data = data.replace(oldname,newname)            
+            
+            # process data depending on file type
+            if file == "modelDescription.xml":
+                guidstr="$$GUID$$"
+                data = data.replace(guidstr, str(guid))                
+            if file=="FMIProject.cpp":
+                guidstr="$$GUID$$"
+                data = data.replace(guidstr, str(guid))            
+            
+            #finally, write data back to file
+            
             fobj=open(src,'w')
-            fobj.write(data.replace(oldname,newname))
+            fobj.write(data)
             fobj.close()
+            
             if oldname in file:
                 dst = os.path.join(root,file.replace(oldname, newname))
                 os.rename(src,dst)
@@ -59,7 +85,7 @@ def generateFMU(FMUIDName):
     scriptpath = os.path.abspath(os.path.dirname(sys.argv[0]))
     print scriptpath
     
-    oldname = "Math003Part3" #Old name of files and folders
+    oldname = "FMIProject" #Old name of files and folders
     oldpath = "../data" 
     cwd=os.getcwd()
     
@@ -69,3 +95,14 @@ def generateFMU(FMUIDName):
         rename_folders_files(cwd, oldpath, targetdir, oldname, newname)
     else:
         print ("This is an original file")
+#def GUID():
+    #seed = random.getrandsbits(32)
+    #while True:
+        #yield seed
+        #see+=1
+
+#unique=GUID()
+
+#print unique
+
+       

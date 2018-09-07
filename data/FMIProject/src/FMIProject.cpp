@@ -29,7 +29,7 @@
 // *** Variables and functions to be implemented in user code. ***
 
 // *** GUID that uniquely identifies this FMU code
-const char * const InstanceData::GUID = "{471a3b52-4923-44d8-ab4a-fcdb813c7324}";
+const char * const InstanceData::GUID = "{$$GUID$$}";
 
 // *** Factory function, creates model specific instance of InstanceData-derived class
 InstanceData * InstanceData::create() {

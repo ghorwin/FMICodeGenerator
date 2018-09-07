@@ -48,11 +48,10 @@ def rename_folders_files(cwd, oldpath, targetdir, oldname, newname):
             
             # process data depending on file type
             if file == "modelDescription.xml":
-                guidstr="$$GUID$$"
-                data = data.replace(guidstr, str(guid))                
+#                data = adjust_model_description(data, str(guid), description)
+                data = data.replace("$$GUID$$", str(guid))                
             if file=="FMIProject.cpp":
-                guidstr="$$GUID$$"
-                data = data.replace(guidstr, str(guid))            
+                data = data.replace("$$GUID$$", str(guid))            
             
             #finally, write data back to file
             

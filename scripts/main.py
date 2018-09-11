@@ -1,8 +1,10 @@
+#!/usr/bin/python
+
 import argparse
 from generate import generateFMU
 
 parser = argparse.ArgumentParser()
-parser.add_argument("FMUIDName",type=str,help="ID Name of FMU / Model Name")
+parser.add_argument("ModelName", type=str, help="ID Name of FMU, will be used for directory names, generated FMU name and model name.")
 args = parser.parse_args()
 
 # TODO : get other config options
@@ -13,5 +15,5 @@ args = parser.parse_args()
 # call function of generator to create model
 
 
-generateFMU(args.FMUIDName)
+generateFMU(args.ModelName)
 

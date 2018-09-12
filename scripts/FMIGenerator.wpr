@@ -4,10 +4,11 @@
 # Wing IDE project file                                          #
 ##################################################################
 [project attributes]
-proj.file-list = [loc('generate.py'),
+proj.file-list = [loc('FMIGenerator.py'),
+                  loc('generate.py'),
                   loc('main.py')]
 proj.file-type = 'shared'
 proj.launch-config = {loc('main.py'): ('project',
-                                       (u'Test01',
+                                       (u'Test01\n--description "New Project"',
         ''))}
 proj.main-file = loc('main.py')

@@ -2,6 +2,9 @@ import os
 import sys
 import shutil
 import uuid
+import time
+import argparse
+import FMIGenerator
 
 
 #create new root folder with the name given in "New_Name"
@@ -14,7 +17,8 @@ def create_folder(adrs):
         shutil.rmtree(adrs)
     return
 
-def rename_folders_files(cwd, oldpath, targetdir, oldname, newname):
+# renaming of folders,files,text
+def rename_folders_files(cwd, oldpath, targetdir, oldname, newname,newdescription):
     src = ""
     dst = ""
     shutil.copytree(cwd + "/" + oldpath + "/"+ oldname, targetdir)
@@ -22,7 +26,8 @@ def rename_folders_files(cwd, oldpath, targetdir, oldname, newname):
     
     # generate global unique identifier ID
     guid=uuid.uuid1()
-    
+    # generate date and time
+    localtime = time.strftime('%Y-%m-%dT%I:%M:%SZ',time.localtime())
         
     for root, dircs, files in os.walk(targetdir):
         for dirc in dircs:
@@ -46,10 +51,11 @@ def rename_folders_files(cwd, oldpath, targetdir, oldname, newname):
             # generic data adjustment
             data = data.replace(oldname,newname)            
             
+            
             # process data depending on file type
             if file == "modelDescription.xml":
-#                data = adjust_model_description(data, str(guid), description)
-                data = data.replace("$$GUID$$", str(guid))                
+                data = FMIGenerator.adjust_model_description(data,localtime, guid)
+                               
             if file=="FMIProject.cpp":
                 data = data.replace("$$GUID$$", str(guid))            
             
@@ -67,41 +73,3 @@ def rename_folders_files(cwd, oldpath, targetdir, oldname, newname):
                 #print("no match")
     return
 
-def generateFMU(FMUIDName):
-
-    # FMUIDName is interpreted as directory name
-    # directory structure should be created relative to current working directory, so full
-    # path to new directory is:
-    
-    targetdir = os.path.join(os.getcwd(), FMUIDName)
-    print("Creating directory '{}'".format(targetdir))
-
-    # the source directory with the template files is located relative to
-    # this python script: ../data/FMIProject
-    
-    # get the path of the current python script
-    
-    scriptpath = os.path.abspath(os.path.dirname(sys.argv[0]))
-    print scriptpath
-    
-    oldname = "FMIProject" #Old name of files and folders
-    oldpath = "../data" 
-    cwd=os.getcwd()
-    
-    if FMUIDName!=oldname:
-        newname = FMUIDName     #Update the name of files and folder
-        create_folder(targetdir)
-        rename_folders_files(cwd, oldpath, targetdir, oldname, newname)
-    else:
-        print ("This is an original file")
-#def GUID():
-    #seed = random.getrandsbits(32)
-    #while True:
-        #yield seed
-        #see+=1
-
-#unique=GUID()
-
-#print unique
-
-       

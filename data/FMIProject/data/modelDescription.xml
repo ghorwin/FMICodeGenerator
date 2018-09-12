@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <fmiModelDescription
 	fmiVersion="2.0"
-	modelName="Part3"
+	modelName="$$modelName$$"
 	guid="{$$GUID$$}"
-	description="Part3 of Math003 Test Case"
+	description="$$description$$"
 	generationTool="C++ Code using FMI support functions from IBK@TU Dresden"
-	generationDateAndTime="2018-08-01T12:49:19Z"
+	generationDateAndTime="$$dateandtime$$"
 	variableNamingConvention="structured"
 	numberOfEventIndicators="0">
 

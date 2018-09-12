@@ -3,6 +3,7 @@ import sys
 import shutil
 import uuid
 import time
+import subprocess
 
 
 
@@ -11,7 +12,9 @@ class FMIGenerator():
     def _init_(self):
         self.modelName = ""
         self.description = ""
-
+        inputvar = []
+        outputvar = []
+        parameters = []
         
    #create new root folder with the name given in "New_Name"
         
@@ -117,9 +120,9 @@ class FMIGenerator():
             print ("This is an original file")
             
         # calling build.sh file
-    
-        #os.system('sh'+ 'newname/build/build.sh')
-        
+        #subprocess.call('targetdir/build', -1)
+        subprocess.call('ls',-1)
+        subprocess.run(["ls","-1","/bin/deploy"],capture_output=True)
 
     
         def adjust_model_description(self, data, time, guid):

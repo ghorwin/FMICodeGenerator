@@ -17,7 +17,7 @@
 
 #include "fmi2common/fmi2Functions.h"
 #include "fmi2common/fmi2FunctionTypes.h"
-#include "FMIProject.h"
+#include "FMI_template.h"
 
 // FMI interface variables
 
@@ -29,15 +29,15 @@
 // *** Variables and functions to be implemented in user code. ***
 
 // *** GUID that uniquely identifies this FMU code
-const char * const InstanceData::GUID = "{$$GUID$$}";
+const char * const InstanceData::GUID = "{471a3b52-4923-44d8-ab4a-fcdb813c7324}";
 
 // *** Factory function, creates model specific instance of InstanceData-derived class
 InstanceData * InstanceData::create() {
-	return new FMIProject; // caller takes ownership
+	return new FMI_template; // caller takes ownership
 }
 
 
-FMIProject::FMIProject() :
+FMI_template::FMI_template() :
 	InstanceData()
 {
 	// initialize input variables
@@ -48,12 +48,12 @@ FMIProject::FMIProject() :
 }
 
 
-FMIProject::~FMIProject() {
+FMI_template::~FMI_template() {
 }
 
 
 // create a model instance
-void FMIProject::init() {
+void FMI_template::init() {
 	logger(fmi2OK, "progress", "Starting initialization.");
 
 	if (m_modelExchange) {
@@ -76,7 +76,7 @@ void FMIProject::init() {
 }
 
 
-void FMIProject::updateIfModified() {
+void FMI_template::updateIfModified() {
 	if (!m_externalInputVarsModified)
 		return;
 	double x3 = m_realInput[FMI_INPUT_X3];
@@ -93,7 +93,7 @@ void FMIProject::updateIfModified() {
 
 
 // only for Co-simulation
-void FMIProject::integrateTo(double tCommunicationIntervalEnd) {
+void FMI_template::integrateTo(double tCommunicationIntervalEnd) {
 
 	// state of FMU before integration:
 	//   m_currentTimePoint = t_IntervalStart;
@@ -116,7 +116,7 @@ void FMIProject::integrateTo(double tCommunicationIntervalEnd) {
 }
 
 
-void FMIProject::computeFMUStateSize() {
+void FMI_template::computeFMUStateSize() {
 	// distinguish between ModelExchange and CoSimulation
 	if (m_modelExchange) {
 		// store time, y and ydot, and output
@@ -129,7 +129,7 @@ void FMIProject::computeFMUStateSize() {
 }
 
 
-void FMIProject::serializeFMUstate(void * FMUstate) {
+void FMI_template::serializeFMUstate(void * FMUstate) {
 	double * dataStart = (double*)FMUstate;
 	if (m_modelExchange) {
 		*dataStart = m_tInput;
@@ -150,7 +150,7 @@ void FMIProject::serializeFMUstate(void * FMUstate) {
 }
 
 
-void FMIProject::deserializeFMUstate(void * FMUstate) {
+void FMI_template::deserializeFMUstate(void * FMUstate) {
 	const double * dataStart = (const double*)FMUstate;
 	if (m_modelExchange) {
 		m_tInput = *dataStart;
@@ -168,11 +168,6 @@ void FMIProject::deserializeFMUstate(void * FMUstate) {
 		m_yInput[0] = *dataStart;
 		++dataStart;
 		m_realOutput[FMI_OUTPUT_X4] = *dataStart;
-	}
-}
-
-
-4] = *dataStart;
 	}
 }
 

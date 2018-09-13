@@ -1,4 +1,4 @@
-project( FMIProject )
+project( FMI_template )
 
 cmake_minimum_required(VERSION 3.5)
 
@@ -29,5 +29,4 @@ set( SO_VERSION_STRING
 set_target_properties( ${PROJECT_NAME} PROPERTIES
 	VERSION ${SO_VERSION_STRING}
 	SOVERSION ${SO_VERSION_MAJOR}
-)
 )

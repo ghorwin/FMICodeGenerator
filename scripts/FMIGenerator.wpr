@@ -8,6 +8,6 @@ proj.file-list = [loc('FMIGenerator.py'),
                   loc('main.py')]
 proj.file-type = 'shared'
 proj.launch-config = {loc('main.py'): ('project',
-                                       (u'Test08 --description "New Project"',
+                                       (u'FMI_template --description "A template project that new FMIs are based on"',
         ''))}
 proj.main-file = loc('main.py')

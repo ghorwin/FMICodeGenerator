@@ -2,7 +2,7 @@
 # Project for FMU Test/Example cases
 # ----------------------------------
 
-TARGET = FMIProject
+TARGET = FMI_template
 TEMPLATE = lib
 
 # no GUI
@@ -25,7 +25,7 @@ else {
 	}
 }
 
-#DEFINES += FMI2_FUNCTION_PREFIX=FMIProject_
+#DEFINES += FMI2_FUNCTION_PREFIX=FMI_template_
 
 unix|mac {
 	VER_MAJ = 1
@@ -39,7 +39,7 @@ INCLUDEPATH = ../../src
 SOURCES += \
 	../../src/fmi2common/fmi2Functions.cpp \
 	../../src/fmi2common/InstanceData.cpp \
-	../../src/FMIProject.cpp
+	../../src/FMI_template.cpp
 
 HEADERS += \
 	../../src/fmi2common/fmi2Functions.h \
@@ -47,9 +47,6 @@ HEADERS += \
 	../../src/fmi2common/fmi2FunctionTypes.h \
 	../../src/fmi2common/fmi2TypesPlatform.h \
 	../../src/fmi2common/InstanceData.h \
-	../../src/FMIProject.h
-
-
-rt3.h
+	../../src/FMI_template.h
 
 

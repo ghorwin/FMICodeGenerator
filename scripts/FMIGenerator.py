@@ -39,7 +39,7 @@ class FMIGenerator():
         
         cwd -- The absolute path to the current working directory.
         oldPath -- The relative path to the template data from cwd
-        targetDir -- The relative path to the user defined directory to be copied
+        targetDir -- The absolute path to the user defined directory to be copied
         oldName -- Name of the folder to be copied
         """
         
@@ -142,7 +142,7 @@ class FMIGenerator():
         scriptpath = os.path.abspath(os.path.dirname(sys.argv[0]))
         
         #Old name of files and folders
-        oldName = "FMIProject" 
+        oldName = "FMI_template" 
         
         #Old path or source path of template data
         oldPath = "../data" 
@@ -163,6 +163,7 @@ class FMIGenerator():
     
     def adjustModelDescription(self, data, time, guid):
         """ defined function to to replace modelName, description, date and time, and GUID in file script 
+        and returns the modified memory, variable 'data'.
         
         Arguments:
         

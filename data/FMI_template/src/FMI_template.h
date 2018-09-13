@@ -15,19 +15,19 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FMIProjectH
-#define FMIProjectH
+#ifndef FMI_templateH
+#define FMI_templateH
 
 #include "fmi2common/InstanceData.h"
 
 /*! This class wraps all data needed for a single instance of the FMU. */
-class FMIProject : public InstanceData {
+class FMI_template : public InstanceData {
 public:
 	/*! Initializes empty instance. */
-	FMIProject();
+	FMI_template();
 
 	/*! Destructor, writes out cached results from Therakles. */
-	~FMIProject();
+	~FMI_template();
 
 	/*! Initializes model */
 	void init();
@@ -61,7 +61,6 @@ public:
 
 	/*! Cached current time point of the FMU, defines starting point for time integration in co-simulation mode. */
 	double m_currentTimePoint;
-}; // class FMIProject
+}; // class FMI_template
 
-#endif // FMIProjectH
-Math003Part3H
+#endif // FMI_templateH

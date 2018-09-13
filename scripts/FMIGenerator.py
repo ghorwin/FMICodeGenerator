@@ -8,74 +8,98 @@ import subprocess
 
 
 class FMIGenerator():
+    """Class that encapsulates all parameters needed to generate the FMU.
     
-    def _init_(self):
-        self.modelName = ""
-        self.description = ""
-        inputvar = []
-        outputvar = []
-        parameters = []
+    Usage: create class instance, set member variables, call function generate()
+    """
+    
+    def __init__(self):
+        """ Construction, initializes member variables."""
         
-   #create new root folder with the name given in "New_Name"
+        self.m_modelName = ""
+        self.m_description = ""
+        m_inputvar = []
+        m_outputvar = []
+        m_parameters = []
         
-    def create_folder(self,adrs):
-        self.adrs=adrs
-        try:
-            os.mkdir(adrs)
-            shutil.rmtree(adrs)
-        except:
-            print("Directory already exists, replacing directory")
-            shutil.rmtree(adrs)
-        return
-
-
-   # renaming of folders,files,text
-    def rename_folders_files(self, cwd, oldpath, targetdir, oldname):
-
+        """
+        Member variables:
+        
+        m_modelName -- A user defined model name
+        m_description -- A user defined description
+        m_inputVar
+        """
+    
+        
+    def renameFoldersFiles(self, cwd, oldPath, targetDir, oldName):
+        """Copies a folder from template to the new location. Replaces the old name of directories, files 
+        and script in the files with the newly user defined name (i.e.modelName).
+        
+        Arguments:
+        
+        cwd -- The absolute path to the current working directory.
+        oldPath -- The absolute path to the template from cwd
+        targetDir -- The absolute path to the user defined directory to be copied
+        oldName -- Name of the folder to be copied
+        """
+        
         self.cwd = cwd
-        self.oldpath = oldpath
-        self.targetdir = targetdir
-        self.oldname = oldname
+        self.oldPath = oldPath
+        self.targetDir = targetDir
+        self.oldName = oldName
     
-        src = ""
-        dst = ""   
-        shutil.copytree(cwd + "/" + oldpath + "/"+ oldname, targetdir)
-        print("Copying directory structure into new root directory!!!!")
-         
-        # generate global unique identifier ID
-        guid=uuid.uuid1()
         
-        # generate date and time
+        try:
+            # Copy source folder to a new location(i.e.targetDir)
+            shutil.copytree(cwd + "/" + oldPath + "/"+ oldName, targetDir)
+            
+        except:
+            # Remove the folder, if already exist
+            shutil.rmtree(targetDir)
+            # Copy source folder to a new location(i.e.targetDir)
+            shutil.copytree(cwd + "/" + oldPath + "/"+ oldName, targetDir)
+            
+        # Generate globally unique identifier
+        guid = uuid.uuid1()
+        
+        # Generate local date and time
         localtime = time.strftime('%Y-%m-%dT%I:%M:%SZ',time.localtime())
         
+        # Path to check the name of the directories, files, script in files in new folder  
+        src = ""
+        # Path refering the directories, files, script in files after renaming in new folder
+        dst = ""
         
-        for root, dircs, files in os.walk(targetdir):
+        
+        # loop to walk through the new folder  
+        for root, dircs, files in os.walk(targetDir):
+            # loop to replace the old name of directories into user defined new name(i.e modelName)
             for dirc in dircs:
-                if oldname in dirc:
+                if oldName in dirc:
+                    # compose full path of old named directory inside the new folder
                     src = os.path.join(root,dirc)
-                    dst = os.path.join(root,dirc.replace(oldname, self.modelName))
+                    # compose full path of newly named directory inside new folder
+                    dst = os.path.join(root,dirc.replace(oldName, self.modelName))
                     os.rename(src,dst)
-                    print("Directory renamed as '{}'".format(dirc))
-                    #else:
-                        #print("no match")
-                
+    
+            # loop to replace the old name of files and in script into a new name (i.e.modelName)  
             for file in files:
                     
                 # compose full file path
                 src = os.path.join(root,file)
                     
                 # read file into memory, variable 'data'
-                fobj=open(src,'r')
-                data=fobj.read()
+                fobj = open(src,'r')
+                data = fobj.read()
                 fobj.close()
 
                 # generic data adjustment
-                data = data.replace(oldname,self.modelName)            
+                data = data.replace(oldName,self.modelName)            
                     
                     
                 # process data depending on file type
                 if file == "modelDescription.xml":
-                    data = self.adjust_model_description(data, localtime, guid)
+                    data = self.adjustModelDescription(data, localtime, guid)
                                        
                 if file=="FMIProject.cpp":
                     data = data.replace("$$GUID$$", str(guid))            
@@ -86,52 +110,70 @@ class FMIGenerator():
                 fobj.write(data)
                 fobj.close()
                     
-                if oldname in file:
-                    dst = os.path.join(root,file.replace(oldname, self.modelName))
+                if oldName in file:
+                    dst = os.path.join(root,file.replace(oldName, self.modelName))
                     os.rename(src,dst)
                     print("'{}' renamed" .format(file))
-                # else:
-                    #print("no match")
+                
         return
 
 
     def generate(self):
+        
+        """ Main function which is executed from main.py through class FMIGenerator()
+        
+        Usage: 
+            1. It calls defined function 'renameFolderFile()', to replace the old name with the 
+            new name (i.e. modelName) in directories,files, scripts. 
+            2. It calls defined function 'adjustModelDescription()', to replace modelName, description, 
+            date and time, and GUID
+        """
     
         # FMUIDName is interpreted as directory name
         # directory structure should be created relative to current working directory, so full
         # path to new directory is:
-        
-        
-        targetdir = os.path.join(os.getcwd(), self.modelName)
-        print("Creating directory '{}'".format(targetdir))
+        targetDir = os.path.join(os.getcwd(), self.modelName)
+        print("Creating directory '{}'".format(targetDir))
     
         # the source directory with the template files is located relative to
         # this python script: ../data/FMIProject
     
         # get the path of the current python script
-    
         scriptpath = os.path.abspath(os.path.dirname(sys.argv[0]))
-    
-        oldname = "FMIProject" #Old name of files and folders
-        oldpath = "../data" 
+        
+        #Old name of files and folders
+        oldName = "FMIProject" 
+        
+        #Old path or source path of template
+        oldPath = "../data" 
+        
+        # The absolute path to the current working directory
         cwd=os.getcwd()
     
-        if self.modelName!=oldname:
-            self.create_folder(targetdir)
-            self.rename_folders_files(cwd, oldpath, targetdir, oldname)
+        if self.modelName!=oldName:
+            self.renameFoldersFiles(cwd, oldPath, targetDir, oldName)
         else:
             print ("This is an original file")
             
         # calling build.sh file
-        #subprocess.call('targetdir/build', -1)
+        #subprocess.call('targetDir/build', -1)
         #subprocess.call('ls',-1)
         #subprocess.run(["ls","-1","/bin/deploy"],capture_output=True)
 
     
-    def adjust_model_description(self, data, time, guid):
+    def adjustModelDescription(self, data, time, guid):
+        """ defined function to to replace modelName, description, date and time, and GUID in file script 
+        
+        Arguments:
+        
+        data -- read file into memory
+        time -- generated localtime(format:2018-09-13T11:59:46Z)
+        guid -- globally unique identifier
+        """
         self.data = data
         self.time = time
         self.guid = guid
+        
         data = data.replace("$$description$$", self.description)
         data = data.replace("$$modelName$$",self.modelName)    
         data = data.replace("$$dateandtime$$",time)

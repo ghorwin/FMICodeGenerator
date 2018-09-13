@@ -5,10 +5,9 @@
 ##################################################################
 [project attributes]
 proj.file-list = [loc('FMIGenerator.py'),
-                  loc('generate.py'),
                   loc('main.py')]
 proj.file-type = 'shared'
 proj.launch-config = {loc('main.py'): ('project',
-                                       (u'Test01\n--description "New Project"',
+                                       (u'Test08 --description "New Project"',
         ''))}
 proj.main-file = loc('main.py')

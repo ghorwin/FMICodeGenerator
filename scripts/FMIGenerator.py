@@ -21,11 +21,11 @@ class FMIGenerator():
     def create_folder(self,adrs):
         self.adrs=adrs
         try:
-                os.mkdir(adrs)
-                shutil.rmtree(adrs)
+            os.mkdir(adrs)
+            shutil.rmtree(adrs)
         except:
-                print("Directory already exists, replacing directory")
-                shutil.rmtree(adrs)
+            print("Directory already exists, replacing directory")
+            shutil.rmtree(adrs)
         return
 
 
@@ -41,55 +41,58 @@ class FMIGenerator():
         dst = ""   
         shutil.copytree(cwd + "/" + oldpath + "/"+ oldname, targetdir)
         print("Copying directory structure into new root directory!!!!")
-            
+         
         # generate global unique identifier ID
         guid=uuid.uuid1()
+        
         # generate date and time
         localtime = time.strftime('%Y-%m-%dT%I:%M:%SZ',time.localtime())
-                
+        
+        
         for root, dircs, files in os.walk(targetdir):
             for dirc in dircs:
                 if oldname in dirc:
-                        src = os.path.join(root,dirc)
-                        dst = os.path.join(root,dirc.replace(oldname, self.modelName))
-                        os.rename(src,dst)
-                        print("Directory renamed as '{}'".format(dirc))
+                    src = os.path.join(root,dirc)
+                    dst = os.path.join(root,dirc.replace(oldname, self.modelName))
+                    os.rename(src,dst)
+                    print("Directory renamed as '{}'".format(dirc))
                     #else:
                         #print("no match")
-                for file in files:
+                
+            for file in files:
                     
-                    # compose full file path
-                    src = os.path.join(root,file)
+                # compose full file path
+                src = os.path.join(root,file)
                     
-                    # read file into memory, variable 'data'
-                    fobj=open(src,'r')
-                    data=fobj.read()
-                    fobj.close()
+                # read file into memory, variable 'data'
+                fobj=open(src,'r')
+                data=fobj.read()
+                fobj.close()
 
-                    # generic data adjustment
-                    data = data.replace(oldname,self.modelName)            
+                # generic data adjustment
+                data = data.replace(oldname,self.modelName)            
                     
                     
-                    # process data depending on file type
-                    if file == "modelDescription.xml":
-                        data = FMIGenerator.adjust_model_description(data, localtime, guid)
+                # process data depending on file type
+                if file == "modelDescription.xml":
+                    data = self.adjust_model_description(data, localtime, guid)
                                        
-                    if file=="FMIProject.cpp":
-                        data = data.replace("$$GUID$$", str(guid))            
+                if file=="FMIProject.cpp":
+                    data = data.replace("$$GUID$$", str(guid))            
                     
-                    #finally, write data back to file
+                #finally, write data back to file
                     
-                    fobj=open(src,'w')
-                    fobj.write(data)
-                    fobj.close()
+                fobj=open(src,'w')
+                fobj.write(data)
+                fobj.close()
                     
-                    if oldname in file:
-                        dst = os.path.join(root,file.replace(oldname, self.modelName))
-                        os.rename(src,dst)
-                        print("'{}' renamed" .format(file))
-                   # else:
-                        #print("no match")
-            return
+                if oldname in file:
+                    dst = os.path.join(root,file.replace(oldname, self.modelName))
+                    os.rename(src,dst)
+                    print("'{}' renamed" .format(file))
+                # else:
+                    #print("no match")
+        return
 
 
     def generate(self):
@@ -121,19 +124,19 @@ class FMIGenerator():
             
         # calling build.sh file
         #subprocess.call('targetdir/build', -1)
-        subprocess.call('ls',-1)
-        subprocess.run(["ls","-1","/bin/deploy"],capture_output=True)
+        #subprocess.call('ls',-1)
+        #subprocess.run(["ls","-1","/bin/deploy"],capture_output=True)
 
     
-        def adjust_model_description(self, data, time, guid):
-                self.data = data
-                self.time = time
-                self.guid = guid
-                data = data.replace("$$description$$", self.description)
-                data = data.replace("$$modelName$$",self.modelName)    
-                data = data.replace("$$dateandtime$$",time)
-                data = data.replace("$$GUID$$", str(guid))
-                return data 
+    def adjust_model_description(self, data, time, guid):
+        self.data = data
+        self.time = time
+        self.guid = guid
+        data = data.replace("$$description$$", self.description)
+        data = data.replace("$$modelName$$",self.modelName)    
+        data = data.replace("$$dateandtime$$",time)
+        data = data.replace("$$GUID$$", str(guid))
+        return data 
     
     
     

@@ -32,14 +32,14 @@ class FMIGenerator():
     
         
     def renameFoldersFiles(self, cwd, oldPath, targetDir, oldName):
-        """Copies a folder from template to the new location. Replaces the old name of directories, files 
+        """Copies a folder from template data to the new location. Replaces the old name of directories, files 
         and script in the files with the newly user defined name (i.e.modelName).
         
         Arguments:
         
         cwd -- The absolute path to the current working directory.
-        oldPath -- The absolute path to the template from cwd
-        targetDir -- The absolute path to the user defined directory to be copied
+        oldPath -- The relative path to the template data from cwd
+        targetDir -- The relative path to the user defined directory to be copied
         oldName -- Name of the folder to be copied
         """
         
@@ -120,7 +120,7 @@ class FMIGenerator():
 
     def generate(self):
         
-        """ Main function which is executed from main.py through class FMIGenerator()
+        """ Function which is executed from main.py through class FMIGenerator()
         
         Usage: 
             1. It calls defined function 'renameFolderFile()', to replace the old name with the 
@@ -144,7 +144,7 @@ class FMIGenerator():
         #Old name of files and folders
         oldName = "FMIProject" 
         
-        #Old path or source path of template
+        #Old path or source path of template data
         oldPath = "../data" 
         
         # The absolute path to the current working directory
@@ -174,6 +174,7 @@ class FMIGenerator():
         self.time = time
         self.guid = guid
         
+
         data = data.replace("$$description$$", self.description)
         data = data.replace("$$modelName$$",self.modelName)    
         data = data.replace("$$dateandtime$$",time)

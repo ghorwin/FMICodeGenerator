@@ -58,7 +58,7 @@ Only Tabs (usually displayed with 4 spaces)
 
 ### Code documentation
 
-Python doc strings according to PEP 257.
+Python doc strings according to PEP 257 (see https://www.python.org/dev/peps/pep-0257).
 
 ### Variable and Function namings
 

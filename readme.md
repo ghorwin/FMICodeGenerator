@@ -81,7 +81,7 @@ class ExampleClass:
     Class names (and type names in general) should be in camel-case and start with a capital letter.
     """
     
-    def _init_(self):
+    def __init__(self):
         """Construction, initializes member variables.
         Note prefix m_ of member variables!
         """

@@ -1,6 +1,7 @@
 import os
 import sys
 import shutil
+from shutil import *
 import uuid
 import time
 import subprocess
@@ -50,15 +51,19 @@ class FMIGenerator():
     
         
         try:
+            # check if the directory exists?
+            # check whether it crashes
+            # throw an error message
+            # check if you can only change the modified files
             # Copy source folder to a new location(i.e.targetDir)
             shutil.copytree(cwd + "/" + oldPath + "/"+ oldName, targetDir)
-            
+            os.utime(targetDir,None)
         except:
             # Remove the folder, if already exist
             shutil.rmtree(targetDir)
             # Copy source folder to a new location(i.e.targetDir)
             shutil.copytree(cwd + "/" + oldPath + "/"+ oldName, targetDir)
-            
+            os.utime(targetDir,None)
         # Generate globally unique identifier
         guid = uuid.uuid1()
         
@@ -74,6 +79,7 @@ class FMIGenerator():
         # loop to walk through the new folder  
         for root, dircs, files in os.walk(targetDir):
             # loop to replace the old name of directories into user defined new name(i.e modelName)
+            os.utime(root,None)
             for dirc in dircs:
                 if oldName in dirc:
                     # compose full path of old named directory inside the new folder
@@ -81,6 +87,7 @@ class FMIGenerator():
                     # compose full path of newly named directory inside new folder
                     dst = os.path.join(root,dirc.replace(oldName, self.modelName))
                     os.rename(src,dst)
+                    
     
             # loop to replace the old name of files and in script into a new name (i.e.modelName)  
             for file in files:

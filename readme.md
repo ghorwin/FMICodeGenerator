@@ -58,7 +58,7 @@ Only Tabs (usually displayed with 4 spaces)
 
 ### Code documentation
 
-Python doc strings according to PEP 257.
+Python doc strings according to PEP 257 (see https://www.python.org/dev/peps/pep-0257).
 
 ### Variable and Function namings
 
@@ -71,3 +71,35 @@ Python doc strings according to PEP 257.
 - external documentation (not in source code files) should go into the `doc` directory
 - where appropriate, use markdown files  (extension `.md`)
 - longer technical docs use Lyx/Latex (https://www.lyx.org/Home)
+
+### Example
+
+```python
+
+class ExampleClass:
+    """This class serves as coding style and documentation style example.
+    Class names (and type names in general) should be in camel-case and start with a capital letter.
+    """
+    
+    def __init__(self):
+        """Construction, initializes member variables.
+        Note prefix m_ of member variables!
+        """
+        
+        self.m_someDataMember = ""
+        self.m_someList = []
+        
+    def doSomthing(self, firstNumber, someString):
+        """Member function names should be in camel case, starting with a lower-case letter.
+        Function documentation should include documentation of arguments.
+        
+        Arguments:
+        firstNumber -- A number between 0 and 10
+        someString -- A descriptive string or...
+        """
+        
+        # document pieces of code with simple comments
+        print someString
+        print ("{} with {} values").format(someString, firstNumber)
+```
+   

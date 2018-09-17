@@ -5,7 +5,8 @@ from shutil import *
 import uuid
 import time
 import subprocess
-
+import send2trash as st
+import datetime
 
 
 class FMIGenerator():
@@ -50,19 +51,33 @@ class FMIGenerator():
         self.oldName = oldName
     
         
-        try:
+        #try:
             # check if the directory exists?
             # check whether it crashes
             # throw an error message
             # check if you can only change the modified files
             # Copy source folder to a new location(i.e.targetDir)
-            shutil.copytree(cwd + "/" + oldPath + "/"+ oldName, targetDir)
-            os.utime(targetDir,None)
+            #if self.modelName==self.modelname:
+            
+            
+           # shutil.copytree(cwd + "/" + oldPath + "/"+ oldName, targetDir)
+           # os.utime(targetDir,None)
+                
+        #except:              
+        try:
+            # Check if the folder already exist with the same name
+            if self.modelName!=-1:
+                # Moves the folder to thrash
+                st.send2trash(self.modelName)
+                # Copy source folder to a new location(i.e.targetDir)
+                shutil.copytree(cwd + "/" + oldPath + "/"+ oldName, targetDir)
+                # Generates modified time
+                os.utime(targetDir,None)
+
         except:
-            # Remove the folder, if already exist
-            shutil.rmtree(targetDir)
-            # Copy source folder to a new location(i.e.targetDir)
+            # Copy source folder to a new location(i.e.targetDir)           
             shutil.copytree(cwd + "/" + oldPath + "/"+ oldName, targetDir)
+            # Generates modified time
             os.utime(targetDir,None)
         # Generate globally unique identifier
         guid = uuid.uuid1()
@@ -139,9 +154,10 @@ class FMIGenerator():
         # FMUIDName is interpreted as directory name
         # directory structure should be created relative to current working directory, so full
         # path to new directory is:
+        
         targetDir = os.path.join(os.getcwd(), self.modelName)
         print("Creating directory '{}'".format(targetDir))
-    
+        
         # the source directory with the template files is located relative to
         # this python script: ../data/FMIProject
     

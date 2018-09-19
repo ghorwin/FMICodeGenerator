@@ -4,6 +4,12 @@
 # Wing IDE project file                                          #
 ##################################################################
 [project attributes]
+proj.directory-list = [{'dirloc': loc('third_party'),
+                        'excludes': (),
+                        'filter': u'*',
+                        'include_hidden': False,
+                        'recursive': True,
+                        'watch_for_changes': True}]
 proj.file-list = [loc('FMIGenerator.py'),
                   loc('main.py')]
 proj.file-type = 'shared'

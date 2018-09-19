@@ -5,8 +5,8 @@ from shutil import *
 import uuid
 import time
 import subprocess
-import send2trash as st
 import datetime
+from third_party.send2trash_master.send2trash import send2trash
 
 
 class FMIGenerator():
@@ -50,25 +50,13 @@ class FMIGenerator():
         self.targetDir = targetDir
         self.oldName = oldName
     
-        
-        #try:
-            # check if the directory exists?
-            # check whether it crashes
-            # throw an error message
-            # check if you can only change the modified files
-            # Copy source folder to a new location(i.e.targetDir)
-            #if self.modelName==self.modelname:
-            
-            
-           # shutil.copytree(cwd + "/" + oldPath + "/"+ oldName, targetDir)
-           # os.utime(targetDir,None)
-                
-        #except:              
+                   
         try:
             # Check if the folder already exist with the same name
             if self.modelName!=-1:
+                send2trash(self.modelName)
                 # Moves the folder to thrash
-                st.send2trash(self.modelName)
+                compat(self.modelName)
                 # Copy source folder to a new location(i.e.targetDir)
                 shutil.copytree(cwd + "/" + oldPath + "/"+ oldName, targetDir)
                 # Generates modified time
@@ -79,6 +67,7 @@ class FMIGenerator():
             shutil.copytree(cwd + "/" + oldPath + "/"+ oldName, targetDir)
             # Generates modified time
             os.utime(targetDir,None)
+            
         # Generate globally unique identifier
         guid = uuid.uuid1()
         

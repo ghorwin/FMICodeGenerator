@@ -6,6 +6,7 @@ import uuid
 import time
 import subprocess
 import datetime
+import platform
 from third_party.send2trash_master.send2trash import send2trash
 
 
@@ -179,20 +180,37 @@ class FMIGenerator():
         bindir = targetDir + "/build"
         
         try:
-            # start the external shell script to build the FMI library
-            pipe = subprocess.Popen(["bash", './build.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-            # retrieve output and error messages
-            outputMsg,errorMsg = pipe.communicate()  
-            # get return code
-            rc = pipe.returncode
+            # Check for the platform on which the shell script will execute
+            # Shell file execution for Windows
             
-            # if return code is different from 0, print the error message
-            if rc != 0:
-                print "Error during compilation of FMU"
-                print errorMsg
-                return
+            if platform.system() == "Windows":
+                # start the external shell script to build the FMI library
+                pipe = subprocess.Popen(["bash", './build.bat'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                
+                # retrieve output and error messages
+                outputMsg,errorMsg = pipe.communicate()  
+                # get return code
+                rc = pipe.returncode             
+                # if return code is different from 0, print the error message
+                if rc != 0:
+                    print "Error during compilation of FMU"
+                    print errorMsg
+                    return
+                else:
+                    print "Compiled FMU successfully"
+                 
+                
             else:
-                print "Compiled FMU successfully"
+                # shell file execution for Mac & Linux
+                pipe = subprocess.Popen(["bash", './build.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
+                outputMsg,errorMsg = pipe.communicate()  
+                rc = pipe.returncode             
+                
+                if rc != 0:
+                    print "Error during compilation of FMU"
+                    print errorMsg
+                    return
+                else:
+                    print "Compiled FMU successfully"
             
         except OSError as e:
             print "Error executing 'bash' command line interpreter."

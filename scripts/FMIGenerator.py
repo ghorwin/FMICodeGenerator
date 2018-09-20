@@ -18,11 +18,11 @@ class FMIGenerator():
     def __init__(self):
         """ Construction, initializes member variables."""
         
-        self.m_modelName = ""
-        self.m_description = ""
-        m_inputvar = []
-        m_outputvar = []
-        m_parameters = []
+        self.modelName = ""
+        self.description = ""
+        self.inputvar = []
+        self.outputvar = []
+        self.parameters = []
         
         """
         Member variables:
@@ -33,23 +33,20 @@ class FMIGenerator():
         """
     
         
-    def renameFoldersFiles(self, cwd, oldPath, targetDir, oldName):
+    def copyFolderFiles(self, scriptpath, oldPath, targetDir, oldName):
         """Copies a folder from template data to the new location. Replaces the old name of directories, files 
         and script in the files with the newly user defined name (i.e.modelName).
         
+        const-function.
+        
         Arguments:
         
-        cwd -- The absolute path to the current working directory.
-        oldPath -- The relative path to the template data from cwd
+        scriptpath -- The absolute path to the script.
+        oldPath -- The relative path to the template data from scriptpath
         targetDir -- The absolute path to the user defined directory to be copied
         oldName -- Name of the folder to be copied
         """
         
-        self.cwd = cwd
-        self.oldPath = oldPath
-        self.targetDir = targetDir
-        self.oldName = oldName
-    
                    
         try:
             # Check if the folder already exist with the same name
@@ -58,16 +55,27 @@ class FMIGenerator():
                 # Moves the folder to thrash
                 compat(self.modelName)
                 # Copy source folder to a new location(i.e.targetDir)
-                shutil.copytree(cwd + "/" + oldPath + "/"+ oldName, targetDir)
+                shutil.copytree(scriptpath + "/" + oldPath + "/"+ oldName, targetDir)
                 # Generates modified time
                 os.utime(targetDir,None)
 
         except:
             # Copy source folder to a new location(i.e.targetDir)           
-            shutil.copytree(cwd + "/" + oldPath + "/"+ oldName, targetDir)
+            shutil.copytree(scriptpath + "/" + oldPath + "/"+ oldName, targetDir)
             # Generates modified time
             os.utime(targetDir,None)
-            
+       
+    def rename(self, targetDir, oldName):  
+        """1. It generates globally unique identifier
+           2. It generates local time
+           3. It renames all the folder,files and script from oldName with the modelName.
+           
+        Arguments:  
+           
+           targetDir -- The absolute path to the user defined directory to be copied
+           oldName -- Name of the folder to be copied
+        """
+        
         # Generate globally unique identifier
         guid = uuid.uuid1()
         
@@ -81,7 +89,7 @@ class FMIGenerator():
         
         
         # loop to walk through the new folder  
-        for root, dircs, files in os.walk(targetDir):
+        for root, dircs, files in os.walk(targetDir,oldName):
             # loop to replace the old name of directories into user defined new name(i.e modelName)
             os.utime(root,None)
             for dirc in dircs:
@@ -126,9 +134,7 @@ class FMIGenerator():
                     os.rename(src,dst)
                     print("'{}' renamed" .format(file))
                 
-        return
-
-
+    
     def generate(self):
         
         """ Function which is executed from main.py through class FMIGenerator()
@@ -163,15 +169,37 @@ class FMIGenerator():
         cwd=os.getcwd()
     
         if self.modelName!=oldName:
-            self.renameFoldersFiles(cwd, oldPath, targetDir, oldName)
+            self.copyFolderFiles(scriptpath, oldPath, targetDir, oldName)
+            self.rename(targetDir,oldName)
         else:
             print ("This is an original file")
             
-        # calling build.sh file
-        #subprocess.call('targetDir/build', -1)
-        #subprocess.call('ls',-1)
-        #subprocess.run(["ls","-1","/bin/deploy"],capture_output=True)
-
+        #calling build.sh file
+        # generate path to /bin subdir
+        bindir = targetDir + "/build"
+        
+        try:
+            # start the external shell script to build the FMI library
+            pipe = subprocess.Popen(["bash", './build.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+            # retrieve output and error messages
+            outputMsg,errorMsg = pipe.communicate()  
+            # get return code
+            rc = pipe.returncode
+            
+            # if return code is different from 0, print the error message
+            if rc != 0:
+                print "Error during compilation of FMU"
+                print errorMsg
+                return
+            else:
+                print "Compiled FMU successfully"
+            
+        except OSError as e:
+            print "Error executing 'bash' command line interpreter."
+            return
+        
+        # continue with script (now that FMI library is available)
+        
     
     def adjustModelDescription(self, data, time, guid):
         """ defined function to to replace modelName, description, date and time, and GUID in file script 
@@ -187,11 +215,11 @@ class FMIGenerator():
         self.time = time
         self.guid = guid
         
-
+        data = data.replace("$$dateandtime$$",time)
+        data = data.replace("$$GUID$$", str(guid))        
         data = data.replace("$$description$$", self.description)
         data = data.replace("$$modelName$$",self.modelName)    
-        data = data.replace("$$dateandtime$$",time)
-        data = data.replace("$$GUID$$", str(guid))
+        
         return data 
     
     

@@ -13,11 +13,14 @@
 #   [verbose]					enable cmake to call verbose makefiles
 
 # FMU-specific variables - set by code generator
+FMU_MODEL_NAME=Math003Part3
 FMU_SHARED_LIB_NAME=libMath003Part3
 FMU_SHARED_LIB_VERSION=1.0.0
 
+# get script location
 BUILD_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-CMAKELISTSDIR=$(pwd)/../projects/cmake
+# get directory of CMakeLists.txt file
+CMAKELISTSDIR=$BUILD_SCRIPT_DIR/../projects/cmake
 BUILDDIR="bb"
 
 # set defaults
@@ -135,11 +138,11 @@ cd $BUILD_SCRIPT_DIR &&
 mkdir -p ../bin/release &&
 # copy for Linux/Unix builds
 if [ -e $BUILDDIR/$FMU_SHARED_LIB_NAME.so ]; then
-  cp $BUILDDIR/$FMU_SHARED_LIB_NAME.so.$FMU_SHARED_LIB_VERSION ../bin/release/$FMU_SHARED_LIB_NAME.so.$FMU_SHARED_LIB_VERSION &&
-  echo "Copied $FMU_SHARED_LIB_NAME.so.$FMU_SHARED_LIB_VERSION to bin/release ***"
+  cp $BUILDDIR/$FMU_SHARED_LIB_NAME.so.$FMU_SHARED_LIB_VERSION ../bin/release/$FMU_MODEL_NAME.so &&
+  echo "Copied $FMU_MODEL_NAME.so to bin/release ***"
 fi &&
 # copy for Mac builds
 if [ -e $BUILDDIR/$FMU_SHARED_LIB_NAME.dylib ]; then
-  cp $BUILDDIR/$FMU_SHARED_LIB_NAME.$FMU_SHARED_LIB_VERSION.dylib ../bin/release/$FMU_SHARED_LIB_NAME.$FMU_SHARED_LIB_VERSION.dylib &&
-  echo "Copied $FMU_SHARED_LIB_NAME.$FMU_SHARED_LIB_VERSION.dylib to bin/release ***"
+  cp $BUILDDIR/$FMU_SHARED_LIB_NAME.$FMU_SHARED_LIB_VERSION.dylib ../bin/release/$FMU_MODEL_NAME.dylib &&
+  echo "Copied $FMU_MODEL_NAME.dylib to bin/release ***"
 fi

@@ -4,13 +4,13 @@
 
 # remove target directory if it exists
 if [ -d Math003Part3 ]; then
-  rm -rf Math003Part3 &&
-fi
+  rm -rf Math003Part3 
+fi &&
 
 # remove target FMU if it exists
-if [ -f ../Math003Part3.fmu ]; then
-    rm ../Math003Part3.fmu &&
-fi
+if [ -f Math003Part3.fmu ]; then
+    rm Math003Part3.fmu 
+fi &&
 
 # create subdir and change into it
 mkdir -p Math003Part3 &&
@@ -20,7 +20,7 @@ cd Math003Part3 &&
 mkdir -p binaries/linux64 &&
 
 # copy shared library, we expect it to be already renamed correctly
-cp ../../bin/release/libMath003Part1.so binaries/linux64/Math003Part3.so &&
+cp ../../bin/release/Math003Part3.so binaries/linux64/Math003Part3.so &&
 cp ../../data/modelDescription.xml . &&
 
 # create zip archive

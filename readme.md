@@ -13,6 +13,8 @@ However, the process of setting up the FMU (core files, `modelDescription.xml`, 
 
 ## The (anticipated) use of the FMI Code Generator
 
+### Create a fully working FMU source code template
+
 Creating the barebone of an FMU should be as simple as that:
 
 1. clone this repository
@@ -21,21 +23,26 @@ Creating the barebone of an FMU should be as simple as that:
 
 Once the generator has finished, you have a fully working FMU source code with matching `modelDescription.xml` and can build it cross-platform with a CMake-based build system.
 
-This works as follows (for Linux/Unix/Mac):
+### Develop FMU-specific functionality
+
+The template directory structure contains build system files for CMake and Qt-qmake. With CMake, you can easily generate makefiles for various compilers and development environments. With the pro-files you can directly start developing with Qt Creator (even though the FMU code itself is plain C/C++ code without Qt dependencies).
+
+### Generate fmu and deploy
+
+The template directory structure contains a deployment script/batch file (either `<FmuModelName>/build/deploy.sh` or `<FmuModelName>/build/deploy.bat`).
+
+You may want to adjust the `deploy.sh` script to add, for example, own resources.
+
+Deployment works as follows (for Linux/Unix/Mac):
 
 ```bash
 # change into generated directory structure
-cd <MyFmuName>/build
+cd <FmuModelName>/build
 # build the FMU in release mode
 ./build.sh release
 # deploy the FMU, e.g. package the FMU in the zipped directory structure
 ./deploy.sh
 ```
-
-Typically, you may want to hack in your actual code into the prepared functions first. And you may want to adjust the `deploy.sh` script to add, for example, own resources.
-
-
-
 
 # Information and Coding Guidelines
 
@@ -44,9 +51,10 @@ Typically, you may want to hack in your actual code into the prepared functions 
     bin                 - batch/shell scripts to simplify/automate FMU generation
     data                - resources and template files
     doc                 - documentation, also includes examples
+    examples            - example directory structures (this is what the FMI generator should produce)
     scripts             - the actual python scripts
     scripts/third_party - external library and scripts
-    tests               - holds autogenerate FMUs and co-simulation tests to check for compliance
+    third_party         - external tools like the compliance checker
 
 ## Coding Conventions
 

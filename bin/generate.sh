@@ -1,4 +1,6 @@
 #!/bin/bash
 
-python ../scripts/main.py $*
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+python $DIR/../scripts/main.py $*
 

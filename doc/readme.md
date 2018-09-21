@@ -1,29 +1,8 @@
 # Basic concepts
 
-## Program name: Changing the Name
+Anticipated workflow:
 
-## Input Data
-  * Get directory from the user
-  * Get the name from the user (Specified name:FMIProject)
-
-## Program Details
-  * Make a new sub-directory as template
-  * Copy all the files from user's directory to the new directory
-  * Rename the directory and files with old name to the new name
-
-# To do
-create sub-dirv data/template
-
-
-
-# Usage
-
-```bash
-# suppose this command is executed from /home/fasih/
-python git/FMICodeGenerator/scripts/main.py MyFMU
-```
-
-Questions:
-
-* where is the directory `MyFMU` created?
-* where is the script getting the template files and folder path from?
+1. call `generate.py` (or `generate.sh` or `generate.bat`) to create a basic directory
+   structure for FMU development with initial source code and `modelDescription.xml` file
+2. start editing C/C++ code and testing it (use prepared Qt creator project file or cmake based build)
+3. generate FMU by calling `deploy.py` (or `deploy.sh` or `deploy.bat`) to create the FMU

@@ -172,8 +172,7 @@ class FMIGenerator():
         if self.modelName!=oldName:
             self.copyFolderFiles(scriptpath, oldPath, targetDir, oldName)
             self.rename(targetDir,oldName)
-        else:
-            print ("This is an original file")
+        
             
         #calling build.sh file
         # generate path to /bin subdir
@@ -209,7 +208,7 @@ class FMIGenerator():
                     print "Error during compilation of FMU"
                     print errorMsg
                     return
-                else:
+                else:                    
                     print "Compiled FMU successfully"
             
         except OSError as e:

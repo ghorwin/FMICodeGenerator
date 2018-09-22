@@ -184,11 +184,12 @@ class FMIGenerator():
             
             if platform.system() == "Windows":
                 # start the external shell script to build the FMI library
-                pipe = subprocess.Popen(["bash", './build.bat'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                
+                pipe = subprocess.Popen(["bash", './build.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                
                 # retrieve output and error messages
                 outputMsg,errorMsg = pipe.communicate()  
                 # get return code
-                rc = pipe.returncode             
+                rc = pipe.returncode 
+		
                 # if return code is different from 0, print the error message
                 if rc != 0:
                     print "Error during compilation of FMU"
@@ -196,8 +197,28 @@ class FMIGenerator():
                     return
                 else:
                     print "Compiled FMU successfully"
-                 
-                
+		    
+		# renaming file    
+		binDir = targetDir + "/bin/release"
+		for root, dircs, files in os.walk(binDir):
+		    for file in files:
+			if file == 'lib'+ self.modelName + '.so.1.0.0':
+			    oldName = os.path.join(binDir,'lib'+ self.modelName + '.so.1.0.0')
+			    newName = os.path.join(binDir,'test001.dll')
+			    os.rename(oldName,newName)
+
+		
+		deploy = subprocess.Popen(["bash", './deploy.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
+		outputMsg,errorMsg = deploy.communicate()  
+		dc = deploy.returncode             
+	    
+		if dc != 0:
+		    print "Error during compilation of FMU"
+		    print errorMsg
+		    return
+		else:                    
+		    print "Compiled FMU successfully"	                 
+	     
             else:
                 # shell file execution for Mac & Linux
                 pipe = subprocess.Popen(["bash", './build.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
@@ -210,14 +231,38 @@ class FMIGenerator():
                     return
                 else:                    
                     print "Compiled FMU successfully"
+		
+		binDir = targetDir + "/bin/release"
+		for root, dircs, files in os.walk(binDir):
+		    for file in files:
+			if file == 'lib'+ self.modelName + '.so.1.0.0':
+ 			    oldName = os.path.join(binDir,'lib'+ self.modelName + '.so.1.0.0')
+			    # chnage of file extension depending on type of platform
+			    if platform.system() == 'Darwin':
+			        newName = os.path.join(binDir,'test001.dylib')
+			    else:
+				newName = os.path.join(binDir,'test001.so')
+			    os.rename(oldName,newName)
+
+		# shell file execution for Mac & Linux
+		deploy = subprocess.Popen(["bash", './deploy.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
+		outputMsg,errorMsg = deploy.communicate()  
+		dc = deploy.returncode             
+	    
+		if dc != 0:
+		    print "Error during compilation of FMU"
+		    print errorMsg
+		    return
+		else:                    
+		    print "Compiled FMU successfully"	
             
         except OSError as e:
             print "Error executing 'bash' command line interpreter."
             return
         
-        # continue with script (now that FMI library is available)
         
-    
+        
+   
     def adjustModelDescription(self, data, time, guid):
         """ defined function to to replace modelName, description, date and time, and GUID in file script 
         and returns the modified memory, variable 'data'.

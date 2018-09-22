@@ -203,9 +203,9 @@ class FMIGenerator():
 		for root, dircs, files in os.walk(binDir):
 		    for file in files:
 			if file == 'lib'+ self.modelName + '.so.1.0.0':
-			    oldName = os.path.join(binDir,'lib'+ self.modelName + '.so.1.0.0')
-			    newName = os.path.join(binDir,'test001.dll')
-			    os.rename(oldName,newName)
+			    oldFileName = os.path.join(binDir,'lib'+ self.modelName + '.so.1.0.0')
+			    newFileName = os.path.join(binDir,'test001.dll')
+			    os.rename(oldFileName,newFileName)
 
 		
 		deploy = subprocess.Popen(["bash", './deploy.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
@@ -236,13 +236,13 @@ class FMIGenerator():
 		for root, dircs, files in os.walk(binDir):
 		    for file in files:
 			if file == 'lib'+ self.modelName + '.so.1.0.0':
- 			    oldName = os.path.join(binDir,'lib'+ self.modelName + '.so.1.0.0')
+ 			    oldFileName = os.path.join(binDir,'lib'+ self.modelName + '.so.1.0.0')
 			    # chnage of file extension depending on type of platform
 			    if platform.system() == 'Darwin':
-			        newName = os.path.join(binDir,'test001.dylib')
+			        newFileName = os.path.join(binDir,'test001.dylib')
 			    else:
-				newName = os.path.join(binDir,'test001.so')
-			    os.rename(oldName,newName)
+				newFileName = os.path.join(binDir,'test001.so')
+			    os.rename(oldFileName,newFileName)
 
 		# shell file execution for Mac & Linux
 		deploy = subprocess.Popen(["bash", './deploy.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           

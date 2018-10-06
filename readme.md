@@ -97,7 +97,7 @@ class ExampleClass:
         self.m_someDataMember = ""
         self.m_someList = []
         
-    def doSomthing(self, firstNumber, someString):
+    def doSomething(self, firstNumber, someString):
         """Member function names should be in camel case, starting with a lower-case letter.
         Function documentation should include documentation of arguments.
         

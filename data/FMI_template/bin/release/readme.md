@@ -1,2 +1,2 @@
-Target directory for generated FMI_template.dll
+Target directory for generated shared library file.
 

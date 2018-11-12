@@ -48,8 +48,10 @@ fmiGenerator = FMIGenerator()
 
 # store command line arguments
 fmiGenerator.modelName = args.modelName
-if args.description!=None:
+if args.description != None:
 	fmiGenerator.description = args.description
+else:
+	print ("WARNING: Model description missing.")
 
 # call function of generator to create model
 fmiGenerator.generate()

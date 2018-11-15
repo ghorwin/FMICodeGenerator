@@ -246,7 +246,7 @@ class FMIGenerator():
 					for file in files:
 						if file == 'lib'+ self.modelName + '.so.1.0.0':
 							oldFileName = os.path.join(binDir,'lib'+ self.modelName + '.so.1.0.0')
-							newFileName = os.path.join(binDir,'test001.dll')
+							newFileName = os.path.join(binDir,self.modelName + '.dll')
 							os.rename(oldFileName,newFileName)
 
 
@@ -281,9 +281,9 @@ class FMIGenerator():
 							oldFileName = os.path.join(binDir,'lib'+ self.modelName + '.so.1.0.0')
 							# chnage of file extension depending on type of platform
 							if platform.system() == 'Darwin':
-								newFileName = os.path.join(binDir,'test001.dylib')
+								newFileName = os.path.join(binDir,self.modelName + '.dylib')
 							else:
-								newFileName = os.path.join(binDir,'test001.so')
+								newFileName = os.path.join(binDir,self.modelName + '.so')
 							os.rename(oldFileName,newFileName)
 
 				# shell file execution for Mac & Linux

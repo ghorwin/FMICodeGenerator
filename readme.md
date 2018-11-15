@@ -19,6 +19,11 @@ Creating the barebone of an FMU should be as simple as that:
 
 1. clone this repository
 2. run the script `generate.bat` or `generate.sh`
+
+    > # this will generate a directory structure TestFMI01 within 
+    > # your current working directory
+    > ~/git/FMICodeGenerator/bin/generate.sh TestFMI01 --description "My First Test"
+
 3. give the relevant information (model name, list of input and output vars, parameters, integration states etc.)
 
 Once the generator has finished, you have a fully working FMU source code with matching `modelDescription.xml` and can build it cross-platform with a CMake-based build system.

@@ -40,7 +40,7 @@ Once the generator has finished, you have a fully working FMU source code with m
 
 The template directory structure contains build system files for CMake and Qt-qmake. With CMake, you can easily generate makefiles for various compilers and development environments. With the pro-files you can directly start developing with Qt Creator (even though the FMU code itself is plain C/C++ code without Qt dependencies).
 
-### Generate fmu and deploy
+### Generate the FMU and deploy
 
 The template directory structure contains a deployment script/batch file (either `<FmuModelName>/build/deploy.sh` or `<FmuModelName>/build/deploy.bat`).
 

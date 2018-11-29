@@ -48,24 +48,23 @@ class FMIGenerator():
 	"""Class that encapsulates all parameters needed to generate the FMU.
 
 	Usage: create class instance, set member variables, call function generate()
-	
 	"""
 
 	def __init__(self):
 		""" Constructor, initializes member variables.
 
-        Member variables:
-
+		Member variables:
+		
 		targeName -- Target path can be relative (to current working directory) or
-		             absolute. FMU directory is created below this directory, for example:
-		                <target path>/<modelName>/
-		             By default, target path is empty which means that the subdirectory <modelName>
-		             is created directly below the current working directory.
-        modelName -- A user defined model name
-        description -- A user defined description
-        inputVars -- vector of type VarDefs with input variable definitions 
-        outputVars -- vector of type VarDefs with output variable definitions 
-        parameters -- vector of type VarDefs with parameter definitions 
+					 absolute. FMU directory is created below this directory, for example:
+					    <target path>/<modelName>/
+					 By default, target path is empty which means that the subdirectory <modelName>
+					 is created directly below the current working directory.
+		modelName -- A user defined model name
+		description -- A user defined description
+		inputVars -- vector of type VarDefs with input variable definitions 
+		outputVars -- vector of type VarDefs with output variable definitions 
+		parameters -- vector of type VarDefs with parameter definitions 
 		"""
 
 		self.targetPath = "" 
@@ -98,7 +97,7 @@ class FMIGenerator():
 		else:
 			targetDir = os.path.join(os.getcwd(), self.targetPath)
 			targetDir = os.path.join(targetDir, self.modelName)
-			
+
 		print("Target directory   : {}".format(targetDir))
 
 		# the source directory with the template files is located relative to

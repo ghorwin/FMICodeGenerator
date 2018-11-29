@@ -48,25 +48,171 @@ class FMIGenerator():
 	"""Class that encapsulates all parameters needed to generate the FMU.
 
 	Usage: create class instance, set member variables, call function generate()
+	
 	"""
 
 	def __init__(self):
-		""" Construction, initializes member variables."""
+		""" Constructor, initializes member variables.
 
-		self.modelName = ""
-		self.description = ""
-		self.inputvar = []
-		self.outputvar = []
-		self.parameters = []
-
-		"""
         Member variables:
 
-        m_modelName -- A user defined model name
-        m_description -- A user defined description
-        m_inputVar
+		targeName -- Target path can be relative (to current working directory) or
+		             absolute. FMU directory is created below this directory, for example:
+		                <target path>/<modelName>/
+		             By default, target path is empty which means that the subdirectory <modelName>
+		             is created directly below the current working directory.
+        modelName -- A user defined model name
+        description -- A user defined description
+        inputVars -- vector of type VarDefs with input variable definitions 
+        outputVars -- vector of type VarDefs with output variable definitions 
+        parameters -- vector of type VarDefs with parameter definitions 
+		"""
+
+		self.targetPath = "" 
+		
+		self.modelName = ""
+		self.description = ""
+		self.inputVars = []
+		self.outputVars = []
+		self.parameters = []
+
+
+	def generate(self):
+
+		""" Function which is executed from main.py through class FMIGenerator()
+
+        Usage: 
+            1. It calls defined function 'renameFolderFile()', to replace the old name with the 
+            new name (i.e. modelName) in directories,files, scripts. 
+            2. It calls defined function 'adjustModelDescription()', to replace modelName, description, 
+            date and time, and GUID
         """
 
+		# FMUIDName is interpreted as directory name
+		# directory structure should be created relative to current working directory, so full
+		# path to new directory is:
+
+		# compose target directory: check if self.targetPath is an absolute file path
+		if (os.path.isabs(self.targetPath)):
+			targetDir = ps.path.join(targetPath, self.modelName)
+		else:
+			targetDir = os.path.join(os.getcwd(), self.targetPath)
+			targetDir = os.path.join(targetDir, self.modelName)
+			
+		print("Target directory   : {}".format(targetDir))
+
+		# the source directory with the template files is located relative to
+		# this python script: ../data/FMIProject
+
+		# get the path of the current python script
+		scriptpath = os.path.abspath(os.path.dirname(sys.argv[0]))
+		print("Script path        : {}".format(scriptpath))
+
+		# template directory name
+		oldName = "FMI_template" 
+
+		# relative path (from script file) to resource/temperature data
+		oldPath = "../data" 
+		print("Resources location : {}".format(os.path.join(scriptpath, oldPath)))
+
+		# the absolute path to the current working directory
+		cwd = os.getcwd()
+
+		print("Copying template directory to target directory")
+		self.copyFolderFiles(scriptpath, oldPath, targetDir, oldName)
+		# user may have specified "FMI_template" as model name 
+		# (which would be weird and break the code, hence a warning)
+		if self.modelName == oldName:
+			print("WARNING: model name is same as template folder name.. this may not work!")
+
+		print ("Renaming/adjusting template files")
+		self.rename(targetDir,oldName)
+
+		# generate path to /build subdir
+		bindir = targetDir + "/build"
+
+		try:
+			# Check for the platform on which the shell script will execute
+			# Shell file execution for Windows
+
+			print("Test-building the FMU. You should first implement your FMU functionality before using the FMU!")
+			if platform.system() == "Windows":
+				# start the external shell script to build the FMI library
+				pipe = subprocess.Popen(["bash", './build.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                
+				# retrieve output and error messages
+				outputMsg,errorMsg = pipe.communicate()  
+				# get return code
+				rc = pipe.returncode 
+
+				# if return code is different from 0, print the error message
+				if rc != 0:
+					print "Error during compilation of FMU"
+					print errorMsg
+					return
+				else:
+					print "Compiled FMU successfully"
+
+				# renaming file    
+				binDir = targetDir + "/bin/release"
+				for root, dircs, files in os.walk(binDir):
+					for file in files:
+						if file == 'lib'+ self.modelName + '.so.1.0.0':
+							oldFileName = os.path.join(binDir,'lib'+ self.modelName + '.so.1.0.0')
+							newFileName = os.path.join(binDir,self.modelName + '.dll')
+							os.rename(oldFileName,newFileName)
+
+
+				deploy = subprocess.Popen(["bash", './deploy.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
+				outputMsg,errorMsg = deploy.communicate()  
+				dc = deploy.returncode             
+
+				if dc != 0:
+					print "Error during compilation of FMU"
+					print errorMsg
+					return
+				else:                    
+					print "Compiled FMU successfully"	                 
+
+			else:
+				# shell file execution for Mac & Linux
+				pipe = subprocess.Popen(["bash", './build.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
+				outputMsg,errorMsg = pipe.communicate()  
+				rc = pipe.returncode             
+
+				if rc != 0:
+					print "Error during compilation of FMU"
+					print errorMsg
+					return
+				else:                    
+					print "Compiled FMU successfully"
+
+				binDir = targetDir + "/bin/release"
+				for root, dircs, files in os.walk(binDir):
+					for file in files:
+						if file == 'lib'+ self.modelName + '.so.1.0.0':
+							oldFileName = os.path.join(binDir,'lib'+ self.modelName + '.so.1.0.0')
+							# chnage of file extension depending on type of platform
+							if platform.system() == 'Darwin':
+								newFileName = os.path.join(binDir,self.modelName + '.dylib')
+							else:
+								newFileName = os.path.join(binDir,self.modelName + '.so')
+							os.rename(oldFileName,newFileName)
+
+				# shell file execution for Mac & Linux
+				deploy = subprocess.Popen(["bash", './deploy.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
+				outputMsg,errorMsg = deploy.communicate()  
+				dc = deploy.returncode             
+
+				if dc != 0:
+					print "Error during compilation of FMU"
+					print errorMsg
+					return
+				else:                    
+					print "Compiled FMU successfully"	
+
+		except OSError as e:
+			print "Error executing 'bash' command line interpreter."
+			return
 
 	def copyFolderFiles(self, scriptpath, oldPath, targetDir, oldName):
 		"""Copies a folder from template data to the new location. Replaces the old name of directories, files 
@@ -171,136 +317,6 @@ class FMIGenerator():
 					print("'{}' renamed" .format(file))
 
 
-	def generate(self):
-
-		""" Function which is executed from main.py through class FMIGenerator()
-
-        Usage: 
-            1. It calls defined function 'renameFolderFile()', to replace the old name with the 
-            new name (i.e. modelName) in directories,files, scripts. 
-            2. It calls defined function 'adjustModelDescription()', to replace modelName, description, 
-            date and time, and GUID
-        """
-
-		# FMUIDName is interpreted as directory name
-		# directory structure should be created relative to current working directory, so full
-		# path to new directory is:
-
-		targetDir = os.path.join(os.getcwd(), self.modelName)
-		print("Target directory   : {}".format(targetDir))
-
-		# the source directory with the template files is located relative to
-		# this python script: ../data/FMIProject
-
-		# get the path of the current python script
-		scriptpath = os.path.abspath(os.path.dirname(sys.argv[0]))
-		print("Script path        : {}".format(targetDir))
-
-		# template directory name
-		oldName = "FMI_template" 
-
-		# relative path (from script file) to resource/temperature data
-		oldPath = "../data" 
-		print("Resources location : {}".format(os.path.join(scriptpath, oldPath)))
-
-		# the absolute path to the current working directory
-		cwd = os.getcwd()
-
-		print("Copying template directory to target directory")
-		self.copyFolderFiles(scriptpath, oldPath, targetDir, oldName)
-		# user may have specified "FMI_template" as model name 
-		# (which would be weird and break the code, hence a warning)
-		if self.modelName == oldName:
-			print("WARNING: model name is same as template folder name.. this may not work!")
-			
-		print ("Renaming/adjusting template files")
-		self.rename(targetDir,oldName)
-
-		# generate path to /build subdir
-		bindir = targetDir + "/build"
-
-		try:
-			# Check for the platform on which the shell script will execute
-			# Shell file execution for Windows
-
-			print("Test-building the FMU. You should first implement your FMU functionality before using the FMU!")
-			if platform.system() == "Windows":
-				# start the external shell script to build the FMI library
-				pipe = subprocess.Popen(["bash", './build.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                
-				# retrieve output and error messages
-				outputMsg,errorMsg = pipe.communicate()  
-				# get return code
-				rc = pipe.returncode 
-
-				# if return code is different from 0, print the error message
-				if rc != 0:
-					print "Error during compilation of FMU"
-					print errorMsg
-					return
-				else:
-					print "Compiled FMU successfully"
-
-				# renaming file    
-				binDir = targetDir + "/bin/release"
-				for root, dircs, files in os.walk(binDir):
-					for file in files:
-						if file == 'lib'+ self.modelName + '.so.1.0.0':
-							oldFileName = os.path.join(binDir,'lib'+ self.modelName + '.so.1.0.0')
-							newFileName = os.path.join(binDir,self.modelName + '.dll')
-							os.rename(oldFileName,newFileName)
-
-
-				deploy = subprocess.Popen(["bash", './deploy.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
-				outputMsg,errorMsg = deploy.communicate()  
-				dc = deploy.returncode             
-
-				if dc != 0:
-					print "Error during compilation of FMU"
-					print errorMsg
-					return
-				else:                    
-					print "Compiled FMU successfully"	                 
-
-			else:
-				# shell file execution for Mac & Linux
-				pipe = subprocess.Popen(["bash", './build.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
-				outputMsg,errorMsg = pipe.communicate()  
-				rc = pipe.returncode             
-
-				if rc != 0:
-					print "Error during compilation of FMU"
-					print errorMsg
-					return
-				else:                    
-					print "Compiled FMU successfully"
-
-				binDir = targetDir + "/bin/release"
-				for root, dircs, files in os.walk(binDir):
-					for file in files:
-						if file == 'lib'+ self.modelName + '.so.1.0.0':
-							oldFileName = os.path.join(binDir,'lib'+ self.modelName + '.so.1.0.0')
-							# chnage of file extension depending on type of platform
-							if platform.system() == 'Darwin':
-								newFileName = os.path.join(binDir,self.modelName + '.dylib')
-							else:
-								newFileName = os.path.join(binDir,self.modelName + '.so')
-							os.rename(oldFileName,newFileName)
-
-				# shell file execution for Mac & Linux
-				deploy = subprocess.Popen(["bash", './deploy.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
-				outputMsg,errorMsg = deploy.communicate()  
-				dc = deploy.returncode             
-
-				if dc != 0:
-					print "Error during compilation of FMU"
-					print errorMsg
-					return
-				else:                    
-					print "Compiled FMU successfully"	
-
-		except OSError as e:
-			print "Error executing 'bash' command line interpreter."
-			return
 
 
 

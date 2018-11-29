@@ -35,12 +35,12 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import argparse
-from FMIGenerator import FMIGenerator
+from FMIGenerator import *
 
 # commandline argument parser
 parser = argparse.ArgumentParser()
 parser.add_argument("modelName", type=str, help="ID Name of FMU, will be used for directory names, generated FMU name and model name.")
-parser.add_argument("--description", type=str, help="Description of FMU")
+parser.add_argument("--description", type=str, help="Description of the FMU/model")
 args = parser.parse_args()
 
 # create storage class instance

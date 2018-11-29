@@ -125,7 +125,7 @@ class FMIGenerator():
 		self.substitutePlaceholders()
 
 		print ("Test-building FMU")
-		#self.testBuild()
+		self.testBuildFMU()
 		
 		# *** Done with FMU generation ***
 
@@ -149,7 +149,6 @@ class FMIGenerator():
 		   self.copyTemplateDirectory("../data/FMI_template")
 		   # will rename "FMI_template" to "testFMU" after copying
 		"""
-
 
 		try:
 			# check if target directory exists already
@@ -256,33 +255,37 @@ class FMIGenerator():
 		return data
 
 
-	def testBuildFMU(self, targetDir):
+
+	def testBuildFMU(self):
+		"""Runs a cmake-based compilation of the generated FMU to check if the code compiles.
+		"""
+		
 		# generate path to /build subdir
-		bindir = targetDir + "/build"
+		buildDir = os.path.join(self.targetDirPath, "build")
+		binDir = os.path.join(self.targetDirPath, "bin/release")
 	
+		print("We are now test-building the FMU. You should first implement your FMU functionality and afterwards "
+		      "build and deploy the FMU!")
 		try:
-			# Check for the platform on which the shell script will execute
-			# Shell file execution for Windows
-	
-			print("Test-building the FMU. You should first implement your FMU functionality before using the FMU!")
+
+			# Different script handling based on platform
 			if platform.system() == "Windows":
-				# start the external shell script to build the FMI library
-				pipe = subprocess.Popen(["bash", './build.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                
+				
+				# call batch file to build the FMI library
+				pipe = subprocess.Popen("build.bat", creationflags=subprocess.CREATE_NEW_CONSOLE, cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                
 				# retrieve output and error messages
-				outputMsg,errorMsg = pipe.communicate()  
+				outputMsg, errorMsg = pipe.communicate()  
 				# get return code
 				rc = pipe.returncode 
 	
 				# if return code is different from 0, print the error message
 				if rc != 0:
-					print "Error during compilation of FMU"
 					print errorMsg
-					return
-				else:
-					print "Compiled FMU successfully"
+					raise RuntimeError("Error during compilation of FMU.")
+
+				print "Compiled FMU successfully"
 	
-				# renaming file    
-				binDir = targetDir + "/bin/release"
+				# renaming/moving file    
 				for root, dircs, files in os.walk(binDir):
 					for file in files:
 						if file == 'lib'+ self.modelName + '.so.1.0.0':
@@ -290,56 +293,56 @@ class FMIGenerator():
 							newFileName = os.path.join(binDir,self.modelName + '.dll')
 							os.rename(oldFileName,newFileName)
 	
-	
-				deploy = subprocess.Popen(["bash", './deploy.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
+				deploy = subprocess.Popen(["bash", './deploy.sh'], cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
 				outputMsg,errorMsg = deploy.communicate()  
 				dc = deploy.returncode             
 	
 				if dc != 0:
-					print "Error during compilation of FMU"
 					print errorMsg
-					return
-				else:                    
-					print "Compiled FMU successfully"	                 
+					raise RuntimeError("Error during compilation of FMU")
+
+				print "Compiled FMU successfully"	                 
 	
 			else:
 				# shell file execution for Mac & Linux
-				pipe = subprocess.Popen(["bash", './build.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
+				pipe = subprocess.Popen(["bash", './build.sh'], cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
 				outputMsg,errorMsg = pipe.communicate()  
 				rc = pipe.returncode             
 	
 				if rc != 0:
-					print "Error during compilation of FMU"
 					print errorMsg
-					return
-				else:                    
-					print "Compiled FMU successfully"
+					raise RuntimeError("Error during compilation of FMU")
+
+				print "Compiled FMU successfully"
 	
-				binDir = targetDir + "/bin/release"
-				for root, dircs, files in os.walk(binDir):
-					for file in files:
-						if file == 'lib'+ self.modelName + '.so.1.0.0':
-							oldFileName = os.path.join(binDir,'lib'+ self.modelName + '.so.1.0.0')
-							# chnage of file extension depending on type of platform
-							if platform.system() == 'Darwin':
-								newFileName = os.path.join(binDir,self.modelName + '.dylib')
-							else:
-								newFileName = os.path.join(binDir,self.modelName + '.so')
-							os.rename(oldFileName,newFileName)
+				if platform.system() == 'Darwin':
+					libName = "lib" + self.modelName + ".dylib.1.0.0"
+				else:
+					libName = "lib" + self.modelName + ".so.1.0.0"
+					
+				for root, dircs, files in os.walk(buildDir):
+					for f in files:
+						if f == libName:
+							oldFileName = os.path.join(root, libName)
+							newFileName = os.path.join(binDir, self.modelName + '.so')
+							os.rename(oldFileName, newFileName)
+							print ("Creating: {}".format(newFileName))
+							break
+	
+				# Deployment
 	
 				# shell file execution for Mac & Linux
-				deploy = subprocess.Popen(["bash", './deploy.sh'], cwd = bindir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
+				deploy = subprocess.Popen(["bash", './deploy.sh'], cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
 				outputMsg,errorMsg = deploy.communicate()  
 				dc = deploy.returncode             
 	
 				if dc != 0:
-					print "Error during compilation of FMU"
 					print errorMsg
-					return
-				else:                    
-					print "Compiled FMU successfully"	
+					raise RuntimeError("Error during assembly of FMU")
+
+				print ("Successfully created {}".format(self.modelName + ".fmu")	)
 	
-		except OSError as e:
-			print "Error executing 'bash' command line interpreter."
-			return
+		except Exception as e:
+			print ("Error building FMU.")
+			raise
 

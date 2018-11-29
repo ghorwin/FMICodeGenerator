@@ -122,7 +122,7 @@ class FMIGenerator():
 		self.copyTemplateDirectory(templateDirPath)
 		
 		print ("Adjusting template files (replacing placeholders)")
-		#self.subtitutePlaceholders()
+		self.subtitutePlaceholders()
 
 		print ("Test-building FMU")
 		#self.testBuild()
@@ -164,8 +164,7 @@ class FMIGenerator():
 			shutil.copytree(templatePath, self.targetDirPath)
 			# Set modified time of newly created folder
 			os.utime(self.targetDirPath, None)
-		except OSError as e:
-			print e
+		except:
 			raise RuntimeError("Cannot copy template directory to target directory")
 
 		try:
@@ -176,20 +175,17 @@ class FMIGenerator():
 			          self.targetDirPath + "/src/" + self.modelName + ".cpp")
 			os.rename(self.targetDirPath + "/src/" + TEMPLATE_FOLDER_NAME + ".h", 
 			          self.targetDirPath + "/src/" + self.modelName + ".h")
-		except OSError as e:
-			print e
-			raise RuntimeError("Cannot copy template directory to target directory")
+		except:
+			raise RuntimeError("Cannot rename template files")
 
 
-	def subtitutePlaceholders(self, targetDir):  
-		"""1. It generates globally unique identifier
-		   2. It generates local time
-		   3. It renames all the folder,files and script from oldName with the modelName.
+	def subtitutePlaceholders(self):  
+		"""Processes all template files and replaces placeholders within the files with generated values.
+		
+		1. It generates globally unique identifier
+		2. It generates local time
+		3. It replaces placeholders.
 
-		Arguments:  
-
-		   targetDir -- The absolute path to the user defined directory to be copied
-		   oldName -- Name of the folder to be copied
 		"""
 
 		# Generate globally unique identifier
@@ -202,7 +198,6 @@ class FMIGenerator():
 		src = ""
 		# Path refering the directories, files, script in files after renaming in new folder
 		dst = ""
-
 
 		# loop to walk through the new folder  
 		for root, dircs, files in os.walk(targetDir,oldName):

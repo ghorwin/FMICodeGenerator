@@ -144,13 +144,10 @@ class FMIGenerator():
 
 		templatePath -- The absolute path to the template directory.
 		
-		Example:
+		Example::
 		
-		```python
-		self.copyTemplateDirectory("../data/FMI_template")
-		
-		# will rename "FMI_template" to "testFMU" after copying
-		```
+		   self.copyTemplateDirectory("../data/FMI_template")
+		   # will rename "FMI_template" to "testFMU" after copying
 		"""
 
 
@@ -182,8 +179,8 @@ class FMIGenerator():
 	def subtitutePlaceholders(self):  
 		"""Processes all template files and replaces placeholders within the files with generated values.
 		
-		1. It generates globally unique identifier
-		2. It generates local time
+		1. It generates a globally unique identifier.
+		2. It generates a local time stamp.
 		3. It replaces placeholders.
 
 		"""
@@ -191,85 +188,57 @@ class FMIGenerator():
 		# Generate globally unique identifier
 		guid = uuid.uuid1()
 
-		# Generate local date and time
-		localtime = time.strftime('%Y-%m-%dT%I:%M:%SZ',time.localtime())
+		# Generate time stamp of local date and time
+		localTime = time.strftime('%Y-%m-%dT%I:%M:%SZ',time.localtime())
 
-		# Path to check the name of the directories, files, script in files in new folder  
-		src = ""
-		# Path refering the directories, files, script in files after renaming in new folder
-		dst = ""
-
-		# loop to walk through the new folder  
-		for root, dircs, files in os.walk(targetDir,oldName):
-			# loop to replace the old name of directories into user defined new name(i.e modelName)
-			os.utime(root,None)
-			for dirc in dircs:
-				if oldName in dirc:
-					# compose full path of old named directory inside the new folder
-					src = os.path.join(root,dirc)
-					# compose full path of newly named directory inside new folder
-					dst = os.path.join(root,dirc.replace(oldName, self.modelName))
-					os.rename(src,dst)
-
-
-			# loop to replace the old name of files and in script into a new name (i.e.modelName)  
-			for file in files:
-
-				# compose full file path
-				src = os.path.join(root,file)
-
-				# read file into memory, variable 'data'
-				fobj = open(src,'r')
-				data = fobj.read()
-				fobj.close()
-
-				# generic data adjustment
-				data = data.replace(oldName,self.modelName)            
-
-
-				# process data depending on file type
-				if file == "modelDescription.xml":
-					data = self.adjustModelDescription(data, localtime, guid)
-
-				if file=="FMIProject.cpp":
-					data = data.replace("$$GUID$$", str(guid))            
-
-				#finally, write data back to file
-
-				fobj=open(src,'w')
-				fobj.write(data)
-				fobj.close()
-
-				if oldName in file:
-					dst = os.path.join(root,file.replace(oldName, self.modelName))
-					os.rename(src,dst)
-					print("'{}' renamed" .format(file))
+		# We process file after file
+		
+		# 1. modelDescription.xml
+		self.adjustModelDescription(localTime, guid)
+		
+		# 2. files with modelName placeholders
+	
+	
+	
 
 
 
 
 
-
-	def adjustModelDescription(self, data, time, guid):
-		""" defined function to to replace modelName, description, date and time, and GUID in file script 
-		and returns the modified memory, variable 'data'.
+	def adjustModelDescription(self, localTimeStamp, guid):
+		"""Adjusts content of `modelDescription.xml` file.
+		Reads the template file. Inserts strings for model name, description, 
+		date and time, GUID, ...
+		And writes the modified string to file again.
 
 		Arguments:
 
-		data -- read file into memory
-		time -- generated localtime(format:2018-09-13T11:59:46Z)
+		localTimeStamp -- time stamp of local time
 		guid -- globally unique identifier
-		"""
-		self.data = data
-		self.time = time
-		self.guid = guid
 
+		"""
+
+		modelDescFilePath = os.path.abspath(os.path.join(self.targetDirPath, "dat/modelDescription.xml"))
+		try:
+			# read file into memory, variable 'data'
+			
+			fobj = open(modelDescFilePath,'r')
+			data = fobj.read()
+			fobj.close()
+		except:
+			raise RuntimeError("Error reading ModelDescription file: {}".format(modelDescFilePath))
+		
 		data = data.replace("$$dateandtime$$",time)
 		data = data.replace("$$GUID$$", str(guid))        
 		data = data.replace("$$description$$", self.description)
 		data = data.replace("$$modelName$$",self.modelName)    
 
-		return data 
+		try:
+			fobj = open(self.targetDir + "/modelDescription.xml",'w')
+			fobj.write(data)
+			fobj.close()
+		except:
+			raise RuntimeError("Error writing modelDescription.xml file.")
 
 
 

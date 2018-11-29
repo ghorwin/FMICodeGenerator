@@ -54,7 +54,12 @@ else:
 	print ("WARNING: Model description missing.")
 
 # call function of generator to create model
-fmiGenerator.generate()
+try:
+	fmiGenerator.generate()
+except Exception as e:
+	print ("ERROR: Error during FMU generation")
+	print e
+	
 
 
 

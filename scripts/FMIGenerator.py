@@ -122,7 +122,7 @@ class FMIGenerator():
 		self.copyTemplateDirectory(templateDirPath)
 		
 		print ("Adjusting template files (replacing placeholders)")
-		self.subtitutePlaceholders()
+		self.substitutePlaceholders()
 
 		print ("Test-building FMU")
 		#self.testBuild()
@@ -176,7 +176,7 @@ class FMIGenerator():
 			raise RuntimeError("Cannot rename template files")
 
 
-	def subtitutePlaceholders(self):  
+	def substitutePlaceholders(self):  
 		"""Processes all template files and replaces placeholders within the files with generated values.
 		
 		1. It generates a globally unique identifier.
@@ -193,19 +193,45 @@ class FMIGenerator():
 
 		# We process file after file
 		
-		# 1. modelDescription.xml
-		self.adjustModelDescription(localTime, guid)
-		
-		# 2. files with modelName placeholders
+		# loop to walk through the new folder  
+		for root, dirs, files in os.walk(self.targetDirPath):
+			# process all files
+			for f in files:
 	
+				# compose full file path
+				src = os.path.join(root, f)
 	
+				try:
+					# read file into memory, variable 'data'
+					fobj = open(src, 'r')
+					data = fobj.read()
+					fobj.close()
+				except:
+					raise RuntimeError("Error reading file: {}".format(src))
 	
+				# generic data adjustment
+				data = data.replace(TEMPLATE_FOLDER_NAME, self.modelName)
+
+				# special handling for certain file types
+				
+				# 1. modelDescription.xml
+				if f == "modelDescription.xml":
+					data = self.adjustModelDescription(data, localTime, guid)
+			
+				# 2. <modelName>.cpp
+				if f==self.modelName + ".cpp":
+					data = data.replace("$$GUID$$", str(guid))
+	
+				# finally, write data back to file
+				try:
+					fobj = open(src, 'w')
+					fobj.write(data)
+					fobj.close()
+				except:
+					raise RuntimeError("Error writing file: {}".format(src))
 
 
-
-
-
-	def adjustModelDescription(self, localTimeStamp, guid):
+	def adjustModelDescription(self, data, localTimeStamp, guid):
 		"""Adjusts content of `modelDescription.xml` file.
 		Reads the template file. Inserts strings for model name, description, 
 		date and time, GUID, ...
@@ -213,33 +239,21 @@ class FMIGenerator():
 
 		Arguments:
 
+		data -- string holding the contents of the modelDescription.xml file
 		localTimeStamp -- time stamp of local time
 		guid -- globally unique identifier
 
+		Returns:
+		
+		Returns string with modified modelDescription.xml file
 		"""
 
-		modelDescFilePath = os.path.abspath(os.path.join(self.targetDirPath, "dat/modelDescription.xml"))
-		try:
-			# read file into memory, variable 'data'
-			
-			fobj = open(modelDescFilePath,'r')
-			data = fobj.read()
-			fobj.close()
-		except:
-			raise RuntimeError("Error reading ModelDescription file: {}".format(modelDescFilePath))
-		
-		data = data.replace("$$dateandtime$$",time)
+		data = data.replace("$$dateandtime$$",localTimeStamp)
 		data = data.replace("$$GUID$$", str(guid))        
 		data = data.replace("$$description$$", self.description)
-		data = data.replace("$$modelName$$",self.modelName)    
-
-		try:
-			fobj = open(self.targetDir + "/modelDescription.xml",'w')
-			fobj.write(data)
-			fobj.close()
-		except:
-			raise RuntimeError("Error writing modelDescription.xml file.")
-
+		data = data.replace("$$modelName$$",self.modelName)
+		
+		return data
 
 
 	def testBuildFMU(self, targetDir):

@@ -13,7 +13,7 @@ call %VCVARSALL_PATH%
 
 :: These environment variables can also be set externally
 if not defined JOM_PATH (
-	JOM_PATH=c:\Qt\Qt5.10.1\Tools\QtCreator\bin
+	set JOM_PATH=c:\Qt\Qt5.10.1\Tools\QtCreator\bin
 )
 
 if not defined CMAKE_PREFIX_PATH (
@@ -23,23 +23,27 @@ if not defined CMAKE_PREFIX_PATH (
 :: add search path for jom.exe
 set PATH=%PATH%;%JOM_PATH%
 
+:: FMU-specific variables - set by code generator
+set FMU_SHARED_LIB_NAME=FMI_template.dll
+
+set CMAKELISTSDIR=%CD%\..\projects\cmake
+
 :: create and change into build subdir
 mkdir bb_VC_x64
 pushd bb_VC_x64
 
 :: configure makefiles and build
-cmake -G "NMake Makefiles JOM" .. -DCMAKE_BUILD_TYPE:String="Release" -DUSE_OMP:BOOL=ON
+cmake -G "NMake Makefiles JOM" %CMAKELISTSDIR% -DCMAKE_BUILD_TYPE:String="Release"
 jom
 if ERRORLEVEL 1 GOTO fail
 
 popd
 
 :: copy executable to bin/release dir
-xcopy /Y .\bb_VC_x64\FMI_template\FMI_template.dll ..\..\bin\release_x64
+xcopy /Y .\bb_VC_x64\%FMU_SHARED_LIB_NAME% ..\bin\release_x64
 
 exit /b 0
 
 :fail
 echo ** Build Failed **
-::pause
 exit /b 1

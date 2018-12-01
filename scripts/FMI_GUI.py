@@ -1,74 +1,94 @@
 import sys
+import platform
 import PyQt5
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+from PyQt5 import QtGui, QtCore
 
-# CREATE WIZARD, WATERMARK, LOGO, BANNER
-app = QApplication(sys.argv)
-wizard = QWizard()
-wizard.setWizardStyle(QWizard.ModernStyle)
+class GUI():
+    
+    def __init__(self):
+        
+        
+        self.modelName = QLabel('Model Name:')
+        self.description = QLabel('Description:')          
+        self.modelNameEdit = QLineEdit()
+        self.descriptionEdit = QTextEdit()  
+        self.wizard = QWizard()
+        
+    
+    def QWizardPage(self): 
+        
+        
+        if platform.system() == 'Darwin':
+            self.wizard.setWizardStyle(QWizard.MacStyle)
+            
+        elif platform.system() == 'Windows':
+            self.wizard.setWizardStyle(QWizard.AeroStyle)
+            
+        else:
+            self.wizard.setWizardStyle(QWizard.ModernStyle)
+        
+        
+        self.wizard.setPixmap(QWizard.WatermarkPixmap,QPixmap('FMI.j'))
+        self.wizard.setPixmap(QWizard.LogoPixmap,QPixmap('FMI.jpg'))
+        self.wizard.setPixmap(QWizard.BannerPixmap,QPixmap('FMI.j'))
+        self.wizard.setWindowIcon(QIcon('FMI.jpeg'))
+        
+        page1 = QWizardPage()
+        page1.setTitle('FMU Initialization')
+        page1.setSubTitle('Please enter the below details')
+        
 
-wizard.setPixmap(QWizard.WatermarkPixmap,QPixmap('FM.png'))
-wizard.setPixmap(QWizard.LogoPixmap,QPixmap('FM.png'))
-wizard.setPixmap(QWizard.BannerPixmap,QPixmap('FM.png'))
-wizard.setWindowIcon(QIcon('FMI.png')) 
+        vLayout1 = QVBoxLayout(page1)
+        vLayout1.addWidget(self.modelName)
+        vLayout1.addWidget(self.modelNameEdit)
+        vLayout1.addWidget(self.description)
+        vLayout1.addWidget(self.descriptionEdit)
+        
+        QToolTip.setFont(QFont('SansSerif', 10))
+        self.modelNameEdit.setToolTip('Write new Model Name')
+        self.descriptionEdit.setToolTip('Provide a new description')          
+        
+        page1.registerField('Field1*',self.modelNameEdit,self.modelNameEdit.text(),self.modelNameEdit.textChanged)
+       
+       
+       
+        page2 = QWizardPage()
+        page2.setFinalPage(True)
+        page2.setTitle('FMU Page 2')
+        page2.setSubTitle('Fasih!')
+        
+        label1 = QLabel()
+        
+        vLayout2 = QVBoxLayout(page2)
+        vLayout2.addWidget(label1)
+        
+        
+        nxt = self.wizard.button(QWizard.NextButton)
+        func1 = lambda:label1.setText(page1.field('Field1'))
+        self.validating(self.modelNameEdit)
+        nxt.clicked.connect(func1)
+        
+        self.wizard.addPage(page1)
+        self.wizard.addPage(page2)
+        
+        self.wizard.show()
+        app.exec_()
 
+               
+    
+    def validating(self,text):
+        
+        regex = QtCore.QRegExp("[a-z-A-Z_äÄöÖüÜ§$%&()=#+;,0-9]+")
+        validator = QRegExpValidator(regex)   
+        text.setValidator(validator)  
+     
+              
+if __name__ == '__main__':
+        
+    app = QApplication(sys.argv) 
+    g = GUI()
+    f = g.QWizardPage()
+    
 
-page1 = QWizardPage()
-page1.setTitle('FMU Initialization')
-page1.setSubTitle('Please enter the below details')
-
-modelName = QLabel('Model Name:')
-description = QLabel('Description:')          
-modelNameEdit = QLineEdit()
-descriptionEdit = QLineEdit()
-
-lineEdit = QLineEdit()
-vLayout1 = QVBoxLayout(page1)
-vLayout1.addWidget(modelName)
-vLayout1.addWidget(modelNameEdit)
-
-#hLayout3 = QHBoxLayout(page1)
-vLayout1.addWidget(description)
-vLayout1.addWidget(descriptionEdit)
-
-page1.registerField('Field1*',modelNameEdit,modelNameEdit.text(),modelNameEdit.textChanged)
-page1.registerField('Field2',descriptionEdit,descriptionEdit.text(),descriptionEdit.textChanged)
-
-# CREATE PAGE 2, LABEL, TITLES
-page2 = QWizardPage()
-page2.setFinalPage(True)
-
-page2.setTitle('FMU Page 2')
-page2.setSubTitle('Fasih!')
-
-label1 = QLabel()
-label2 = QLabel()
-
-vLayout2 = QVBoxLayout(page2)
-
-vLayout2.addWidget(label1)
-vLayout2.addWidget(label2)
-
-
-QToolTip.setFont(QFont('SansSerif', 10))
-modelNameEdit.setToolTip('Write new Model Name')
-descriptionEdit.setToolTip('Provide a new description')
-
-
-
-
-
-# CONNECT SIGNALS AND PAGES
-# lineEdit.textChanged.connect(lambda:label.setText(lineEdit.text()))
-nxt = wizard.button(QWizard.NextButton)
-func1 = lambda:label1.setText(page1.field('Field1'))
-func2 = lambda:label2.setText(page1.field('Field2'))
-nxt.clicked.connect(func1)
-nxt.clicked.connect(func2)
-
-wizard.addPage(page1)
-wizard.addPage(page2)
-
-wizard.show()
-sys.exit(app.exec_())

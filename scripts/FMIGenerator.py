@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Implementation of class FMIGenerator
 #
 # This file is part of FMICodeGenerator (https://github.com/ghorwin/FMICodeGenerator)

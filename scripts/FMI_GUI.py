@@ -1,23 +1,30 @@
 import sys
+import os
 import platform
 import PyQt5
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore, QtWidgets
+import os.path
+from FMIGenerator import *
 
 class GUI():
     
     def __init__(self):
         
         
-        self.modelName = QLabel('Model Name:')
+        self.labelModelName = QLabel('Model Name:')
         self.description = QLabel('Description:')          
-        self.modelNameEdit = QLineEdit()
+        self.lineEditModelName = QLineEdit()
         self.descriptionEdit = QTextEdit()  
         self.wizard = QWizard()
+        self.TargetDir = QLabel('Target Location:')
+        self.TargetDirEdit = ""
         
+        self.destinationButton = QPushButton()
     
     def QWizardPage(self): 
+        
         
         
         if platform.system() == 'Darwin':
@@ -46,16 +53,34 @@ class GUI():
         vLayout1.addWidget(self.description)
         vLayout1.addWidget(self.descriptionEdit)
         
+        
+        hLayout1 = QHBoxLayout(page1)
+        hLayout1.addWidget(self.TargetDir)
+        hLayout1.addWidget(self.destinationButton)
+        hLayout1.setStretch(0,1)
+        
+        vLayout1.addLayout(hLayout1)
+        
+        
+        
         QToolTip.setFont(QFont('SansSerif', 10))
         self.modelNameEdit.setToolTip('Write new Model Name')
         self.descriptionEdit.setToolTip('Provide a new description')          
         
         page1.registerField('Field1*',self.modelNameEdit,self.modelNameEdit.text(),self.modelNameEdit.textChanged)
-       
-       
-       
+        
+        self.destinationButton.clicked.connect(self.selectFile)
+        self.TargetDirEdit = QLineEdit(str(self.TargetDir) + '/' + str(self.modelNameEdit))
+        vLayout1.addWidget(self.TargetDirEdit)
+                                       
+        
+        
+     
+        
+
         page2 = QWizardPage()
         page2.setFinalPage(True)
+        
         page2.setTitle('FMU Page 2')
         page2.setSubTitle('Fasih!')
         
@@ -68,7 +93,14 @@ class GUI():
         nxt = self.wizard.button(QWizard.NextButton)
         func1 = lambda:label1.setText(page1.field('Field1'))
         self.validating(self.modelNameEdit)
+    
         nxt.clicked.connect(func1)
+       
+        
+               
+        
+        
+        
         
         self.wizard.addPage(page1)
         self.wizard.addPage(page2)
@@ -79,11 +111,15 @@ class GUI():
                
     
     def validating(self,text):
-        
+              
         regex = QtCore.QRegExp("[a-z-A-Z_äÄöÖüÜ§$%&()=#+;,0-9]+")
         validator = QRegExpValidator(regex)   
-        text.setValidator(validator)  
-     
+        text.setValidator(validator) 
+    
+    def selectFile(self):
+        filepath = QFileDialog.getExistingDirectory(None, "Select Directory")
+
+        
               
 if __name__ == '__main__':
         

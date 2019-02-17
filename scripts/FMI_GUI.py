@@ -31,6 +31,15 @@ class GUI():
         self.lineEditTargetDir = QLineEdit()
         self.page1 = QWizardPage()
         self.page2 = QWizardPage()
+        
+        # Different Wizard based on platform
+        if platform.system() == 'Darwin':
+            self.wizard.setWizardStyle(QWizard.MacStyle)
+            
+        elif platform.system() == 'Windows':
+            self.wizard.setWizardStyle(QWizard.AeroStyle)
+        else:
+            self.wizard.setWizardStyle(QWizard.ModernStyle)        
     
         
     def QWizardPage1(self): 
@@ -47,15 +56,8 @@ class GUI():
         self.pushbuttonClear = QPushButton()         
         
     
-        # Different Wizard based on platform
-        if platform.system() == 'Darwin':
-            self.wizard.setWizardStyle(QWizard.MacStyle)
-            
-        elif platform.system() == 'Windows':
-            self.wizard.setWizardStyle(QWizard.AeroStyle)
-        else:
-            self.wizard.setWizardStyle(QWizard.ModernStyle)
         
+
         # watermark,logo,banner and windowicon for wizard 
         self.page1.setPixmap(QWizard.WatermarkPixmap,QPixmap('FMI.jeg'))
         self.page1.setPixmap(QWizard.LogoPixmap,QPixmap('FMI.jeg'))
@@ -119,23 +121,32 @@ class GUI():
         func1 = lambda:self.page2.setTitle('FMU Inputs for ' + self.page1.field('Field1') + ':')
         func2 = lambda:self.page2.field('Field2')
         
-        nxt.clicked.connect(self.clickMethod)
-        nxt.clicked.connect(func1)
-        nxt.clicked.connect(func2)
         
-       
+         
+        
+        nxt.clicked.connect(func1)
+        nxt.clicked.connect(func2)   
+        
+        nxt.clicked.connect(self.descriptionError)
+        nxt.clicked.connect(self.clickMethod)          
+        
+        
         # adding wizard pages
         self.wizard.addPage(self.page1)
         
+    
         # calling the defined function for wizard page2
         self.QWizardPage2()
+        
         
         # command to show the wizard pages
         self.wizard.show()
         app.exec_() 
         
+        
         # calling the defined function to generate FMU
-        self.callFMIGenerator()
+        self.callFMIGenerator()          
+    
            
         
     def QWizardPage2(self):
@@ -146,51 +157,174 @@ class GUI():
         """        
         # setting up page 2 of the wizard    
         self.page2.setFinalPage(True)
+
         
         # setting up the three input labels and lineEdit's
         self.labelInputVar1 = QLabel("Input Var1:")
-        self.lineEditInputVal1 = QLineEdit()
+        self.lineEditInputVal11 = QLineEdit()
+        self.lineEditInputVal12 = QLineEdit()
+        self.lineEditInputVal13 = QLineEdit()
+        self.lineEditInputVal14 = QLineEdit()
+        
+        
         self.labelInputVar2 = QLabel("Input Var2:")
-        self.lineEditInputVal2 = QLineEdit()
+        self.lineEditInputVal21 = QLineEdit()
+        self.lineEditInputVal22 = QLineEdit()
+        self.lineEditInputVal23 = QLineEdit()
+        self.lineEditInputVal24 = QLineEdit()        
+        
+        
         self.labelInputVar3 = QLabel("Input Var3:")
-        self.lineEditInputVal3 = QLineEdit()
-        self.progress = QProgressBar()
+        self.lineEditInputVal31 = QLineEdit()
+        self.lineEditInputVal32 = QLineEdit()
+        self.lineEditInputVal33 = QLineEdit()
+        self.lineEditInputVal34 = QLineEdit()        
+        
+     
         
         # setting up page 2 vertical and horizontal BoxLayout
         vLayout2 = QVBoxLayout(self.page2)
         
+        
         # for input Variable 1
         hLayout21 = QHBoxLayout(self.page2)
         hLayout21.addWidget(self.labelInputVar1)
-        hLayout21.addWidget(self.lineEditInputVal1)
+        hLayout21.addWidget(self.lineEditInputVal11)
+        hLayout21.addWidget(self.lineEditInputVal12)
+        hLayout21.addWidget(self.lineEditInputVal13)
+        hLayout21.addWidget(self.lineEditInputVal14)
         hLayout21.addStretch(1)
+        hLayout21.addStretch(2) 
         vLayout2.addLayout(hLayout21)
         
         # for input Variable 2
         hLayout22 = QHBoxLayout(self.page2)
         hLayout22.addWidget(self.labelInputVar2)
-        hLayout22.addWidget(self.lineEditInputVal2)
+        hLayout22.addWidget(self.lineEditInputVal21)
+        hLayout22.addWidget(self.lineEditInputVal22)
+        hLayout22.addWidget(self.lineEditInputVal23)
+        hLayout22.addWidget(self.lineEditInputVal24)        
         hLayout22.addStretch(1)  
         vLayout2.addLayout(hLayout22)
         
         # for input Variable 3
         hLayout23 = QHBoxLayout(self.page2)
         hLayout23.addWidget(self.labelInputVar3)
-        hLayout23.addWidget(self.lineEditInputVal3)
+        hLayout23.addWidget(self.lineEditInputVal31)
+        hLayout23.addWidget(self.lineEditInputVal32)
+        hLayout23.addWidget(self.lineEditInputVal33)
+        hLayout23.addWidget(self.lineEditInputVal34) 
         hLayout23.addStretch(1)  
         vLayout2.addLayout(hLayout23)        
+        
+
+        # setting up the two paramter labels and lineEdit's
+        self.labelparameterVar1 = QLabel("Parameter 1:")
+        self.lineEditparameterVal11 = QLineEdit()
+        self.lineEditparameterVal12 = QLineEdit()
+        
+        
+        
+        self.labelparameterVar2 = QLabel("Parameter 2:")
+        self.lineEditparameterVal21 = QLineEdit()
+        self.lineEditparameterVal22 = QLineEdit()
+                
+        
+        
+        self.labelparameterVar3 = QLabel("Parameter 3:")
+        self.lineEditparameterVal31 = QLineEdit()
+        self.lineEditparameterVal32 = QLineEdit()
+               
+    
+        
+        # for parameter Variable 1
+        hLayout24 = QHBoxLayout(self.page2)
+        hLayout24.addWidget(self.labelparameterVar1)
+        hLayout24.addWidget(self.lineEditparameterVal11)
+        hLayout24.addWidget(self.lineEditparameterVal12)
+        hLayout24.addStretch(1)
+        hLayout24.addStretch(2) 
+        vLayout2.addLayout(hLayout24)
+        
+        # for parameter Variable 2
+        hLayout25 = QHBoxLayout(self.page2)
+        hLayout25.addWidget(self.labelparameterVar2)
+        hLayout25.addWidget(self.lineEditparameterVal21)
+        hLayout25.addWidget(self.lineEditparameterVal22)
+                
+        hLayout25.addStretch(1)  
+        vLayout2.addLayout(hLayout25)
+        
+        # for parameter Variable 3
+        hLayout26 = QHBoxLayout(self.page2)
+        hLayout26.addWidget(self.labelparameterVar3)
+        hLayout26.addWidget(self.lineEditparameterVal31)
+        hLayout26.addWidget(self.lineEditparameterVal32)
+        hLayout26.addStretch(1)  
+        vLayout2.addLayout(hLayout26)                
+        
+        
+        
+        # setting up the three output labels and lineEdit's
+        self.labeloutputVar1 = QLabel("Output Var1:")
+        self.lineEditoutputVal11 = QLineEdit()
+        self.lineEditoutputVal12 = QLineEdit()
+        
+        
+        
+        self.labeloutputVar2 = QLabel("Output Var2:")
+        self.lineEditoutputVal21 = QLineEdit()
+        self.lineEditoutputVal22 = QLineEdit()
+                
+        
+        
+        self.labeloutputVar3 = QLabel("Output Var3:")
+        self.lineEditoutputVal31 = QLineEdit()
+        self.lineEditoutputVal32 = QLineEdit()
+               
+    
+        
+        
+        # for output Variable 1
+        hLayout24.addWidget(self.labeloutputVar1)
+        hLayout24.addWidget(self.lineEditoutputVal11)
+        hLayout24.addWidget(self.lineEditoutputVal12)
+        hLayout24.addStretch(2) 
+        vLayout2.addLayout(hLayout24)
+        
+        # for output Variable 2
+        
+        hLayout25.addWidget(self.labeloutputVar2)
+        hLayout25.addWidget(self.lineEditoutputVal21)
+        hLayout25.addWidget(self.lineEditoutputVal22)
+        hLayout25.addStretch(1)  
+        vLayout2.addLayout(hLayout25)
+        
+        # for output Variable 3
+        
+        hLayout26.addWidget(self.labeloutputVar3)
+        hLayout26.addWidget(self.lineEditoutputVal31)
+        hLayout26.addWidget(self.lineEditoutputVal32)
+        hLayout26.addStretch(1)  
+        vLayout2.addLayout(hLayout26)                
+       
+   
+       
+        self.progress = QProgressBar()
          
         # for progressBar  
         vLayout2.addStretch()
         vLayout2.addWidget(self.progress)
         self.btn = QPushButton("Okay")
         vLayout2.addWidget(self.btn)
-        self.btn.clicked.connect(self.download)
+        self.btn.clicked.connect(self.progressbar)
         
         # adding  Page2 to wizard
         self.wizard.addPage(self.page2)
         
-    def download(self):
+        
+        
+    def progressbar(self):
         self.completed = 0
         while self.completed < 100:
             self.completed+=0.0001
@@ -205,8 +339,6 @@ class GUI():
     
     def clickMethod(self):
         msgBox = QMessageBox()
-        #msgBox.setText("The document has been modified.")
-        #msgBox.exec_()        
         
         msgBox.setIcon(QMessageBox.Question)
         msgBox.setText("The file name and pathname have been modified")
@@ -242,6 +374,23 @@ class GUI():
         # set new filepath in line edit
         self.lineEditTargetDir.setText(filepath)
         
+    def descriptionError(self):
+        # user defined description from wizard 
+        if self.textEditdescription.toPlainText() != "":
+            print self.textEditdescription.toPlainText()  
+        else:
+            print ("WARNING: Model description missing.")
+            msgBox = QMessageBox()        
+            msgBox.setIcon(QMessageBox.Question)
+            msgBox.setText("WARNING: Model description missing.")
+            msgBox.setInformativeText("Do you want to quit?")
+            msgBox.setStandardButtons(QMessageBox.Cancel  )
+            msgBox.setDefaultButton(QMessageBox.No)
+            reply = msgBox.exec_()
+            if reply == QMessageBox.Cancel:
+                return "Cancel"        
+    
+        
     def callFMIGenerator(self):
         """ calling the FMIGenerator.py script to generate and test build the FMU
         """
@@ -251,15 +400,10 @@ class GUI():
         
         # gets user input modelName and target directory from wizard
         fmiGenerator.modelName = str(self.lineEditModelName.text())
-        fmiGenerator.targetDir = self.lineEditTargetDir.text()
         
-        # user defined description from wizard 
-        if self.textEditdescription != None:
-            fmiGenerator.description = self.textEditdescription.toPlainText()
-            print self.textEditdescription.toPlainText()
-        else:
-            print ("WARNING: Model description missing.")
-            
+        fmiGenerator.targetDir = self.lineEditTargetDir.text()
+        fmiGenerator.description = self.textEditdescription.toPlainText()
+                         
         # call function of generator to create model
         try:
             fmiGenerator.generate()

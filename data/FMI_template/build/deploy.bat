@@ -1,4 +1,4 @@
-@echo on
+@echo off
 
 :: script is supposed to be executed in /build directory
 
@@ -17,17 +17,18 @@ MKDIR FMI_template
 cd FMI_template 
 
 :: create binary dir for Windows
-MKDIR binaries/Windows
+MKDIR binaries\Windows
 
 :: copy shared library, we expect it to be already renamed correctly
-cp ..\..\bin\release\FMI_template.so binaries\Windows\FMI_template.so
-cp ..\..\data\modelDescription.xml
+xcopy ..\..\bin\release\FMI_template.so binaries\Windows\FMI_template.so
+xcopy ..\..\data\modelDescription.xml
 
 
 ::create zip archive
-7z a -tzip %..\FMI_template.zip% -r %FMI_template\*.h
-cd ..
-move ..\FMI_template.zip ..\FMI_template.fmu
+7z.exe a archive.7z FMI_template\
+
+cd..
+move FMI_template.zip FMI_template.fmu
 echo "Created FMI_template.fmu"
 
 ::change working directory back to original dir

@@ -9,7 +9,7 @@ echo m
 @RD /S /Q "FMI_template"  
 
 :: remove target FMU if it exists
-DEL /F /S /Q "FMI_template.fmu"
+DEL /F /S /Q "FMI_template.fmu.zip"
 	
 ::create subdir and change into it
 MKDIR FMI_template 

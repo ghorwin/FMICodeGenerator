@@ -4,375 +4,202 @@ import platform
 import PyQt5
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
+from PyQt5.QtCore import *
 from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 import os.path
-from FMIGenerator import *
 
-class GUI():
-    
-    def __init__(self):
-        """ Constructor, initializes member variables.
-        wizard -- To set a Wizard
-        ModelName -- A user defined model name
-        description -- A user defined description
-        TargetDir -- Target directory can be relative (to current working directory) or
-					 absolute. FMU directory is created below this directory, for example:
-					    <target path>/<modelName>/
-					 By default, target path is empty which means that the subdirectory <modelName>
-					 is created directly below the current working directory.
-        page1 -- Page 1 of Wizard
-        page2 -- Page 2 of Wizard
-        """
-        
+from PyQt5.QtWidgets import QApplication, QMainWindow, QGridLayout, QWidget, QTableWidget, QTableWidgetItem,QWizardPage
+from PyQt5.QtCore import QSize, Qt
+
+try:
+    _fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+    def _fromUtf8(s):
+        return s
+
+try:
+    _encoding = QApplication.UnicodeUTF8
+    def _translate(context, text, disambig):
+        return QApplication.translate(context, text, disambig, _encoding)
+except AttributeError:
+    def _translate(context, text, disambig):
+        return QApplication.translate(context, text, disambig)
+
+class Ui_Wizard(object):
+    def setupUi(self, Wizard):
+        Wizard.setObjectName(_fromUtf8("Wizard"))
+        Wizard.resize(510, 439)
+        self.wizardPage1 = QWizardPage()
         self.wizard = QWizard()
-        self.lineEditModelName = QLineEdit()
-        self.textEditdescription = QTextEdit()
-        self.lineEditTargetDir = QLineEdit()
-        self.page1 = QWizardPage()
-        self.page2 = QWizardPage()
+        self.wizardPage1.setObjectName(_fromUtf8("wizardPage1"))
+        self.lineEdit = QLineEdit(self.wizardPage1)
+        self.lineEdit.setGeometry(QtCore.QRect(0, 20, 491, 25))
+        self.lineEdit.setToolTip(_fromUtf8(""))
+        self.lineEdit.setInputMethodHints(QtCore.Qt.ImhSensitiveData)
+        self.lineEdit.setText(_fromUtf8(""))
+        self.lineEdit.setPlaceholderText(_fromUtf8(""))
+        self.lineEdit.setObjectName(_fromUtf8("lineEdit"))
+        self.textEdit = QTextEdit(self.wizardPage1)
+        self.textEdit.setGeometry(QtCore.QRect(0, 70, 491, 211))
+        self.textEdit.setTextInteractionFlags(QtCore.Qt.LinksAccessibleByKeyboard|QtCore.Qt.LinksAccessibleByMouse|QtCore.Qt.TextBrowserInteraction|QtCore.Qt.TextEditable|QtCore.Qt.TextEditorInteraction|QtCore.Qt.TextSelectableByKeyboard|QtCore.Qt.TextSelectableByMouse)
+        self.textEdit.setPlaceholderText(_fromUtf8(""))
+        self.textEdit.setObjectName(_fromUtf8("textEdit"))
+        self.ModelName = QLabel(self.wizardPage1)
+        self.ModelName.setGeometry(QtCore.QRect(0, 0, 91, 17))
+        self.ModelName.setObjectName(_fromUtf8("ModelName"))
+        self.toolButton = QToolButton(self.wizardPage1)
+        self.toolButton.setGeometry(QtCore.QRect(460, 340, 26, 24))
+        self.toolButton.setObjectName(_fromUtf8("toolButton"))
+        self.lineEdit_2 = QLineEdit(self.wizardPage1)
+        self.lineEdit_2.setGeometry(QtCore.QRect(0, 340, 451, 25))
+        self.lineEdit_2.setObjectName(_fromUtf8("lineEdit_2"))
+        self.pushButton = QPushButton(self.wizardPage1)
+        self.pushButton.setGeometry(QtCore.QRect(0, 290, 491, 25))
+        self.pushButton.setCheckable(False)
+        self.pushButton.setObjectName(_fromUtf8("pushButton"))
+        self.label = QLabel(self.wizardPage1)
+        self.label.setGeometry(QtCore.QRect(0, 50, 81, 17))
+        self.label.setObjectName(_fromUtf8("label"))
+        self.label_2 = QLabel(self.wizardPage1)
+        self.label_2.setGeometry(QtCore.QRect(0, 320, 121, 17))
+        self.label_2.setObjectName(_fromUtf8("label_2"))
+        self.kdialog = QDialog(self.wizardPage1)
+        self.kdialog.setGeometry(QtCore.QRect(60, 120, 361, 121))
+        self.kdialog.setSizeGripEnabled(False)
+        self.kdialog.setModal(False)
+        self.kdialog.setObjectName(_fromUtf8("kdialog"))
+        self.buttonBox = QDialogButtonBox(self.kdialog)
+        self.buttonBox.setGeometry(QtCore.QRect(110, 70, 166, 25))
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.buttonBox.sizePolicy().hasHeightForWidth())
+        self.buttonBox.setSizePolicy(sizePolicy)
+        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
+        self.buttonBox.setCenterButtons(True)
+        self.buttonBox.setObjectName(_fromUtf8("buttonBox"))
+        self.label_3 = QLabel(self.kdialog)
+        self.label_3.setGeometry(QtCore.QRect(90, 30, 201, 20))
+        sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label_3.sizePolicy().hasHeightForWidth())
+        self.label_3.setSizePolicy(sizePolicy)
+        self.label_3.setObjectName(_fromUtf8("label_3"))
+        Wizard.addPage(self.wizardPage1)
+        self.wizardPage2 = QWizardPage()
+        self.wizardPage2.setObjectName(_fromUtf8("wizardPage2"))
+        self.tableWidget = QTableWidget(self.wizardPage2)
+        self.tableWidget.setGeometry(QtCore.QRect(0, 10, 491, 141))
+        sizePolicy = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.tableWidget.sizePolicy().hasHeightForWidth())
+        self.tableWidget.setSizePolicy(sizePolicy)
+        self.tableWidget.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.tableWidget.setAutoFillBackground(True)
+        self.tableWidget.setLineWidth(1)
+        self.tableWidget.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.tableWidget.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.tableWidget.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
+        self.tableWidget.setTabKeyNavigation(False)
+        self.tableWidget.setAlternatingRowColors(False)
+        self.tableWidget.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.tableWidget.setShowGrid(True)
+        self.tableWidget.setGridStyle(QtCore.Qt.SolidLine)
+        self.tableWidget.setRowCount(3)
+        self.tableWidget.setObjectName(_fromUtf8("tableWidget"))
+        self.tableWidget.setColumnCount(4)
+        item = QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget.setHorizontalHeaderItem(0, item)
+        item = QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget.setHorizontalHeaderItem(1, item)
+        item = QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        item.setFont(font)
+        self.tableWidget.setHorizontalHeaderItem(2, item)
+        item = QTableWidgetItem()
+        item.setTextAlignment(QtCore.Qt.AlignCenter)
+        font = QFont()
+        font.setPointSize(11)
+        font.setBold(True)
+        font.setWeight(75)
+        font.setStyleStrategy(QFont.PreferDefault)
+        item.setFont(font)
+        self.tableWidget.setHorizontalHeaderItem(3, item)
+        self.tableWidget.horizontalHeader().setVisible(True)
+        self.tableWidget.horizontalHeader().setCascadingSectionResizes(True)
+        self.tableWidget.horizontalHeader().setDefaultSectionSize(116)
+        self.tableWidget.horizontalHeader().setHighlightSections(True)
+        self.tableWidget.horizontalHeader().setMinimumSectionSize(68)
+        self.tableWidget.horizontalHeader().setSortIndicatorShown(True)
+        self.tableWidget.horizontalHeader().setStretchLastSection(True)
+        self.tableWidget.verticalHeader().setVisible(False)
+        self.tableWidget.verticalHeader().setCascadingSectionResizes(True)
+        self.tableWidget.verticalHeader().setDefaultSectionSize(35)
+        self.tableWidget.verticalHeader().setMinimumSectionSize(21)
+        self.tableWidget.verticalHeader().setSortIndicatorShown(True)
+        self.tableWidget.verticalHeader().setStretchLastSection(False)
+        self.line = QFrame(self.wizardPage2)
+        self.line.setGeometry(QtCore.QRect(0, 160, 491, 16))
+        self.line.setFrameShape(QFrame.HLine)
+        self.line.setFrameShadow(QFrame.Sunken)
+        self.line.setObjectName(_fromUtf8("line"))
         
-        # Different Wizard based on platform
-        if platform.system() == 'Darwin':
-            self.wizard.setWizardStyle(QWizard.MacStyle)
-            
-        elif platform.system() == 'Windows':
-            self.wizard.setWizardStyle(QWizard.AeroStyle)
-        else:
-            self.wizard.setWizardStyle(QWizard.ModernStyle)        
-    
         
-    def QWizardPage1(self): 
-        """ Develops Wizard page 1 for FMUGeneration inputs such as,
-        ModelName -- A user defined model name
-        description -- A user defined description
-        """
-        
-        # different labels and lineEdit's for Page 1
-        self.labelModelName = QLabel('Model Name:')
-        self.labeldescription = QLabel('Description:')
-        self.labelTargetDir = QLabel('Target Location:')
-        self.pushButtondestination = QToolButton()        
-        self.pushbuttonClear = QPushButton()         
-        
-    
-        
-
-        # watermark,logo,banner and windowicon for wizard 
-        self.page1.setPixmap(QWizard.WatermarkPixmap,QPixmap('FMI.jeg'))
-        self.page1.setPixmap(QWizard.LogoPixmap,QPixmap('FMI.jeg'))
-        self.page1.setPixmap(QWizard.BannerPixmap,QPixmap('FMI.jeg'))        
-        self.wizard.setWindowIcon(QIcon('FMI.jpeg'))
-        
-        # setting up the first page of wizard with title and subtitile
-        self.page1.setTitle('FMU Initialization')
-        self.page1.setSubTitle('Enter the below details')
-        
-        # setting up the page 1 vertical BoxLayout
-        vLayout1 = QVBoxLayout(self.page1)
-        
-        # adding required widgets for the page 1
-        vLayout1.addWidget(self.labelModelName)
-        vLayout1.addWidget(self.lineEditModelName)
-        vLayout1.addWidget(self.labeldescription)
-        vLayout1.addWidget(self.textEditdescription)
-        vLayout1.addWidget(self.pushbuttonClear)
-        vLayout1.addWidget(self.labelTargetDir)
-        
-        # setting up page 1 horizontal BoxLayout
-        hLayout1 = QHBoxLayout(self.page1)
-        hLayout1.addWidget(self.lineEditTargetDir)
-        hLayout1.addWidget(self.pushButtondestination)
-        hLayout1.setStretch(0,1)      
-        vLayout1.addLayout(hLayout1)
-        
-        # setting up the tool tips for page 1
-        QToolTip.setFont(QFont('SansSerif', 10))
-        self.lineEditModelName.setToolTip('Write new Model Name')
-        self.textEditdescription.setToolTip('Provide a new description') 
-        self.pushButtondestination.setToolTip('Click to choose the directory') 
-        
-        # place holder text 
-        self.lineEditModelName.setPlaceholderText('Eg: ModelName')
-        #self.textEditdescription.setPlaceholderText('This is a test for FMU Generation')
-        
-        # validating the entered ModelName
-        self.validating(self.lineEditModelName)
-        
-        # setting up the pushButton for clearing the text in lineEditdescription
-        self.pushbuttonClear.setText("Clear")
-        self.pushbuttonClear.clicked.connect(self.pushbuttonClearContentClicked)   
-            
-    
-        # setting up the pushButton for choosing the Target director location
-        self.pushButtondestination.setIcon(QtGui.QIcon('FMI.jpeg'))          
-        #self.pushButtondestination.setText("...")
-        self.pushButtondestination.clicked.connect(self.selectFolder)
-        
-        
-        # parsing ModelName to page2 of wizard
-        self.page1.registerField('Field1*',self.lineEditModelName,self.lineEditModelName.text(),self.lineEditModelName.textChanged)
-        self.page1.registerField('Field2*',self.lineEditTargetDir,self.lineEditTargetDir.text(),self.lineEditTargetDir.textChanged)
-       
-        # setting up the NextButton
-        nxt = self.wizard.button(QWizard.NextButton)
+        self.wizardPage1.registerField('Field1*',self.lineEdit,self.lineEdit.text(),self.lineEdit.textChanged)
+        self.wizardPage1.registerField('Field2*',self.lineEdit_2,self.lineEdit_2.text(),self.lineEdit_2.textChanged)        
         
         # activation of NextButton after lineEditModelName and lineEditTargetDir fields are filled
-        func1 = lambda:self.page2.setTitle('FMU Inputs for ' + self.page1.field('Field1') + ':')
-        func2 = lambda:self.page2.field('Field2')
+        func1 = lambda:self.wizardPage2.setTitle('FMU Inputs for ' + self.wizardPage1.field('Field1') + ':')
+        func2 = lambda:self.wizardPage2.field('Field2')         
         
-        
-         
-        
+        # setting up the NextButton
+        nxt = self.wizard.button(QWizard.NextButton)        
         nxt.clicked.connect(func1)
-        nxt.clicked.connect(func2)   
+        nxt.clicked.connect(func2)        
         
-        nxt.clicked.connect(self.descriptionError)
-        nxt.clicked.connect(self.clickMethod)          
-        
-        
-        # adding wizard pages
-        self.wizard.addPage(self.page1)
-        
-    
-        # calling the defined function for wizard page2
-        self.QWizardPage2()
-        
-        
-        # command to show the wizard pages
-        self.wizard.show()
-        app.exec_() 
-        
-        
-        # calling the defined function to generate FMU
-        self.callFMIGenerator()          
-    
-           
-        
-    def QWizardPage2(self):
-        """ Develops Wizard page 2 for FMUGeneration inputs such as,
-        InputVal1 -- A user defined input value 1
-        InputVal2 -- A user defined input value 2
-        progress -- A progress Bar
-        """        
-        # setting up page 2 of the wizard    
-        self.page2.setFinalPage(True)
-
-        
-        # setting up the three input labels and lineEdit's
-        self.labelInputVar1 = QLabel("Input Var1:")
-        self.lineEditInputVal11 = QLineEdit()
-        self.lineEditInputVal12 = QLineEdit()
-        self.lineEditInputVal13 = QLineEdit()
-        self.lineEditInputVal14 = QLineEdit()
-        
-        
-        self.labelInputVar2 = QLabel("Input Var2:")
-        self.lineEditInputVal21 = QLineEdit()
-        self.lineEditInputVal22 = QLineEdit()
-        self.lineEditInputVal23 = QLineEdit()
-        self.lineEditInputVal24 = QLineEdit()        
-        
-        
-        self.labelInputVar3 = QLabel("Input Var3:")
-        self.lineEditInputVal31 = QLineEdit()
-        self.lineEditInputVal32 = QLineEdit()
-        self.lineEditInputVal33 = QLineEdit()
-        self.lineEditInputVal34 = QLineEdit()        
-        
-     
-        
-        # setting up page 2 vertical and horizontal BoxLayout
-        vLayout2 = QVBoxLayout(self.page2)
-        
-        
-        # for input Variable 1
-        hLayout21 = QHBoxLayout(self.page2)
-        hLayout21.addWidget(self.labelInputVar1)
-        hLayout21.addWidget(self.lineEditInputVal11)
-        hLayout21.addWidget(self.lineEditInputVal12)
-        hLayout21.addWidget(self.lineEditInputVal13)
-        hLayout21.addWidget(self.lineEditInputVal14)
-        hLayout21.addStretch(1)
-        hLayout21.addStretch(2) 
-        vLayout2.addLayout(hLayout21)
-        
-        # for input Variable 2
-        hLayout22 = QHBoxLayout(self.page2)
-        hLayout22.addWidget(self.labelInputVar2)
-        hLayout22.addWidget(self.lineEditInputVal21)
-        hLayout22.addWidget(self.lineEditInputVal22)
-        hLayout22.addWidget(self.lineEditInputVal23)
-        hLayout22.addWidget(self.lineEditInputVal24)        
-        hLayout22.addStretch(1)  
-        vLayout2.addLayout(hLayout22)
-        
-        # for input Variable 3
-        hLayout23 = QHBoxLayout(self.page2)
-        hLayout23.addWidget(self.labelInputVar3)
-        hLayout23.addWidget(self.lineEditInputVal31)
-        hLayout23.addWidget(self.lineEditInputVal32)
-        hLayout23.addWidget(self.lineEditInputVal33)
-        hLayout23.addWidget(self.lineEditInputVal34) 
-        hLayout23.addStretch(1)  
-        vLayout2.addLayout(hLayout23)        
-        
-
-        # setting up the two paramter labels and lineEdit's
-        self.labelparameterVar1 = QLabel("Parameter 1:")
-        self.lineEditparameterVal11 = QLineEdit()
-        self.lineEditparameterVal12 = QLineEdit()
-        
-        
-        
-        self.labelparameterVar2 = QLabel("Parameter 2:")
-        self.lineEditparameterVal21 = QLineEdit()
-        self.lineEditparameterVal22 = QLineEdit()
-                
-        
-        
-        self.labelparameterVar3 = QLabel("Parameter 3:")
-        self.lineEditparameterVal31 = QLineEdit()
-        self.lineEditparameterVal32 = QLineEdit()
                
-    
         
-        # for parameter Variable 1
-        hLayout24 = QHBoxLayout(self.page2)
-        hLayout24.addWidget(self.labelparameterVar1)
-        hLayout24.addWidget(self.lineEditparameterVal11)
-        hLayout24.addWidget(self.lineEditparameterVal12)
-        hLayout24.addStretch(1)
-        hLayout24.addStretch(2) 
-        vLayout2.addLayout(hLayout24)
-        
-        # for parameter Variable 2
-        hLayout25 = QHBoxLayout(self.page2)
-        hLayout25.addWidget(self.labelparameterVar2)
-        hLayout25.addWidget(self.lineEditparameterVal21)
-        hLayout25.addWidget(self.lineEditparameterVal22)
-                
-        hLayout25.addStretch(1)  
-        vLayout2.addLayout(hLayout25)
-        
-        # for parameter Variable 3
-        hLayout26 = QHBoxLayout(self.page2)
-        hLayout26.addWidget(self.labelparameterVar3)
-        hLayout26.addWidget(self.lineEditparameterVal31)
-        hLayout26.addWidget(self.lineEditparameterVal32)
-        hLayout26.addStretch(1)  
-        vLayout2.addLayout(hLayout26)                
-        
-        
-        
-        # setting up the three output labels and lineEdit's
-        self.labeloutputVar1 = QLabel("Output Var1:")
-        self.lineEditoutputVal11 = QLineEdit()
-        self.lineEditoutputVal12 = QLineEdit()
-        
-        
-        
-        self.labeloutputVar2 = QLabel("Output Var2:")
-        self.lineEditoutputVal21 = QLineEdit()
-        self.lineEditoutputVal22 = QLineEdit()
-                
-        
-        
-        self.labeloutputVar3 = QLabel("Output Var3:")
-        self.lineEditoutputVal31 = QLineEdit()
-        self.lineEditoutputVal32 = QLineEdit()
-               
-    
-        
-        
-        # for output Variable 1
-        hLayout24.addWidget(self.labeloutputVar1)
-        hLayout24.addWidget(self.lineEditoutputVal11)
-        hLayout24.addWidget(self.lineEditoutputVal12)
-        hLayout24.addStretch(2) 
-        vLayout2.addLayout(hLayout24)
-        
-        # for output Variable 2
-        
-        hLayout25.addWidget(self.labeloutputVar2)
-        hLayout25.addWidget(self.lineEditoutputVal21)
-        hLayout25.addWidget(self.lineEditoutputVal22)
-        hLayout25.addStretch(1)  
-        vLayout2.addLayout(hLayout25)
-        
-        # for output Variable 3
-        
-        hLayout26.addWidget(self.labeloutputVar3)
-        hLayout26.addWidget(self.lineEditoutputVal31)
-        hLayout26.addWidget(self.lineEditoutputVal32)
-        hLayout26.addStretch(1)  
-        vLayout2.addLayout(hLayout26)                
-       
-   
-       
-        self.progress = QProgressBar()
-         
-        # for progressBar  
-        vLayout2.addStretch()
-        vLayout2.addWidget(self.progress)
-        self.btn = QPushButton("Okay")
-        vLayout2.addWidget(self.btn)
-        self.btn.clicked.connect(self.progressbar)
-        
-        # adding  Page2 to wizard
-        self.wizard.addPage(self.page2)
-        
-        
-        
-    def progressbar(self):
-        self.completed = 0
-        while self.completed < 100:
-            self.completed+=0.0001
-            self.progress.setValue(self.completed)
+        Wizard.addPage(self.wizardPage2)
 
-    def validating(self,text):
-        """ to validate the ModelName entered
-        """
-        regex = QtCore.QRegExp("[a-z-A-Z_äÄöÖüÜ§$%&()=#+;,0-9]+")
-        validator = QRegExpValidator(regex)   
-        text.setValidator(validator)
-    
-    def clickMethod(self):
-        msgBox = QMessageBox()
-        
-        msgBox.setIcon(QMessageBox.Question)
-        msgBox.setText("The file name and pathname have been modified")
-        msgBox.setInformativeText("Do you want to save your changes?")
-        msgBox.setStandardButtons(QMessageBox.Yes| QMessageBox.No| QMessageBox.Cancel  )
-        msgBox.setDefaultButton(QMessageBox.No)
-        reply = msgBox.exec_()
-        if reply == QMessageBox.Yes:
-            return "yes"
-        elif reply == QMessageBox.No:
-            return "no"
-        else:
-            return "cancel"
-    
-       
-        
-    def pushbuttonClearContentClicked(self):
-        """ to clear the content in lineEditdecription 
-        """       
-        # clear the content of the 'QLineEdit'
-        self.textEditdescription.clear()
-        # gets the current contents of the 'QLineEdit'
-        current_content = self.textEditdescription    
-    
-    def selectFolder(self):
-        """ to choose the valid directory path
-        """
-        filepath = QFileDialog.getExistingDirectory(None, "Select Directory")
-        # check if user canceled the dialog, if it was canceled, string is empty and we do nothing
-        if filepath == "":
-            return 
+        self.retranslateUi(Wizard)
+        self.pushButton.clicked.connect(self.textEdit.clear)
+        self.kdialog.accepted.connect(self.wizardPage2.show)
+        self.kdialog.rejected.connect(self.wizardPage1.show)
+        QtCore.QMetaObject.connectSlotsByName(Wizard)
 
-        # set new filepath in line edit
-        self.lineEditTargetDir.setText(filepath)
+    def retranslateUi(self, Wizard):
+        Wizard.setWindowTitle(_translate("Wizard", "FMU", None))
+        self.ModelName.setText(_translate("Wizard", "ModelName:", None))
+        self.toolButton.setText(_translate("Wizard", "...", None))
+        self.pushButton.setText(_translate("Wizard", "Clear", None))
+        self.label.setText(_translate("Wizard", "Description:", None))
+        self.label_2.setText(_translate("Wizard", "Target Location:", None))
+        self.label_3.setText(_translate("Wizard", "Do you want to save changes?", None))
+        self.tableWidget.setSortingEnabled(False)
+        item = self.tableWidget.horizontalHeaderItem(0)
+        item.setText(_translate("Wizard", "Unique ID Name", None))
+        item = self.tableWidget.horizontalHeaderItem(1)
+        item.setText(_translate("Wizard", "Macro Name", None))
+        item = self.tableWidget.horizontalHeaderItem(2)
+        item.setText(_translate("Wizard", "Type", None))
+        item = self.tableWidget.horizontalHeaderItem(3)
+        item.setText(_translate("Wizard", "Properties", None))
         
     def descriptionError(self):
         # user defined description from wizard 
@@ -388,9 +215,8 @@ class GUI():
             msgBox.setDefaultButton(QMessageBox.No)
             reply = msgBox.exec_()
             if reply == QMessageBox.Cancel:
-                return "Cancel"        
-    
-        
+                return "Cancel"
+            
     def callFMIGenerator(self):
         """ calling the FMIGenerator.py script to generate and test build the FMU
         """
@@ -409,16 +235,29 @@ class GUI():
             fmiGenerator.generate()
         except Exception as e:
             print ("ERROR: Error during FMU generation")
-            print e        
-              
-if __name__ == '__main__':
+            print e
+            
+    def clickMethod(self):
+        msgBox = QMessageBox()
         
+        msgBox.setIcon(QMessageBox.Question)
+        msgBox.setText("The file name and pathname have been modified")
+        msgBox.setInformativeText("Do you want to save your changes?")
+        msgBox.setStandardButtons(QMessageBox.Yes| QMessageBox.No| QMessageBox.Cancel  )
+        msgBox.setDefaultButton(QMessageBox.No)
+        reply = msgBox.exec_()
+        if reply == QMessageBox.Yes:
+            return "yes"
+        elif reply == QMessageBox.No:
+            return "no"
+        else:
+            return "cancel"    
+
+if __name__ == '__main__':
+                
     app = QApplication(sys.argv) 
-    g = GUI()
-    m = g.QWizardPage1()
-    
-
- 
-     
-    
-
+    w=QWizard()
+    g = Ui_Wizard()
+    m = g.setupUi(w)
+    w.show()
+    app.exec_() 

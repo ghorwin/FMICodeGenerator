@@ -48,21 +48,26 @@ from third_party.send2trash_master.send2trash import send2trash
 TEMPLATE_FOLDER_NAME = "FMI_template"
 
 class VarDef:
+	"""Contains all properties of a scalar variable in the model description."""
 	def __init__(self):
 		self.name = ""
-		self.valueRef = -1 # means auto
-		self.variability = ""
-		self.causality = ""
-		self.initial = ""
+		self.valueRef = -1 # means automatic enumeration of value references
+		self.variability = "" # constant, fixed, tunable, discrete, continuous
+		self.causality = "" # parameter, calculatedParameter, input, output, local, independent
+		self.initial = "" # exact, approx, calculated
+		self.typeID = "" # Real, Integer, Boolean, String
 		self.startValue = ""
 
 	def __init__(self, name, variability, causality, initial):
 		self.name = name
-		self.valueRef = -1 # means auto
+		self.valueRef = -1
 		self.variability = variability
 		self.causality = causality
 		self.initial = initial
+		self.typeID = ""
 		self.startValue = ""
+
+
 
 class FMIGenerator:
 	"""Class that encapsulates all parameters needed to generate the FMU.

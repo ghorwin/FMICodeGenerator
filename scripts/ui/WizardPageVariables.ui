@@ -32,7 +32,7 @@
          <number>0</number>
         </property>
         <property name="columnCount">
-         <number>6</number>
+         <number>7</number>
         </property>
         <attribute name="horizontalHeaderStretchLastSection">
          <bool>true</bool>
@@ -63,6 +63,11 @@
         <column>
          <property name="text">
           <string>Initial</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Type</string>
          </property>
         </column>
         <column>
@@ -265,15 +270,46 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="label_6">
         <property name="text">
          <string>Start value:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="2" column="1">
        <widget class="QLineEdit" name="lineEditStart"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Type:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QComboBox" name="comboBoxTypeID">
+        <item>
+         <property name="text">
+          <string>Real</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Integer</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Boolean</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>String</string>
+         </property>
+        </item>
+       </widget>
       </item>
      </layout>
     </widget>

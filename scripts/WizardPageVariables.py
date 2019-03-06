@@ -54,7 +54,7 @@ class WizardPageVariables(QWidget):
 		self.variables = []
 		
 		# add default variable
-		newVar = VarDef("ResultRootDir", "fixed", "parameter", "exact")
+		newVar = VarDef("ResultRootDir", "fixed", "parameter", "exact", "String")
 		newVar.valueRef = 42
 		newVar.startValue = "<provided by MasterSim>"
 		
@@ -72,8 +72,8 @@ class WizardPageVariables(QWidget):
 			var = self.variables[i]
 			
 			item = QTableWidgetItem()
-			item.setText(var.name)
 			item.setFlags( Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+			item.setText(var.name)
 			self.ui.tableWidget.setItem(i, 0, item)
 			
 			item = QTableWidgetItem()
@@ -97,9 +97,14 @@ class WizardPageVariables(QWidget):
 			self.ui.tableWidget.setItem(i, 4, item)
 			
 			item = QTableWidgetItem()
-			item.setText("{}".format(var.startValue))
+			item.setText(var.typeID)
 			item.setFlags( Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 			self.ui.tableWidget.setItem(i, 5, item)
+
+			item = QTableWidgetItem()
+			item.setText("{}".format(var.startValue))
+			item.setFlags( Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+			self.ui.tableWidget.setItem(i, 6, item)
 			
 		self.ui.tableWidget.resizeColumnsToContents()
 
@@ -112,16 +117,16 @@ class WizardPageVariables(QWidget):
 		self.ui.comboBoxCausality.setCurrentIndex( self.ui.comboBoxCausality.findText(var.causality) )
 		self.ui.comboBoxVariability.setCurrentIndex( self.ui.comboBoxVariability.findText(var.variability) )
 		self.ui.comboBoxInitial.setCurrentIndex( self.ui.comboBoxInitial.findText(var.initial) )
+		self.ui.comboBoxTypeID.setCurrentIndex( self.ui.comboBoxTypeID.findText(var.typeID) )
 		self.ui.lineEditStart.setText( var.startValue )
-		
-
+	
 
 	@pyqtSlot()
 	def on_toolButtonAdd_clicked(self):
 		# add a new table row and enabled edit field
 		currentVarCount = self.ui.tableWidget.rowCount()
 		
-		newVar = VarDef("<unnamed>", "continuous", "local", "exact")
+		newVar = VarDef("<unnamed>", "continuous", "local", "exact", "Real")
 		self.variables.append(newVar)
 		
 		# update table
@@ -154,13 +159,16 @@ class WizardPageVariables(QWidget):
 		currentRow = self.ui.tableWidget.currentRow()
 		# get corresponding variable
 		if currentRow < 0:
+			# disable edit fields
 			self.ui.groupBox_2.setEnabled(False) 
-			self.ui.toolButtonRemove.setEnabled(False) # disable remove
+			# disable remove
+			self.ui.toolButtonRemove.setEnabled(False) 
 			return # no selection, return
 		
 		assert(currentRow < len(self.variables))
 		
-		self.ui.toolButtonRemove.setEnabled(True) # enable remove button
+		# enable remove button
+		self.ui.toolButtonRemove.setEnabled(True) 
 		
 		# fill in edit fields
 		self.updateEditField(self.variables[currentRow])
@@ -177,6 +185,7 @@ class WizardPageVariables(QWidget):
 		item = self.ui.tableWidget.takeItem(currentRow,0)
 		item.setText(text)
 		self.ui.tableWidget.setItem(currentRow,0,item)
+		self.ui.tableWidget.resizeColumnToContents(0)
 		
 		
 	@pyqtSlot(int)
@@ -190,6 +199,7 @@ class WizardPageVariables(QWidget):
 		item = self.ui.tableWidget.takeItem(currentRow,1)
 		item.setText("{}".format(value))
 		self.ui.tableWidget.setItem(currentRow,1,item)
+		self.ui.tableWidget.resizeColumnToContents(1)
 
 
 	@pyqtSlot(str)
@@ -203,6 +213,7 @@ class WizardPageVariables(QWidget):
 		item = self.ui.tableWidget.takeItem(currentRow,2)
 		item.setText(text)
 		self.ui.tableWidget.setItem(currentRow,2,item)
+		self.ui.tableWidget.resizeColumnToContents(2)
 
 
 	@pyqtSlot(str)
@@ -216,6 +227,7 @@ class WizardPageVariables(QWidget):
 		item = self.ui.tableWidget.takeItem(currentRow,3)
 		item.setText(text)
 		self.ui.tableWidget.setItem(currentRow,3,item)
+		self.ui.tableWidget.resizeColumnToContents(3)
 
 
 	@pyqtSlot(str)
@@ -229,6 +241,21 @@ class WizardPageVariables(QWidget):
 		item = self.ui.tableWidget.takeItem(currentRow,4)
 		item.setText(text)
 		self.ui.tableWidget.setItem(currentRow,4,item)
+		self.ui.tableWidget.resizeColumnToContents(4)
+
+	
+	@pyqtSlot(str)
+	def on_comboBoxTypeID_currentIndexChanged(self, text):
+		# get current row
+		currentRow = self.ui.tableWidget.currentRow()
+		assert(currentRow >= 0 and currentRow < len(self.variables))
+		# update variable cache
+		self.variables[currentRow].typeID = text
+		# changing a property of a QTableWidgetItem requires removal of item, change of property and re-setting the item
+		item = self.ui.tableWidget.takeItem(currentRow,5)
+		item.setText(text)
+		self.ui.tableWidget.setItem(currentRow,5,item)
+		self.ui.tableWidget.resizeColumnToContents(5)
 
 	
 	@pyqtSlot(str)
@@ -239,6 +266,7 @@ class WizardPageVariables(QWidget):
 		# update variable cache
 		self.variables[currentRow].startValue = text # conversion to suitable data type is checked later
 		# changing a property of a QTableWidgetItem requires removal of item, change of property and re-setting the item
-		item = self.ui.tableWidget.takeItem(currentRow,5)
+		item = self.ui.tableWidget.takeItem(currentRow,6)
 		item.setText(text)
-		self.ui.tableWidget.setItem(currentRow,5,item)
+		self.ui.tableWidget.setItem(currentRow,6,item)
+		self.ui.tableWidget.resizeColumnToContents(6)

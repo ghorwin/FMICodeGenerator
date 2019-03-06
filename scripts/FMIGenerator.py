@@ -58,13 +58,13 @@ class VarDef:
 		self.typeID = "" # Real, Integer, Boolean, String
 		self.startValue = ""
 
-	def __init__(self, name, variability, causality, initial):
+	def __init__(self, name, variability, causality, initial, typeID):
 		self.name = name
 		self.valueRef = -1
 		self.variability = variability
 		self.causality = causality
 		self.initial = initial
-		self.typeID = ""
+		self.typeID = typeID
 		self.startValue = ""
 
 

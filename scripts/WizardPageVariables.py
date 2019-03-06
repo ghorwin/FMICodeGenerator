@@ -54,13 +54,14 @@ class WizardPageVariables(QWidget):
 		self.variables = []
 		
 		# add default variable
-		newVar = VarDef("ResultRootDir", "constant", "parameter", "exact")
+		newVar = VarDef("ResultRootDir", "fixed", "parameter", "exact")
 		newVar.valueRef = 42
-		newVar.startValue = "<default>"
+		newVar.startValue = "<provided by MasterSim>"
 		
 		self.variables.append(newVar)
 		
 		self.updateTable()
+		self.ui.tableWidget.selectRow(0)
 		self.show()
 
 	def updateTable(self):
@@ -104,6 +105,14 @@ class WizardPageVariables(QWidget):
 
 	
 	def updateEditField(self, var):
+		self.ui.groupBox_2.setEnabled(True)
+		
+		self.ui.lineEditName.setText(var.name)
+		self.ui.spinBoxValueRef.setValue(var.valueRef)
+		self.ui.comboBoxCausality.setCurrentIndex( self.ui.comboBoxCausality.findText(var.causality) )
+		self.ui.comboBoxVariability.setCurrentIndex( self.ui.comboBoxVariability.findText(var.variability) )
+		self.ui.comboBoxInitial.setCurrentIndex( self.ui.comboBoxInitial.findText(var.initial) )
+		self.ui.lineEditStart.setText( var.startValue )
 		pass
 		
 
@@ -121,3 +130,38 @@ class WizardPageVariables(QWidget):
 		
 		# select last line, this will trigger the edit field population
 		self.ui.tableWidget.selectRow(len(self.variables)-1)
+
+
+	@pyqtSlot()
+	def on_toolButtonRemove_clicked(self):
+		# get current row
+		currentRow = self.ui.tableWidget.currentRow()
+		assert(currentRow >= 0 and currentRow < len(self.variables))
+
+		# remove selected variable
+		del self.variables[currentRow]
+		# update table
+		self.updateTable()
+		# select next row
+		if currentRow >= len(self.variables):
+			currentRow = currentRow -1
+		if currentRow >= 0:
+			self.ui.tableWidget.selectRow(currentRow)
+
+	@pyqtSlot(QTableWidgetItem, QTableWidgetItem)
+	def on_tableWidget_currentItemChanged(self, current, previous):
+		# get current row
+		currentRow = self.ui.tableWidget.currentRow()
+		# get corresponding variable
+		if currentRow < 0:
+			self.ui.groupBox_2.setEnabled(False) 
+			self.ui.toolButtonRemove.setEnabled(False) # disable remove
+			return # no selection, return
+		
+		assert(currentRow < len(self.variables))
+		
+		self.ui.toolButtonRemove.setEnabled(True) # enable remove button
+		
+		# fill in edit fields
+		self.updateEditField(self.variables[currentRow])
+		

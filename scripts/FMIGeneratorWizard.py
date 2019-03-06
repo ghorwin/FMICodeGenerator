@@ -43,6 +43,8 @@ from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtProperty
 from PyQt5 import QtCore, QtWidgets
 
+from WizardPageBasicProperties import WizardPageBasicProperties
+from WizardPageVariables import WizardPageVariables
 
 class FMIGeneratorWizard(QtWidgets.QWizard):
 	def __init__(self, parent=None):
@@ -56,22 +58,26 @@ class PageBasicProperties(QtWidgets.QWizardPage):
 	def __init__(self, parent=None):
 		super(PageBasicProperties, self).__init__(parent)
 		layout = QtWidgets.QVBoxLayout()
+		self.page = WizardPageBasicProperties()
+		layout.addWidget(self.page)
 		self.setLayout(layout)
+		
+	def initializePage(self):
+		# add init code here
+		pass
 
 
 class PageVariables(QtWidgets.QWizardPage):
 	def __init__(self, parent=None):
 		super(PageVariables, self).__init__(parent)
-		self.label1 = QtWidgets.QLabel()
-		self.label2 = QtWidgets.QLabel()
 		layout = QtWidgets.QVBoxLayout()
-		layout.addWidget(self.label1)
-		layout.addWidget(self.label2)
+		self.page = WizardPageVariables()
+		layout.addWidget(self.page)
 		self.setLayout(layout)
 
 	def initializePage(self):
-		self.label1.setText("Example text")
-		self.label2.setText("Example text")
+		# add init code here
+		pass
 
 
 if __name__ == '__main__':

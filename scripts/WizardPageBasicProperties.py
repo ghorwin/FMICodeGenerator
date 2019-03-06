@@ -38,6 +38,7 @@
 
 import sys
 from PyQt5.QtWidgets import QWidget, QApplication, QFileDialog
+from PyQt5.QtCore import pyqtSlot
 
 from ui.Ui_WizardPageBasicProperties import Ui_WizardPageBasicProperties
 
@@ -46,16 +47,16 @@ class WizardPageBasicProperties(QWidget):
 		super(WizardPageBasicProperties, self).__init__()
 		self.ui = Ui_WizardPageBasicProperties()
 		self.ui.setupUi(self)
-		# must manually connect the tool button - connect by name causes duplicate call to slot
-		self.ui.toolButtonBrowseFilename.clicked.connect(self.on_toolButtonBrowseFilename_clicked2)
 		self.show()
-		
+	
+	@pyqtSlot()
 	def on_lineEditModelName_editingFinished(self):
 		# auto-generate filename for FMU unless previously entered/selected
 		if self.ui.lineEditModelName.text().strip() and not self.ui.lineEditFilePath.text():
 			self.ui.lineEditFilePath.setText( self.ui.lineEditModelName.text().strip() + ".fmu")
 
-	def on_toolButtonBrowseFilename_clicked2(self):
+	@pyqtSlot()
+	def on_toolButtonBrowseFilename_clicked(self):
 		# open browse filename dialog
 		options = QFileDialog.Options()
 		options |= QFileDialog.DontUseNativeDialog

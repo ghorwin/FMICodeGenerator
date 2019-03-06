@@ -1,13 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Main script for generating FMU code. This is the command line version which generates a minimalistic
-# barebone of the modelDescription.xml and the implementation files. Currently, command line
-# arguments exist only for model name and description (so, no variables in your FMU).
-#
-# Feel free to copy this file and add code that populates the FMIGenerator.variables array with data before
-# calling fmiGenerator.generate()
-#
+# Implementation of the variable definition wizard page.
 #
 #
 # This file is part of FMICodeGenerator (https://github.com/ghorwin/FMICodeGenerator)
@@ -42,35 +36,15 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import argparse
-from FMIGenerator import *
+import sys
+from PyQt5.QtWidgets import QWidget, QApplication
 
-# commandline argument parser
-parser = argparse.ArgumentParser()
-parser.add_argument("modelName", type=str, help="ID Name of FMU, will be used for directory names, generated FMU name and model name.")
-parser.add_argument("--description", type=str, help="Description of the FMU/model")
-args = parser.parse_args()
+from ui.Ui_WizardPageVariables import Ui_WizardPageVariables
 
-# create storage class instance
-fmiGenerator = FMIGenerator()
-
-# store command line arguments
-fmiGenerator.modelName = args.modelName
-if args.description != None:
-	fmiGenerator.description = args.description
-else:
-	print ("WARNING: Model description missing.")
-
-# call function of generator to create model
-try:
-	fmiGenerator.generate()
-except Exception as e:
-	print ("ERROR: Error during FMU generation")
-	print e
-	
-
-
-
-
-
+class WizardPageVariables(QWidget):
+	def __init__(self):
+		super(WizardPageVariables, self).__init__()
+		self.ui = Ui_WizardPageVariables()
+		self.ui.setupUi(self)
+		self.show()  
 

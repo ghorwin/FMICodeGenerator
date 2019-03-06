@@ -1,13 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Main script for generating FMU code. This is the command line version which generates a minimalistic
-# barebone of the modelDescription.xml and the implementation files. Currently, command line
-# arguments exist only for model name and description (so, no variables in your FMU).
-#
-# Feel free to copy this file and add code that populates the FMIGenerator.variables array with data before
-# calling fmiGenerator.generate()
-#
+# The Wizard, that collects all data needed to generate the FMU from the user.
 #
 #
 # This file is part of FMICodeGenerator (https://github.com/ghorwin/FMICodeGenerator)
@@ -42,35 +36,46 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import argparse
-from FMIGenerator import *
 
-# commandline argument parser
-parser = argparse.ArgumentParser()
-parser.add_argument("modelName", type=str, help="ID Name of FMU, will be used for directory names, generated FMU name and model name.")
-parser.add_argument("--description", type=str, help="Description of the FMU/model")
-args = parser.parse_args()
-
-# create storage class instance
-fmiGenerator = FMIGenerator()
-
-# store command line arguments
-fmiGenerator.modelName = args.modelName
-if args.description != None:
-	fmiGenerator.description = args.description
-else:
-	print ("WARNING: Model description missing.")
-
-# call function of generator to create model
-try:
-	fmiGenerator.generate()
-except Exception as e:
-	print ("ERROR: Error during FMU generation")
-	print e
-	
+import sys
+from PyQt5 import QtCore
+from PyQt5 import QtGui
+from PyQt5.QtCore import pyqtProperty
+from PyQt5 import QtCore, QtWidgets
 
 
+class FMIGeneratorWizard(QtWidgets.QWizard):
+	def __init__(self, parent=None):
+		super(FMIGeneratorWizard, self).__init__(parent)
+		self.addPage(PageBasicProperties(self))
+		self.addPage(PageVariables(self))
+		self.setWindowTitle("FMI Generator Wizard")
+		self.resize(640,480)
+
+class PageBasicProperties(QtWidgets.QWizardPage):
+	def __init__(self, parent=None):
+		super(PageBasicProperties, self).__init__(parent)
+		layout = QtWidgets.QVBoxLayout()
+		self.setLayout(layout)
 
 
+class PageVariables(QtWidgets.QWizardPage):
+	def __init__(self, parent=None):
+		super(PageVariables, self).__init__(parent)
+		self.label1 = QtWidgets.QLabel()
+		self.label2 = QtWidgets.QLabel()
+		layout = QtWidgets.QVBoxLayout()
+		layout.addWidget(self.label1)
+		layout.addWidget(self.label2)
+		self.setLayout(layout)
+
+	def initializePage(self):
+		self.label1.setText("Example text")
+		self.label2.setText("Example text")
 
 
+if __name__ == '__main__':
+	app = QtWidgets.QApplication(sys.argv)
+	wizard = FMIGeneratorWizard()
+	wizard.show()
+	sys.exit(app.exec_())

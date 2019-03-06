@@ -65,17 +65,13 @@ class FMIGenerator():
 					 is created directly below the current working directory.
 		modelName -- A user defined model name
 		description -- A user defined description
-		inputVars -- vector of type VarDefs with input variable definitions 
-		outputVars -- vector of type VarDefs with output variable definitions 
-		parameters -- vector of type VarDefs with parameter definitions 
+		variables -- vector of type VarDefs with variable definitions (inputs, outputs, parameters) 
 		"""
 		self.targetDir = ""
 		
 		self.modelName = ""
 		self.description = ""
-		self.inputVars = []
-		self.outputVars = []
-		self.parameters = []
+		self.variables = []
 
 	def generate(self):
 

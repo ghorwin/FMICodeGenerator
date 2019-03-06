@@ -37,7 +37,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import sys
-from PyQt5.QtWidgets import QWidget, QApplication
+from PyQt5.QtWidgets import QWidget, QApplication, QFileDialog
 
 from ui.Ui_WizardPageBasicProperties import Ui_WizardPageBasicProperties
 
@@ -46,5 +46,24 @@ class WizardPageBasicProperties(QWidget):
 		super(WizardPageBasicProperties, self).__init__()
 		self.ui = Ui_WizardPageBasicProperties()
 		self.ui.setupUi(self)
-		self.show()  
+		# must manually connect the tool button - connect by name causes duplicate call to slot
+		self.ui.toolButtonBrowseFilename.clicked.connect(self.on_toolButtonBrowseFilename_clicked2)
+		self.show()
+		
+	def on_lineEditModelName_editingFinished(self):
+		# auto-generate filename for FMU unless previously entered/selected
+		if self.ui.lineEditModelName.text().strip() and not self.ui.lineEditFilePath.text():
+			self.ui.lineEditFilePath.setText( self.ui.lineEditModelName.text().strip() + ".fmu")
 
+	def on_toolButtonBrowseFilename_clicked2(self):
+		# open browse filename dialog
+		options = QFileDialog.Options()
+		options |= QFileDialog.DontUseNativeDialog
+		fileName, _ = QFileDialog.getSaveFileName(self, "Select/enter target FMU name","","FMUs (*.fmu);;All files (*)", 
+		                                          options=options)
+		if fileName:
+			# append .fmu extension unless already given
+			if len(fileName) < 4 or fileName[:-4] != ".fmu":
+				fileName = fileName + ".fmu"
+			self.ui.lineEditFilePath.setText(fileName)
+			return True

@@ -51,6 +51,7 @@ class FMIGeneratorWizard(QtWidgets.QWizard):
 		super(FMIGeneratorWizard, self).__init__(parent)
 		self.addPage(PageBasicProperties(self))
 		self.addPage(PageVariables(self))
+		self.addPage(PageGenerate(self))
 		self.setWindowTitle("FMI Generator Wizard")
 		self.resize(640,480)
 
@@ -61,10 +62,29 @@ class PageBasicProperties(QtWidgets.QWizardPage):
 		self.page = WizardPageBasicProperties()
 		layout.addWidget(self.page)
 		self.setLayout(layout)
+		self.setTitle("Basic properties of the Functional Mock-up Unit")
 		
-	def initializePage(self):
-		# add init code here
-		pass
+	def validatePage(self):
+		# check for mandatory input
+		fmuName = self.page.ui.lineEditModelName.text().strip()
+		if len(fmuName) == 0:
+			QtWidgets.QMessageBox.critical(self, "Missing input", "A model name is required.")
+			self.page.ui.lineEditModelName.selectAll()
+			self.page.ui.lineEditModelName.setFocus()
+			return False
+		if fmuName.find(" ") != -1 or fmuName.find("\t") != -1:
+			QtWidgets.QMessageBox.critical(self, "Invalid input", "Model name must not contain whitespace characters.")
+			self.page.ui.lineEditModelName.selectAll()
+			self.page.ui.lineEditModelName.setFocus()
+			return False
+		fmuFileName = self.page.ui.lineEditFilePath.text().strip()
+		if len(fmuFileName) == 0:
+			QtWidgets.QMessageBox.critical(self, "Missing input", "A target filename name is required.")
+			self.page.ui.lineEditFilePath.selectAll()
+			self.page.ui.lineEditFilePath.setFocus()
+			return False
+		# input is ok, proceed to next page
+		return True
 
 
 class PageVariables(QtWidgets.QWizardPage):
@@ -74,10 +94,22 @@ class PageVariables(QtWidgets.QWizardPage):
 		self.page = WizardPageVariables()
 		layout.addWidget(self.page)
 		self.setLayout(layout)
+		self.setTitle("Variables and Parameters")
 
-	def initializePage(self):
+	def validatePage(self):
 		# add init code here
-		pass
+		return True
+
+
+class PageGenerate(QtWidgets.QWizardPage):
+	def __init__(self, parent=None):
+		super(PageGenerate, self).__init__(parent)
+		layout = QtWidgets.QVBoxLayout()
+		#self.page = WizardPageVariables()
+		#layout.addWidget(self.page)
+		layout.addStretch()
+		self.setLayout(layout)
+		self.setTitle("Final generation options")
 
 
 if __name__ == '__main__':

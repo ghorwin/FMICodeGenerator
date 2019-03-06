@@ -113,7 +113,6 @@ class WizardPageVariables(QWidget):
 		self.ui.comboBoxVariability.setCurrentIndex( self.ui.comboBoxVariability.findText(var.variability) )
 		self.ui.comboBoxInitial.setCurrentIndex( self.ui.comboBoxInitial.findText(var.initial) )
 		self.ui.lineEditStart.setText( var.startValue )
-		pass
 		
 
 
@@ -148,6 +147,7 @@ class WizardPageVariables(QWidget):
 		if currentRow >= 0:
 			self.ui.tableWidget.selectRow(currentRow)
 
+
 	@pyqtSlot(QTableWidgetItem, QTableWidgetItem)
 	def on_tableWidget_currentItemChanged(self, current, previous):
 		# get current row
@@ -165,3 +165,80 @@ class WizardPageVariables(QWidget):
 		# fill in edit fields
 		self.updateEditField(self.variables[currentRow])
 		
+		
+	@pyqtSlot(str)
+	def on_lineEditName_textEdited(self,text):
+		# get current row
+		currentRow = self.ui.tableWidget.currentRow()
+		assert(currentRow >= 0 and currentRow < len(self.variables))
+		# update variable cache
+		self.variables[currentRow].name = text
+		# changing a property of a QTableWidgetItem requires removal of item, change of property and re-setting the item
+		item = self.ui.tableWidget.takeItem(currentRow,0)
+		item.setText(text)
+		self.ui.tableWidget.setItem(currentRow,0,item)
+		
+		
+	@pyqtSlot(int)
+	def on_spinBoxValueRef_valueChanged(self, value):
+		# get current row
+		currentRow = self.ui.tableWidget.currentRow()
+		assert(currentRow >= 0 and currentRow < len(self.variables))
+		# update variable cache
+		self.variables[currentRow].valueRef = value
+		# changing a property of a QTableWidgetItem requires removal of item, change of property and re-setting the item
+		item = self.ui.tableWidget.takeItem(currentRow,1)
+		item.setText("{}".format(value))
+		self.ui.tableWidget.setItem(currentRow,1,item)
+
+
+	@pyqtSlot(str)
+	def on_comboBoxVariability_currentIndexChanged(self, text):
+		# get current row
+		currentRow = self.ui.tableWidget.currentRow()
+		assert(currentRow >= 0 and currentRow < len(self.variables))
+		# update variable cache
+		self.variables[currentRow].variability = text
+		# changing a property of a QTableWidgetItem requires removal of item, change of property and re-setting the item
+		item = self.ui.tableWidget.takeItem(currentRow,2)
+		item.setText(text)
+		self.ui.tableWidget.setItem(currentRow,2,item)
+
+
+	@pyqtSlot(str)
+	def on_comboBoxCausality_currentIndexChanged(self, text):
+		# get current row
+		currentRow = self.ui.tableWidget.currentRow()
+		assert(currentRow >= 0 and currentRow < len(self.variables))
+		# update variable cache
+		self.variables[currentRow].causality = text
+		# changing a property of a QTableWidgetItem requires removal of item, change of property and re-setting the item
+		item = self.ui.tableWidget.takeItem(currentRow,3)
+		item.setText(text)
+		self.ui.tableWidget.setItem(currentRow,3,item)
+
+
+	@pyqtSlot(str)
+	def on_comboBoxInitial_currentIndexChanged(self, text):
+		# get current row
+		currentRow = self.ui.tableWidget.currentRow()
+		assert(currentRow >= 0 and currentRow < len(self.variables))
+		# update variable cache
+		self.variables[currentRow].initial = text
+		# changing a property of a QTableWidgetItem requires removal of item, change of property and re-setting the item
+		item = self.ui.tableWidget.takeItem(currentRow,4)
+		item.setText(text)
+		self.ui.tableWidget.setItem(currentRow,4,item)
+
+	
+	@pyqtSlot(str)
+	def on_lineEditStart_textEdited(self,text):
+		# get current row
+		currentRow = self.ui.tableWidget.currentRow()
+		assert(currentRow >= 0 and currentRow < len(self.variables))
+		# update variable cache
+		self.variables[currentRow].startValue = text # conversion to suitable data type is checked later
+		# changing a property of a QTableWidgetItem requires removal of item, change of property and re-setting the item
+		item = self.ui.tableWidget.takeItem(currentRow,5)
+		item.setText(text)
+		self.ui.tableWidget.setItem(currentRow,5,item)

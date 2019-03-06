@@ -47,7 +47,24 @@ from third_party.send2trash_master.send2trash import send2trash
 # The directory name of the template folder
 TEMPLATE_FOLDER_NAME = "FMI_template"
 
-class FMIGenerator():
+class VarDef:
+	def __init__(self):
+		self.name = ""
+		self.valueRef = -1 # means auto
+		self.variability = ""
+		self.causality = ""
+		self.initial = ""
+		self.startValue = ""
+
+	def __init__(self, name, variability, causality, initial):
+		self.name = name
+		self.valueRef = -1 # means auto
+		self.variability = variability
+		self.causality = causality
+		self.initial = initial
+		self.startValue = ""
+
+class FMIGenerator:
 	"""Class that encapsulates all parameters needed to generate the FMU.
 
 	Usage: create class instance, set member variables, call function generate()

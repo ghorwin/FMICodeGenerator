@@ -94,6 +94,13 @@ class FMIGenerator:
 		self.modelName = ""
 		self.description = ""
 		self.variables = []
+		self.messages = []
+
+
+	def printMsg(self, text):
+		print(text)
+		self.messages.append(text)
+		
 
 	def generate(self):
 
@@ -118,32 +125,32 @@ class FMIGenerator:
 			self.targetDirPath = os.path.join(os.getcwd(), self.targetDir)
 			self.targetDirPath = os.path.join(self.targetDirPath, self.modelName)
 
-		print("Target directory   : {}".format(self.targetDirPath))
+		self.printMsg("Target directory   : {}".format(self.targetDirPath))
 
 		# the source directory with the template files is located relative to
 		# this python script: ../data/FMIProject
 
 		# get the path of the current python script
 		scriptpath = os.path.abspath(os.path.dirname(sys.argv[0]))
-		print("Script path        : {}".format(scriptpath))
+		self.printMsg("Script path        : {}".format(scriptpath))
 
 		# relative path (from script file) to resource/template directory
 		templateDirPath = os.path.join(scriptpath, "../data/" + TEMPLATE_FOLDER_NAME)
 		templateDirPath = os.path.abspath(templateDirPath)
-		print("Template location  : {}".format(templateDirPath))
+		self.printMsg("Template location  : {}".format(templateDirPath))
 
 		# user may have specified "FMI_template" as model name 
 		# (which would be weird and break the code, hence a warning)
 		if self.modelName == "FMI_template":
-			print("WARNING: model name is same as template folder name. This may not work!")
+			printMsg("WARNING: model name is same as template folder name. This may not work!")
 			
-		print("Copying template directory to target directory (and renaming files)")
+		self.printMsg("Copying template directory to target directory (and renaming files)")
 		self.copyTemplateDirectory(templateDirPath)
 		
-		print ("Adjusting template files (replacing placeholders)")
+		self.printMsg ("Adjusting template files (replacing placeholders)")
 		self.substitutePlaceholders()
 
-		print ("Test-building FMU")
+		self.printMsg("Test-building FMU")
 		self.testBuildFMU()
 		
 		# *** Done with FMU generation ***
@@ -225,7 +232,7 @@ class FMIGenerator:
 					data = fobj.read().decode('utf8')
 					fobj.close()
 				except Exception as e:
-					print e
+					self.printMsg(e)
 					raise RuntimeError("Error reading file: {}".format(src))
 	
 				# generic data adjustment
@@ -284,7 +291,7 @@ class FMIGenerator:
 		buildDir = os.path.join(self.targetDirPath, "build")
 		binDir = os.path.join(self.targetDirPath, "bin/release")
 	
-		print("We are now test-building the FMU. You should first implement your FMU functionality and afterwards "
+		self.printMsg("We are now test-building the FMU. You should first implement your FMU functionality and afterwards "
 		      "build and deploy the FMU!")
 		try:
 
@@ -300,10 +307,10 @@ class FMIGenerator:
 	
 				# if return code is different from 0, print the error message
 				if rc != 0:
-					print errorMsg
+					self.printMsg(errorMsg)
 					raise RuntimeError("Error during compilation of FMU.")
 
-				print "Compiled FMU successfully"
+				self.printMsg("Compiled FMU successfully")
 	
 				# renaming/moving file    
 				for root, dircs, files in os.walk(binDir):
@@ -318,10 +325,10 @@ class FMIGenerator:
 				dc = deploy.returncode             
 	
 				if dc != 0:
-					print errorMsg
+					self.printMsg(errorMsg)
 					raise RuntimeError("Error during compilation of FMU")
 
-				print "Compiled FMU successfully"	                 
+				self.printMsg("Compiled FMU successfully")
 	
 			else:
 				# shell file execution for Mac & Linux
@@ -330,10 +337,10 @@ class FMIGenerator:
 				rc = pipe.returncode             
 	
 				if rc != 0:
-					print errorMsg
+					self.printMsg(errorMsg)
 					raise RuntimeError("Error during compilation of FMU")
 
-				print "Compiled FMU successfully"
+				self.printMsg("Compiled FMU successfully")
 	
 				if platform.system() == 'Darwin':
 					libName = "lib" + self.modelName + ".dylib.1.0.0"
@@ -346,7 +353,7 @@ class FMIGenerator:
 							oldFileName = os.path.join(root, libName)
 							newFileName = os.path.join(binDir, self.modelName + '.so')
 							os.rename(oldFileName, newFileName)
-							print ("Creating: {}".format(newFileName))
+							self.printMsg("Creating: {}".format(newFileName))
 							break
 	
 				# Deployment
@@ -357,12 +364,12 @@ class FMIGenerator:
 				dc = deploy.returncode             
 	
 				if dc != 0:
-					print errorMsg
+					self.printMsg(errorMsg)
 					raise RuntimeError("Error during assembly of FMU")
 
-				print ("Successfully created {}".format(self.modelName + ".fmu")	)
+				self.printMsg("Successfully created {}".format(self.modelName + ".fmu")	)
 	
 		except Exception as e:
-			print ("Error building FMU.")
+			self.printMsg("Error building FMU.")
 			raise
 

@@ -15,6 +15,7 @@ proj.file-list = [loc('FMIGenerator.py'),
                   loc('FMI_GUI.py'),
                   loc('main.py'),
                   loc('WizardPageBasicProperties.py'),
+                  loc('WizardPageGenerate.py'),
                   loc('WizardPageVariables.py')]
 proj.file-type = 'shared'
 proj.launch-config = {loc('main.py'): ('project',

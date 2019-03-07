@@ -47,6 +47,7 @@ from PyQt5 import QtCore, QtWidgets
 
 from WizardPageBasicProperties import WizardPageBasicProperties
 from WizardPageVariables import WizardPageVariables
+from WizardPageGenerate import WizardPageGenerate
 from FMIGenerator import FMIGenerator, VarDef
 
 
@@ -122,9 +123,8 @@ class PageGenerate(QtWidgets.QWizardPage):
 	def __init__(self, parent=None):
 		super(PageGenerate, self).__init__(parent)
 		layout = QtWidgets.QVBoxLayout()
-		# TODO :  add checkbox to enable/disable auto-test-building FMU at end
-		#layout.addWidget(self.page)
-		layout.addStretch()
+		self.page = WizardPageGenerate()
+		layout.addWidget(self.page)
 		self.setLayout(layout)
 		self.setTitle("Ready to generate FMU")
 

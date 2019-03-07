@@ -145,13 +145,17 @@ class PageGenerate(QtWidgets.QWizardPage):
 		
 		try:
 			fmiGenerator.generate()
-			eslf.page.ui.plainTextEditLog.setPlainText(fmiGenerator.messages.join("\n"))
+			msgs = "\n".join(fmiGenerator.messages)
+			self.page.ui.plainTextEditLog.setPlainText(msgs)
 		except Exception as e:
+			msgs = "\n".join(fmiGenerator.messages)
+			self.page.ui.plainTextEditLog.setPlainText(msgs)
 			QtWidgets.QMessageBox.critical(self, "FMI Generation Error", "Some error occurred during FMI generation:\n{}".format(e.message))
 			return False
 		
 		QtWidgets.QMessageBox.information(self, "FMU Generation Completed", 
-		                                  "FMU '{}' created successfully.".format(self.pageBasicProps.ui.lineEditFMUFilePath.text()))
+		                                  "FMU source code directory '{}' created successfully."
+		                                  .format(self.pageBasicProps.ui.lineEditTargetDir.text()))
 		return True
 
 if __name__ == '__main__':

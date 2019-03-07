@@ -37,7 +37,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import sys
+import platform
+
 from PyQt5.QtWidgets import QWidget
+from PyQt5.QtGui import QFont
 
 from ui.Ui_WizardPageGenerate import Ui_WizardPageGenerate
 
@@ -46,4 +49,18 @@ class WizardPageGenerate(QWidget):
 		super(WizardPageGenerate, self).__init__()
 		self.ui = Ui_WizardPageGenerate()
 		self.ui.setupUi(self)
+
+		# customize font of log window
+		f = QFont()
+		if platform.system() == 'Windows':
+			f.setFamily("Courier New")
+			f.setPointSize(9)
+		elif platform.system() == 'Darwin':
+			f.setFamily("Monaco")
+			f.setPointSize(12)
+		else:
+			f.setFamily("monospace");
+			f.setPointSize(9);
+		self.ui.plainTextEditLog.setFont(f)
+
 		self.show()

@@ -113,7 +113,7 @@ class FMIGenerator:
 
 		# compose target directory: check if self.targetPath is an absolute file path
 		if (os.path.isabs(self.targetDir)):
-			self.targetDirPath = ps.path.join(self.targetDir, self.modelName)
+			self.targetDirPath = os.path.join(self.targetDir, self.modelName)
 		else:
 			self.targetDirPath = os.path.join(os.getcwd(), self.targetDir)
 			self.targetDirPath = os.path.join(self.targetDirPath, self.modelName)

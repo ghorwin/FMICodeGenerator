@@ -38,6 +38,8 @@
 
 
 import sys
+import os.path
+
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtProperty
@@ -86,6 +88,18 @@ class PageBasicProperties(QtWidgets.QWizardPage):
 			self.page.ui.lineEditTargetDir.selectAll()
 			self.page.ui.lineEditTargetDir.setFocus()
 			return False
+		# check if directory exists and is a file
+		if os.path.exists(fmuTargetDir):
+			if os.path.isfile(fmuTargetDir):
+				QtWidgets.QMessageBox.critical(self, "Invalid input", "There exists already a file at '{}'.".format(fmuTargetDir))
+				self.page.ui.lineEditTargetDir.selectAll()
+				self.page.ui.lineEditTargetDir.setFocus()
+				return False
+			res = QtWidgets.QMessageBox.question(self, "Invalid input", "Target directory exists. Overwrite?")
+			if res == QtWidgets.QMessageBox.No:
+				self.page.ui.lineEditTargetDir.selectAll()
+				self.page.ui.lineEditTargetDir.setFocus()
+				return False
 		# input is ok, proceed to next page
 		return True
 
@@ -108,11 +122,11 @@ class PageGenerate(QtWidgets.QWizardPage):
 	def __init__(self, parent=None):
 		super(PageGenerate, self).__init__(parent)
 		layout = QtWidgets.QVBoxLayout()
-		#self.page = WizardPageVariables()
+		# TODO :  add checkbox to enable/disable auto-test-building FMU at end
 		#layout.addWidget(self.page)
 		layout.addStretch()
 		self.setLayout(layout)
-		self.setTitle("Final generation options")
+		self.setTitle("Ready to generate FMU")
 
 	def validatePage(self):
 		# here we generate the actual FMU
@@ -127,13 +141,14 @@ class PageGenerate(QtWidgets.QWizardPage):
 		# variables
 		fmiGenerator.variables = self.pageVars.variables
 		
-		
 		try:
 			fmiGenerator.generate()
 		except Exception as e:
 			QtWidgets.QMessageBox.critical(self, "FMI Generation Error", "Some error occurred during FMI generation:\n{}".format(e.message))
 			return False
 		
+		QtWidgets.QMessageBox.information(self, "FMU Generation Completed", 
+		                                  "FMU '{}' created successfully.".format(self.pageBasicProps.ui.lineEditFMUFilePath.text()))
 		return True
 
 if __name__ == '__main__':

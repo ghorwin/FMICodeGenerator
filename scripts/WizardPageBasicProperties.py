@@ -37,8 +37,9 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import sys
+import os.path
 from PyQt5.QtWidgets import QWidget, QFileDialog
-from PyQt5.QtCore import pyqtSlot
+from PyQt5.QtCore import pyqtSlot, QDir
 
 from ui.Ui_WizardPageBasicProperties import Ui_WizardPageBasicProperties
 
@@ -47,24 +48,34 @@ class WizardPageBasicProperties(QWidget):
 		super(WizardPageBasicProperties, self).__init__()
 		self.ui = Ui_WizardPageBasicProperties()
 		self.ui.setupUi(self)
+		self.ui.lineEditTargetDir.setText( QDir.home().absolutePath() )
 		self.show()
 	
 	@pyqtSlot()
 	def on_lineEditModelName_editingFinished(self):
 		# auto-generate filename for FMU unless previously entered/selected
-		if self.ui.lineEditModelName.text().strip() and not self.ui.lineEditFilePath.text():
-			self.ui.lineEditFilePath.setText( self.ui.lineEditModelName.text().strip() + ".fmu")
+		targetFileName = os.path.join(self.ui.lineEditTargetDir.text(), self.ui.lineEditModelName.text().strip() + ".fmu" )
+		self.ui.lineEditFMUFilePath.setText(targetFileName)
+
+
+	@pyqtSlot()
+	def on_lineEditTargetDir_editingFinished(self):
+		# auto-generate filename for FMU unless previously entered/selected
+		targetFileName = os.path.join(self.ui.lineEditTargetDir.text(), self.ui.lineEditModelName.text().strip() + ".fmu" )
+		self.ui.lineEditFMUFilePath.setText(targetFileName)
+
 
 	@pyqtSlot()
 	def on_toolButtonBrowseFilename_clicked(self):
 		# open browse filename dialog
 		options = QFileDialog.Options()
 		options |= QFileDialog.DontUseNativeDialog
-		fileName, _ = QFileDialog.getSaveFileName(self, "Select/enter target FMU name","","FMUs (*.fmu);;All files (*)", 
-		                                          options=options)
-		if fileName:
-			# append .fmu extension unless already given
-			if len(fileName) < 4 or fileName[:-4] != ".fmu":
-				fileName = fileName + ".fmu"
-			self.ui.lineEditFilePath.setText(fileName)
+		options |= QFileDialog.ShowDirsOnly
+		options |= QFileDialog.DontResolveSymlinks
+		
+		targetDir = QFileDialog.getExistingDirectory(self, "Select/enter target directory for FMU", QDir.home().absolutePath(),
+		                                                options=options)
+		if targetDir:
+			self.ui.lineEditTargetDir.setText(targetDir)
+			self.on_lineEditModelName_editingFinished()
 			return True

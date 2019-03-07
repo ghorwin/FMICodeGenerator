@@ -23,7 +23,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>File path:</string>
+         <string>Target directory:</string>
         </property>
        </widget>
       </item>
@@ -38,7 +38,7 @@
        <widget class="QLineEdit" name="lineEditModelName"/>
       </item>
       <item row="2" column="1">
-       <widget class="QLineEdit" name="lineEditFilePath"/>
+       <widget class="QLineEdit" name="lineEditTargetDir"/>
       </item>
       <item row="2" column="2">
        <widget class="QToolButton" name="toolButtonBrowseFilename">
@@ -55,7 +55,7 @@
          </font>
         </property>
         <property name="text">
-         <string>File path can be an absolute or relative path.</string>
+         <string>Target directory can be an absolute or relative path.</string>
         </property>
        </widget>
       </item>
@@ -68,6 +68,20 @@
         </property>
         <property name="text">
          <string>Model name must not contain whitespace characters.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>FMU file path:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="lineEditFMUFilePath">
+        <property name="readOnly">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

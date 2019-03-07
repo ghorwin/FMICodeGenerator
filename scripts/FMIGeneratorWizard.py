@@ -45,15 +45,22 @@ from PyQt5 import QtCore, QtWidgets
 
 from WizardPageBasicProperties import WizardPageBasicProperties
 from WizardPageVariables import WizardPageVariables
+from FMIGenerator import FMIGenerator, VarDef
+
 
 class FMIGeneratorWizard(QtWidgets.QWizard):
 	def __init__(self, parent=None):
 		super(FMIGeneratorWizard, self).__init__(parent)
 		self.addPage(PageBasicProperties(self))
 		self.addPage(PageVariables(self))
-		self.addPage(PageGenerate(self))
+		generatePage = PageGenerate(self)
+		generatePage.pageBasicProps = self.page(0).page # get WizardPageBasicProperties
+		generatePage.pageVars = self.page(1) # get WizardPageVariables
+		self.addPage(generatePage)
+		
 		self.setWindowTitle("FMI Generator Wizard")
 		self.resize(1400,600)
+
 
 class PageBasicProperties(QtWidgets.QWizardPage):
 	def __init__(self, parent=None):
@@ -63,7 +70,8 @@ class PageBasicProperties(QtWidgets.QWizardPage):
 		layout.addWidget(self.page)
 		self.setLayout(layout)
 		self.setTitle("Basic properties of the Functional Mock-up Unit")
-		
+
+
 	def validatePage(self):
 		# check for mandatory input
 		fmuName = self.page.ui.lineEditModelName.text().strip()
@@ -72,16 +80,11 @@ class PageBasicProperties(QtWidgets.QWizardPage):
 			self.page.ui.lineEditModelName.selectAll()
 			self.page.ui.lineEditModelName.setFocus()
 			return False
-		if fmuName.find(" ") != -1 or fmuName.find("\t") != -1:
-			QtWidgets.QMessageBox.critical(self, "Invalid input", "Model name must not contain whitespace characters.")
-			self.page.ui.lineEditModelName.selectAll()
-			self.page.ui.lineEditModelName.setFocus()
-			return False
-		fmuFileName = self.page.ui.lineEditFilePath.text().strip()
-		if len(fmuFileName) == 0:
-			QtWidgets.QMessageBox.critical(self, "Missing input", "A target filename name is required.")
-			self.page.ui.lineEditFilePath.selectAll()
-			self.page.ui.lineEditFilePath.setFocus()
+		fmuTargetDir = self.page.ui.lineEditTargetDir.text().strip()
+		if len(fmuTargetDir) == 0:
+			QtWidgets.QMessageBox.critical(self, "Missing input", "A target directory is required.")
+			self.page.ui.lineEditTargetDir.selectAll()
+			self.page.ui.lineEditTargetDir.setFocus()
 			return False
 		# input is ok, proceed to next page
 		return True
@@ -97,7 +100,7 @@ class PageVariables(QtWidgets.QWizardPage):
 		self.setTitle("Variables and Parameters")
 
 	def validatePage(self):
-		# add init code here
+		# check all variables for valid combinations of parameters
 		return True
 
 
@@ -111,6 +114,21 @@ class PageGenerate(QtWidgets.QWizardPage):
 		self.setLayout(layout)
 		self.setTitle("Final generation options")
 
+	def validatePage(self):
+		# here we generate the actual FMU
+		
+		fmiGenerator = FMIGenerator()
+		fmiGenerator.modelName = self.pageBasicProps.ui.lineEditModelName.text().strip()
+		fmiGenerator.description = self.pageBasicProps.ui.plainTextEditDescription.toPlainText()
+		fmiGenerator.targetDir = self.pageBasicProps.ui.lineEditTargetDir.text()
+		
+		try:
+			fmiGenerator.generate()
+		except Exception as e:
+			QtWidgets.QMessageBox.critical(self, "FMI Generation Error", "Some error occurred during FMI generation:\n{}".format(e.message))
+			return False
+		
+		return True
 
 if __name__ == '__main__':
 	app = QtWidgets.QApplication(sys.argv)

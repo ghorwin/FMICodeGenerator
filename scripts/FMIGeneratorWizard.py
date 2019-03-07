@@ -55,7 +55,7 @@ class FMIGeneratorWizard(QtWidgets.QWizard):
 		self.addPage(PageVariables(self))
 		generatePage = PageGenerate(self)
 		generatePage.pageBasicProps = self.page(0).page # get WizardPageBasicProperties
-		generatePage.pageVars = self.page(1) # get WizardPageVariables
+		generatePage.pageVars = self.page(1).page # get WizardPageVariables
 		self.addPage(generatePage)
 		
 		self.setWindowTitle("FMI Generator Wizard")
@@ -118,9 +118,15 @@ class PageGenerate(QtWidgets.QWizardPage):
 		# here we generate the actual FMU
 		
 		fmiGenerator = FMIGenerator()
+		
+		# basic properties
 		fmiGenerator.modelName = self.pageBasicProps.ui.lineEditModelName.text().strip()
 		fmiGenerator.description = self.pageBasicProps.ui.plainTextEditDescription.toPlainText()
 		fmiGenerator.targetDir = self.pageBasicProps.ui.lineEditTargetDir.text()
+		
+		# variables
+		fmiGenerator.variables = self.pageVars.variables
+		
 		
 		try:
 			fmiGenerator.generate()

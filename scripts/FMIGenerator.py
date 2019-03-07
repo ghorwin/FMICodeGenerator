@@ -95,6 +95,8 @@ class FMIGenerator:
 		self.description = ""
 		self.variables = []
 		self.messages = []
+		
+		self.autobuild = True
 
 
 	def printMsg(self, text):
@@ -150,8 +152,9 @@ class FMIGenerator:
 		self.printMsg ("Adjusting template files (replacing placeholders)")
 		self.substitutePlaceholders()
 
-		self.printMsg("Test-building FMU")
-		self.testBuildFMU()
+		if self.autobuild:
+			self.printMsg("Test-building FMU")
+			self.testBuildFMU()
 		
 		# *** Done with FMU generation ***
 

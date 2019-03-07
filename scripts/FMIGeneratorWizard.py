@@ -140,9 +140,12 @@ class PageGenerate(QtWidgets.QWizardPage):
 		
 		# variables
 		fmiGenerator.variables = self.pageVars.variables
+
+		fmiGenerator.autobuild = self.page.ui.checkBoxTestBuild.isChecked()
 		
 		try:
 			fmiGenerator.generate()
+			eslf.page.ui.plainTextEditLog.setPlainText(fmiGenerator.messages.join("\n"))
 		except Exception as e:
 			QtWidgets.QMessageBox.critical(self, "FMI Generation Error", "Some error occurred during FMI generation:\n{}".format(e.message))
 			return False

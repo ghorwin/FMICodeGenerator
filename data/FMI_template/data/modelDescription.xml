@@ -4,7 +4,7 @@
 	modelName="$$modelName$$"
 	guid="{$$GUID$$}"
 	description="$$description$$"
-	generationTool="C++ Code using FMI support functions from IBK@TU Dresden"
+	generationTool="ghorwin/FMICodeGenerator@github - C++ Code using FMI support functions from IBK@TU Dresden"
 	generationDateAndTime="$$dateandtime$$"
 	variableNamingConvention="structured"
 	numberOfEventIndicators="0">

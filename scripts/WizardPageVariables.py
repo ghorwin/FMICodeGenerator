@@ -56,7 +56,7 @@ class WizardPageVariables(QWidget):
 		# add default variable
 		newVar = VarDef("ResultRootDir", "fixed", "parameter", "exact", "String")
 		newVar.valueRef = 42
-		newVar.startValue = "<provided by MasterSim>"
+		newVar.startValue = "" # start value is empty, this parameter is automatically supplied by MasterSim
 		
 		self.variables.append(newVar)
 		
@@ -126,7 +126,7 @@ class WizardPageVariables(QWidget):
 		# add a new table row and enabled edit field
 		currentVarCount = self.ui.tableWidget.rowCount()
 		
-		newVar = VarDef("<unnamed>", "continuous", "local", "exact", "Real")
+		newVar = VarDef("unnamed", "continuous", "local", "exact", "Real")
 		self.variables.append(newVar)
 		
 		# update table

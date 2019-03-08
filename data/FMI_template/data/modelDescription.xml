@@ -50,8 +50,8 @@
 
 		<!-- For input variables we need to give a 'start' attribute -->
 		<!-- For output variables with initial="exact" we need to give a 'start' attribute -->
-
 		$$scalarVariables$$
+
 	</ModelVariables>
 
 	<ModelStructure>
@@ -59,7 +59,8 @@
 			<!-- dependencies must be defined for all output quantities. 'dependencyKind' is only needed
 				when some dependencies are constant factors or parameters.
 			-->
-			<Unknown index="2" dependencies="1"/>
+			$$outputDependencies$$
+
 		</Outputs>
 	</ModelStructure>
 

@@ -305,12 +305,17 @@ class FMIGenerator:
 		</ScalarVariable>		
 		"""
 		
+		MODEL_STRUCTURE_TEMPLATE = """			<Unknown index="$$index$$" dependencies="$$dependlist$$"/>
+		"""
+		
 		scalarVariableDefs = ""
 		# now add all variables one by one
 		nextValueRef = 1
 		idx = 0
+		dependList = ""
 		for var in self.variables:
 			idx = idx + 1
+			var.idx = idx
 			varDefBlock = VARIABLE_TEMPLATE
 			varDefBlock = varDefBlock.replace("$$index$$",str(idx))
 			varDefBlock = varDefBlock.replace("$$name$$",var.name)
@@ -326,7 +331,10 @@ class FMIGenerator:
 				varDefBlock = varDefBlock.replace("$$valueRef$$",str(nextValueRef))
 			else:
 				varDefBlock = varDefBlock.replace("$$valueRef$$",str(var.valueRef))
-				
+			
+			if var.causality == "input":
+				dependList = dependList + " " + str(idx)
+			
 			varDefBlock = varDefBlock.replace("$$variability$$",var.variability)
 			varDefBlock = varDefBlock.replace("$$causality$$",var.causality)
 			varDefBlock = varDefBlock.replace("$$initial$$",var.initial)
@@ -337,9 +345,20 @@ class FMIGenerator:
 			scalarVariableDefs = scalarVariableDefs + "\n" + varDefBlock
 		
 		data = data.replace("$$scalarVariables$$",scalarVariableDefs)
-		
-		return data
 
+		dependList = dependList.strip()
+		
+		# output dependency block	
+		modelStructureDefs = ""
+		for var in self.variables:
+			if var.causality == "output":
+				dependsDef = MODEL_STRUCTURE_TEMPLATE
+				dependsDef = dependsDef.replace("$$index$$",str(var.idx))
+				dependsDef = dependsDef.replace("$$dependlist$$", dependList)
+				modelStructureDefs = modelStructureDefs + "\n" + dependsDef
+	
+		data = data.replace("$$outputDependencies$$", modelStructureDefs)
+		return data
 
 
 	def testBuildFMU(self):

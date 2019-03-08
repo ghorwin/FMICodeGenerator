@@ -282,6 +282,62 @@ class FMIGenerator:
 		data = data.replace("$$description$$", self.description)
 		data = data.replace("$$modelName$$",self.modelName)
 		
+		
+		# generate scalar variable section
+		
+		# first create a set of all predefined valueReferences
+		valueRefs = set()
+		
+		for var in self.variables:
+			if var.valueRef != -1:
+				valueRefs.add(var.valueRef)
+		
+		
+		VARIABLE_TEMPLATE = """
+		<!-- Index of variable = "$$index$$" -->
+		<ScalarVariable
+			name="$$name$$"
+			valueReference="$$valueRef$$"
+			variability="$$variability$$"
+			causality="$$causality$$"
+			initial="$$initial$$">
+			<$$typeID$$ start="$$start$$"/>
+		</ScalarVariable>		
+		"""
+		
+		scalarVariableDefs = ""
+		# now add all variables one by one
+		nextValueRef = 1
+		idx = 0
+		for var in self.variables:
+			idx = idx + 1
+			varDefBlock = VARIABLE_TEMPLATE
+			varDefBlock = varDefBlock.replace("$$index$$",str(idx))
+			varDefBlock = varDefBlock.replace("$$name$$",var.name)
+			
+			# generate value if auto-numbered
+			if var.valueRef == -1:
+				# find first unused index
+				i = nextValueRef
+				while i in valueRefs:
+					i = i + 1
+				nextValueRef = i
+				valueRefs.add(i)
+				varDefBlock = varDefBlock.replace("$$valueRef$$",str(nextValueRef))
+			else:
+				varDefBlock = varDefBlock.replace("$$valueRef$$",str(var.valueRef))
+				
+			varDefBlock = varDefBlock.replace("$$variability$$",var.variability)
+			varDefBlock = varDefBlock.replace("$$causality$$",var.causality)
+			varDefBlock = varDefBlock.replace("$$initial$$",var.initial)
+
+			varDefBlock = varDefBlock.replace("$$typeID$$",var.typeID)
+			varDefBlock = varDefBlock.replace("$$start$$",var.startValue)
+		
+			scalarVariableDefs = scalarVariableDefs + "\n" + varDefBlock
+		
+		data = data.replace("$$scalarVariables$$",scalarVariableDefs)
+		
 		return data
 
 

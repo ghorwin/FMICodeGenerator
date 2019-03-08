@@ -51,25 +51,7 @@
 		<!-- For input variables we need to give a 'start' attribute -->
 		<!-- For output variables with initial="exact" we need to give a 'start' attribute -->
 
-		<!-- Index of variable = "1" -->
-		<ScalarVariable
-			name="x3"
-			valueReference="3"
-			variability="continuous"
-			causality="input">
-			<Real start="0.0"/>
-		</ScalarVariable>
-
-		<!-- Index of variable = "2" -->
-		<ScalarVariable
-			name="x4"
-			valueReference="4"
-			variability="continuous"
-			causality="output"
-			initial="exact">
-			<Real start="0.0"/>
-		</ScalarVariable>
-
+		$$scalarVariables$$
 	</ModelVariables>
 
 	<ModelStructure>

@@ -20,7 +20,7 @@
 	-->
 
 	<ModelExchange
-		modelIdentifier="Part3"
+		modelIdentifier="$$modelName$$"
 		completedlntegratorStepNotNeeded="true"
 		canNotUseMemoryManagementFunctions="true"
 		canGetAndSetFMUstate="true"
@@ -28,7 +28,7 @@
 	/>
 
 	<CoSimulation
-		modelIdentifier="Part3"
+		modelIdentifier="$$modelName$$"
 		canHandleVariableCommunicationStepSize="true"
 		canInterpolateInputs="false"
 		maxOutputDerivativeOrder="0"

@@ -53,13 +53,16 @@ class WizardPageBasicProperties(QWidget):
 		super(WizardPageBasicProperties, self).__init__()
 		self.ui = Ui_WizardPageBasicProperties()
 		self.ui.setupUi(self)
-		self.ui.lineEditTargetDir.setText( QDir.home().absolutePath() )
+		self.ui.lineEditTargetDir.setText( os.path.normpath(QDir.home().absolutePath() ) ) 
 		self.show()
 	
 	@pyqtSlot()
 	def on_lineEditModelName_editingFinished(self):
 		# auto-generate filename for FMU unless previously entered/selected
 		targetFileName = os.path.join(self.ui.lineEditTargetDir.text(), self.ui.lineEditModelName.text().strip())
+		targetFileName = os.path.normpath(targetFileName)
+		if self.ui.lineEditFMUFilePath.text() == targetFileName:
+			return
 		self.ui.lineEditFMUFilePath.setText(targetFileName)
 		inputDataCacheFile = targetFileName + ".input"
 		if (os.path.exists(inputDataCacheFile)):

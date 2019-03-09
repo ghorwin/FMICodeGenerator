@@ -270,11 +270,15 @@ class FMIGenerator:
 	
 				try:
 					# read file into memory, variable 'data'
-					fobj = open(src, 'r')
-					data = fobj.read().decode('utf8')
+					if sys.version_info[0] < 3:
+						fobj = open(src, 'r')
+						data = fobj.read().decode('utf8')
+					else:
+						fobj = open(src, 'r', encoding='utf-8')
+						data = fobj.read()
 					fobj.close()
 				except Exception as e:
-					self.printMsg(e)
+					self.printMsg(str(e))
 					raise RuntimeError("Error reading file: {}".format(src))
 	
 				# generic data adjustment
@@ -292,10 +296,15 @@ class FMIGenerator:
 	
 				# finally, write data back to file
 				try:
-					fobj = open(src, 'w')
-					fobj.write(data.encode("utf8"))
+					if sys.version_info[0] < 3:
+						fobj = open(src, 'w')
+						fobj.write(data.encode("utf8"))
+					else:
+						fobj = open(src, 'w',encoding="utf-8")
+						fobj.write(data)
 					fobj.close()
-				except:
+				except Exception as e:
+					self.printMsg("Error writing file: {}".format(str(e)))
 					raise RuntimeError("Error writing file: {}".format(src))
 
 

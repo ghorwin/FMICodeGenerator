@@ -155,7 +155,7 @@ class PageGenerate(QtWidgets.QWizardPage):
 		except Exception as e:
 			msgs = "\n".join(fmiGenerator.messages)
 			self.page.ui.plainTextEditLog.setPlainText(msgs)
-			QtWidgets.QMessageBox.critical(self, "FMI Generation Error", "Some error occurred during FMI generation:\n{}".format(e.message))
+			res = QtWidgets.QMessageBox.critical(self, "FMI Generation Error", "Some error occurred during FMI generation:\n{}".format(str(e)))
 			return False
 		
 		QtWidgets.QMessageBox.information(self, "FMU Generation Completed", 

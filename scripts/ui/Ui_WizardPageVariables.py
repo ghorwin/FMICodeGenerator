@@ -180,4 +180,4 @@ class Ui_WizardPageVariables(object):
 		self.comboBoxTypeID.setItemText(2, _translate("WizardPageVariables", "Boolean"))
 		self.comboBoxTypeID.setItemText(3, _translate("WizardPageVariables", "String"))
 
-import FMIGenerator_rc
+import ui.FMIGenerator_rc

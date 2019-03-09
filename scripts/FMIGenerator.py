@@ -524,15 +524,7 @@ class FMIGenerator:
 					raise RuntimeError("Error during compilation of FMU.")
 
 				self.printMsg("Compiled FMU successfully")
-	
-				# renaming/moving file    
-				for root, dircs, files in os.walk(binDir):
-					for file in files:
-						if file == 'lib'+ self.modelName + '.so.1.0.0':
-							oldFileName = os.path.join(binDir,'lib'+ self.modelName + '.so.1.0.0')
-							newFileName = os.path.join(binDir,self.modelName + '.dll')
-							os.rename(oldFileName,newFileName)
-	
+		
 				deploy = subprocess.Popen(["bash", './deploy.sh'], cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
 				outputMsg,errorMsg = deploy.communicate()  
 				dc = deploy.returncode             

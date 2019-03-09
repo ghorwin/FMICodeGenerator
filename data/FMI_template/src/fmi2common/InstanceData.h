@@ -212,12 +212,6 @@ public:
 	/*! If true, this is a ModelExchange FMU. */
 	bool							m_modelExchange;
 
-	/*! Base directory for storing FMU specific results.
-		Set via setStringParameter() with parameter name "ResultsRootDir" with fixed ID 42.
-		String is an UTF8 encoded path.
-	*/
-	std::string						m_resultsRootDir;
-
 	std::map<int,int>				m_boolInput;
 	std::map<int,double>			m_realInput;
 	std::map<int,int>				m_integerInput;

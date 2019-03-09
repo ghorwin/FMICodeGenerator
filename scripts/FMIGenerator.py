@@ -387,30 +387,108 @@ class FMIGenerator:
 		
 		"""
 		
-		data.replace("$$GUID$$", str(guid))		
+		data = data.replace("$$GUID$$", str(guid))		
 
 		# generate variable defines
 		s = ""
 		for var in self.variables:
+			# compose type prefix for cpp member variables
+			typePrefix = ""
+			cppType = ""
+			if var.typeID == "Real":
+				typePrefix = "real"
+				cppType = "double"
+			elif  var.typeID == "Boolean":
+				typePrefix = "bool"
+				cppType = "bool"
+			elif  var.typeID == "Integer":
+				typePrefix = "integer"
+				cppType = "int"
+			elif  var.typeID == "String":
+				typePrefix = "string"
+				cppType = "const std::string &"
+			assert(typePrefix)
+			
 			if var.causality == "input":
 				sdef = "#define FMI_INPUT_{} {}".format(var.name, var.valueRef)
 				s = s + sdef + "\n"
 				var.varDefine = "FMI_INPUT_{}".format(var.name)
+				var.cppVariable = "m_{}Input[{}]".format(typePrefix, var.varDefine)
+				var.getStatement = "{} {} = {};".format(cppType, var.name, var.cppVariable)
 			elif var.causality == "output":
 				sdef = "#define FMI_OUTPUT_{} {}".format(var.name, var.valueRef)
 				s = s + sdef + "\n"
 				var.varDefine = "FMI_OUTPUT_{}".format(var.name)
+				var.cppVariable = "m_{}Output[{}]".format(typePrefix, var.varDefine)
+				if var.typeID == "String":
+					var.setStatement = '{} = ""; // TODO : store your results here'.format(var.cppVariable)
+				else:
+					var.setStatement = "{} = 0; // TODO : store your results here".format(var.cppVariable)
 			elif var.causality == "parameter":
 				sdef = "#define FMI_PARA_{} {}".format(var.name, var.valueRef)
 				s = s + sdef + "\n"
 				var.varDefine = "FMI_PARA_{}".format(var.name)
+				var.cppVariable = "m_{}Input[{}]".format(typePrefix, var.varDefine)
+				var.getStatement = "{} {} = {};".format(cppType, var.name, var.cppVariable)
+			else:
+				var.varDefine = "" # variable will not be used in cpp code
+				
 
 		data = data.replace("$$variables$$", s)
-		data = data.replace("$$initialization$$", "")		
+		
+		# generate initialization code
+		sIn = ""
+		for var in self.variables:
+			if var.causality == "input" or var.causality == "parameter":
+				if var.typeID == "String":
+					sdef = '\t{} = \"{}\";'.format(var.cppVariable, var.startValue)
+				else:
+					# we expect start value to be an integer value, otherwise we default to 0
+					if len(var.startValue) == 0:
+						var.startValue = "0"
+					sdef = "\t{} = {};".format(var.cppVariable, var.startValue)
+				sIn = sIn + sdef + "\n"
+		if len(sIn) > 0:
+			sIn = "\t// initialize input variables and/or parameters\n" + sIn + "\n"
+			
+		sOut = ""
+		for var in self.variables:
+			if var.causality == "output":
+				if var.typeID == "String":
+					sdef = '\t\t{} = \"{}\";'.format(var.cppVariable, var.startValue)
+				else:
+					# we expect start value to be an integer value, otherwise we default to 0
+					if len(var.startValue) == 0:
+						var.startValue = "0"
+					sdef = "\t{} = {};".format(var.cppVariable, var.startValue)
+				sOut = sOut + sdef + "\n"
+		if len(sOut) > 0:
+			sOut = "\t// initialize output variables\n" + sOut + "\n"
+		
+		data = data.replace("$$initialization$$", sIn + sOut)		
+		
+		# todo states
+		
 		data = data.replace("$$initialStatesME$$", "")		
 		data = data.replace("$$initialStatesCS$$", "")		
-		data = data.replace("$$getInputVars$$", "")		
-		data = data.replace("$$setOutputVars$$", "")		
+		
+		# compose getter block
+		s = ""
+		for var in self.variables:
+			if var.causality == "input" or var.causality == "parameter":
+				sdef = "\t" + var.getStatement
+				s = s + sdef + "\n"		
+		data = data.replace("$$getInputVars$$", s)
+		
+		# compose setter block
+		s = ""
+		for var in self.variables:
+			if var.causality == "output":
+				sdef = "\t" + var.setStatement
+				s = s + sdef + "\n"
+		data = data.replace("$$setOutputVars$$", s)		
+		
+		
 		data = data.replace("$$serializationSizeVars$$", "")		
 		data = data.replace("$$serializeVars$$", "")		
 		data = data.replace("$$deserializeVars$$", "")		

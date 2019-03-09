@@ -89,13 +89,8 @@ void InstanceData::setIntParameter(int varID, int value) {
 
 
 void InstanceData::setStringParameter(int varID, fmi2String value) {
-	// special handling for ResultsRootDir parameter
-	if (varID == 42)
-		m_resultsRootDir = value;
-	else {
-		checkIfIDExists(m_stringInput, varID);
-		m_stringInput[varID] = value;
-	}
+	checkIfIDExists(m_stringInput, varID);
+	m_stringInput[varID] = value;
 	m_externalInputVarsModified = true;
 }
 

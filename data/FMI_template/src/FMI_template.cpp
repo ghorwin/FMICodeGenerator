@@ -58,7 +58,7 @@ InstanceData * InstanceData::create() {
 FMI_template::FMI_template() :
 	InstanceData()
 {
-	$$initialization$$
+$$initialization$$
 }
 
 
@@ -96,12 +96,12 @@ void FMI_template::updateIfModified() {
 		return;
 
 	// get input variables
-	$$getInputVars$$
+$$getInputVars$$
 
 	// TODO : implement your code here
 
 	// output variables
-	$$setOutputVars$$
+$$setOutputVars$$
 
 	// reset externalInputVarsModified flag
 	m_externalInputVarsModified = false;
@@ -115,14 +115,14 @@ void FMI_template::integrateTo(double tCommunicationIntervalEnd) {
 	//   m_currentTimePoint = t_IntervalStart;
 
 	// get input variables
-	$$getInputVars$$
+$$getInputVars$$
 
 
 	// TODO : implement your code here
 
 
 	// output variables
-	$$setOutputVars$$
+$$setOutputVars$$
 
 	m_currentTimePoint = tCommunicationIntervalEnd;
 

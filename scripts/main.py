@@ -61,6 +61,13 @@ if args.description != None:
 else:
 	print ("WARNING: Model description missing.")
 
+# setup variables (test code below)
+if False:
+	v = VarDef("InputVar1", "continuous", "input", "exact", "Real") # valueRef will be given automatically
+	v.startValue = 15
+	fmiGenerator.variables.append(v)
+
+
 # call function of generator to create model
 try:
 	fmiGenerator.generate()

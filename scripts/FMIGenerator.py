@@ -39,6 +39,7 @@ import shutil
 from shutil import *
 import uuid
 import time
+import json
 import subprocess
 import datetime
 import platform
@@ -67,7 +68,22 @@ class VarDef:
 		self.typeID = typeID
 		self.startValue = ""
 
+	def toJson(self):
+		return {
+		    "name" : self.name,
+		    "valueRef" : self.valueRef,
+		    "variability" : self.variability,
+		    "causality" : self.causality,
+		    "initial" : self.initial,
+		    "typeID" : self.typeID,
+		    "startValue" : self.startValue
+		}
 
+def varDefFromJson(data):
+	v = VarDef(data['name'], data['variability'], data['causality'], data['initial'], data['typeID'])
+	v.startValue = data['startValue']
+	v.valueRef = data['valueRef']
+	return v
 
 class FMIGenerator:
 	"""Class that encapsulates all parameters needed to generate the FMU.
@@ -145,7 +161,11 @@ class FMIGenerator:
 		# (which would be weird and break the code, hence a warning)
 		if self.modelName == "FMI_template":
 			printMsg("WARNING: model name is same as template folder name. This may not work!")
-			
+		
+		# store input data into <targetDir>/<modelName>.input so that it can be read again by wizard to
+		# populate input data
+		self.writeInputData(self.targetDirPath + ".input")
+		
 		self.printMsg("Copying template directory to target directory (and renaming files)")
 		self.copyTemplateDirectory(templateDirPath)
 		
@@ -525,15 +545,18 @@ class FMIGenerator:
 
 				self.printMsg("Compiled FMU successfully")
 		
-				deploy = subprocess.Popen(["bash", './deploy.sh'], cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
-				outputMsg,errorMsg = deploy.communicate()  
-				dc = deploy.returncode             
+				# call batch file to build the FMI library
+				pipe = subprocess.Popen("deploy.bat", creationflags=subprocess.CREATE_NEW_CONSOLE, cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                
+				# retrieve output and error messages
+				outputMsg, errorMsg = pipe.communicate()  
+				# get return code
+				rc = pipe.returncode 
 	
 				if dc != 0:
 					self.printMsg(errorMsg)
 					raise RuntimeError("Error during compilation of FMU")
 
-				self.printMsg("Compiled FMU successfully")
+				self.printMsg("Successfully created {}".format(self.modelName + ".fmu")	)
 	
 			else:
 				# shell file execution for Mac & Linux
@@ -546,20 +569,6 @@ class FMIGenerator:
 					raise RuntimeError("Error during compilation of FMU")
 
 				self.printMsg("Compiled FMU successfully")
-	
-				if platform.system() == 'Darwin':
-					libName = "lib" + self.modelName + ".dylib.1.0.0"
-				else:
-					libName = "lib" + self.modelName + ".so.1.0.0"
-					
-				for root, dircs, files in os.walk(buildDir):
-					for f in files:
-						if f == libName:
-							oldFileName = os.path.join(root, libName)
-							newFileName = os.path.join(binDir, self.modelName + '.so')
-							os.rename(oldFileName, newFileName)
-							self.printMsg("Creating: {}".format(newFileName))
-							break
 	
 				# Deployment
 	
@@ -578,3 +587,30 @@ class FMIGenerator:
 			self.printMsg("Error building FMU.")
 			raise
 
+
+	def writeInputData(self, targetFile):
+		"""Writes all input data to FMIGenerator to file so it can be read later by the FMIGeneratorWizard to 
+		populate the dialog again (greatly helps in testing the code)"""
+		
+		varArray = []
+		
+		for v in self.variables:
+			varArray.append(v.toJson())
+		
+		data = {
+		  "modelName" : self.modelName,
+		  "description" : self.description,
+		  "variables" : varArray
+		}
+		
+		with open(targetFile, 'w') as outfile:
+			json.dump(data, outfile, indent=4)		
+			
+	
+	def readInputData(self, targetFile):
+		with open(targetFile, 'r') as f:
+			data = json.load(f)
+			self.description = data['description']
+			for a in data['variables']:
+				v = varDefFromJson(a)
+				self.variables.append(v)

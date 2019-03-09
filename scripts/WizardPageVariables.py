@@ -42,7 +42,7 @@ from PyQt5.QtCore import pyqtSlot, Qt
 
 from ui.Ui_WizardPageVariables import Ui_WizardPageVariables
 
-from FMIGenerator import FMIGenerator, VarDef
+from FMIGenerator import FMIGenerator, VarDef, varDefFromJson
 
 class WizardPageVariables(QWidget):
 	def __init__(self):
@@ -120,6 +120,13 @@ class WizardPageVariables(QWidget):
 		self.ui.comboBoxTypeID.setCurrentIndex( self.ui.comboBoxTypeID.findText(var.typeID) )
 		self.ui.lineEditStart.setText( var.startValue )
 	
+	@pyqtSlot(str)
+	def onLoadDefaults(self, inputDataFile):
+		fmiGenerator = FMIGenerator()
+		fmiGenerator.readInputData(inputDataFile)
+		self.variables = fmiGenerator.variables
+		self.updateTable()
+		
 
 	@pyqtSlot()
 	def on_toolButtonAdd_clicked(self):

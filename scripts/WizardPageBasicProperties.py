@@ -38,12 +38,17 @@
 
 import sys
 import os.path
-from PyQt5.QtWidgets import QWidget, QFileDialog
-from PyQt5.QtCore import pyqtSlot, QDir
+from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox
+from PyQt5.QtCore import pyqtSlot, pyqtSignal, QDir
 
 from ui.Ui_WizardPageBasicProperties import Ui_WizardPageBasicProperties
 
+from FMIGenerator import FMIGenerator
+
+
 class WizardPageBasicProperties(QWidget):
+	loadDefaults = pyqtSignal('QString')
+	
 	def __init__(self):
 		super(WizardPageBasicProperties, self).__init__()
 		self.ui = Ui_WizardPageBasicProperties()
@@ -56,13 +61,22 @@ class WizardPageBasicProperties(QWidget):
 		# auto-generate filename for FMU unless previously entered/selected
 		targetFileName = os.path.join(self.ui.lineEditTargetDir.text(), self.ui.lineEditModelName.text().strip())
 		self.ui.lineEditFMUFilePath.setText(targetFileName)
+		inputDataCacheFile = targetFileName + ".input"
+		if (os.path.exists(inputDataCacheFile)):
+			res = QMessageBox.question(self, "Import previous definitions", 
+			                           "A file with input data for the same FMU exists. Re-load input data?")
+			if res == QMessageBox.No:
+				return
+			fmiGenerator = FMIGenerator()
+			fmiGenerator.readInputData(inputDataCacheFile)
+			self.ui.plainTextEditDescription.setPlainText(fmiGenerator.description)
+			self.loadDefaults.emit(inputDataCacheFile)
+			
 
 
 	@pyqtSlot()
 	def on_lineEditTargetDir_editingFinished(self):
-		# auto-generate filename for FMU unless previously entered/selected
-		targetFileName = os.path.join(self.ui.lineEditTargetDir.text(), self.ui.lineEditModelName.text().strip())
-		self.ui.lineEditFMUFilePath.setText(targetFileName)
+		self.on_lineEditModelName_editingFinished()
 
 
 	@pyqtSlot()

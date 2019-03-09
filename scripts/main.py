@@ -64,7 +64,7 @@ else:
 # setup variables (test code below)
 if False:
 	v = VarDef("InputVar1", "continuous", "input", "exact", "Real") # valueRef will be given automatically
-	v.startValue = 15
+	v.startValue = "15"
 	fmiGenerator.variables.append(v)
 
 

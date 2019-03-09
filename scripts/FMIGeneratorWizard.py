@@ -42,7 +42,7 @@ import os.path
 
 from PyQt5 import QtCore
 from PyQt5 import QtGui
-from PyQt5.QtCore import pyqtProperty
+from PyQt5.QtCore import QObject, pyqtProperty, pyqtSignal 
 from PyQt5 import QtCore, QtWidgets
 
 from WizardPageBasicProperties import WizardPageBasicProperties
@@ -60,6 +60,9 @@ class FMIGeneratorWizard(QtWidgets.QWizard):
 		generatePage.pageBasicProps = self.page(0).page # get WizardPageBasicProperties
 		generatePage.pageVars = self.page(1).page # get WizardPageVariables
 		self.addPage(generatePage)
+		
+		# connect the signal/slots between pages
+		generatePage.pageBasicProps.loadDefaults.connect(generatePage.pageVars.onLoadDefaults)
 		
 		self.setWindowTitle("FMI Generator Wizard")
 		self.resize(1400,600)

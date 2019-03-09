@@ -54,14 +54,14 @@ class WizardPageBasicProperties(QWidget):
 	@pyqtSlot()
 	def on_lineEditModelName_editingFinished(self):
 		# auto-generate filename for FMU unless previously entered/selected
-		targetFileName = os.path.join(self.ui.lineEditTargetDir.text(), self.ui.lineEditModelName.text().strip() + ".fmu" )
+		targetFileName = os.path.join(self.ui.lineEditTargetDir.text(), self.ui.lineEditModelName.text().strip())
 		self.ui.lineEditFMUFilePath.setText(targetFileName)
 
 
 	@pyqtSlot()
 	def on_lineEditTargetDir_editingFinished(self):
 		# auto-generate filename for FMU unless previously entered/selected
-		targetFileName = os.path.join(self.ui.lineEditTargetDir.text(), self.ui.lineEditModelName.text().strip() + ".fmu" )
+		targetFileName = os.path.join(self.ui.lineEditTargetDir.text(), self.ui.lineEditModelName.text().strip())
 		self.ui.lineEditFMUFilePath.setText(targetFileName)
 
 

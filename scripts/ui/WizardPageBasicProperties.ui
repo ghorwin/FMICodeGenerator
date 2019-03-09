@@ -23,7 +23,7 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Target directory:</string>
+         <string>Output directory:</string>
         </property>
        </widget>
       </item>
@@ -55,7 +55,7 @@
          </font>
         </property>
         <property name="text">
-         <string>Target directory can be an absolute or relative path.</string>
+         <string>Output directory can be an absolute or relative path.</string>
         </property>
        </widget>
       </item>
@@ -74,7 +74,7 @@
       <item row="4" column="0">
        <widget class="QLabel" name="label_5">
         <property name="text">
-         <string>FMU file path:</string>
+         <string>FMU directory:</string>
         </property>
        </widget>
       </item>

@@ -12,7 +12,6 @@ proj.directory-list = [{'dirloc': loc('third_party'),
                         'watch_for_changes': True}]
 proj.file-list = [loc('FMIGenerator.py'),
                   loc('FMIGeneratorWizard.py'),
-                  loc('FMI_GUI.py'),
                   loc('main.py'),
                   loc('WizardPageBasicProperties.py'),
                   loc('WizardPageGenerate.py'),

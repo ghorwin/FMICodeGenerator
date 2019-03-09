@@ -42,10 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 // FMI interface variables
 
-#define FMI_INPUT_X3 3
-#define FMI_OUTPUT_X4 4
-
-
+$$variables$$
 
 // *** Variables and functions to be implemented in user code. ***
 
@@ -61,11 +58,7 @@ InstanceData * InstanceData::create() {
 FMI_template::FMI_template() :
 	InstanceData()
 {
-	// initialize input variables
-	m_realInput[FMI_INPUT_X3] = 0;
-
-	// initialize output variables
-	m_realOutput[FMI_OUTPUT_X4] = 0; // initial value
+	$$initialization$$
 }
 
 
@@ -79,16 +72,16 @@ void FMI_template::init() {
 
 	if (m_modelExchange) {
 		// initialize states
-		m_yInput.resize(1);
-		m_ydot.resize(1);
+		$$initialStatesME$$
 
-		m_yInput[0] = 0;	// = x4
-		m_ydot[0] = 0;		// = \dot{x4}
+		// TODO : implement your own initialization code here
 	}
 	else {
 		// initialize states, these are used for our internal time integration
-		m_yInput.resize(1);
-		m_yInput[0] = 0;			// = x4, initial value
+		$$initialStatesCS$$
+
+		// TODO : implement your own initialization code here
+
 		// initialize integrator for co-simulation
 		m_currentTimePoint = 0;
 	}
@@ -97,55 +90,58 @@ void FMI_template::init() {
 }
 
 
+// model exchange: implementation of derivative and output update
 void FMI_template::updateIfModified() {
 	if (!m_externalInputVarsModified)
 		return;
-	double x3 = m_realInput[FMI_INPUT_X3];
 
-	// compute time derivative
-	m_ydot[0] = x3*2;
+	// get input variables
+	$$getInputVars$$
 
-	// output variable is the same as the conserved quantity
-	m_realOutput[FMI_OUTPUT_X4] = m_yInput[0];
+	// TODO : implement your code here
+
+	// output variables
+	$$setOutputVars$$
 
 	// reset externalInputVarsModified flag
 	m_externalInputVarsModified = false;
 }
 
 
-// only for Co-simulation
+// Co-simulation: time integration
 void FMI_template::integrateTo(double tCommunicationIntervalEnd) {
 
 	// state of FMU before integration:
 	//   m_currentTimePoint = t_IntervalStart;
-	//   m_y[0] = x4(t_IntervalStart)
-	//   m_realInput[FMI_INPUT_X3] = x3(t_IntervalStart...tCommunicationIntervalEnd) = const
 
-	// compute time step size
-	double dt = tCommunicationIntervalEnd - m_currentTimePoint;
-	double x3 = m_realInput[FMI_INPUT_X3];
-	double deltaX4 = dt*x3*2;
+	// get input variables
+	$$getInputVars$$
 
-	m_yInput[0] += deltaX4;
-	m_realOutput[FMI_OUTPUT_X4] = m_yInput[0];
+
+	// TODO : implement your code here
+
+
+	// output variables
+	$$setOutputVars$$
+
 	m_currentTimePoint = tCommunicationIntervalEnd;
 
 	// state of FMU after integration:
 	//   m_currentTimePoint = tCommunicationIntervalEnd;
-	//   m_y[0] = x4(tCommunicationIntervalEnd)
-	//   m_realOutput[FMI_INPUT_X4] = x4(tCommunicationIntervalEnd)
 }
 
 
 void FMI_template::computeFMUStateSize() {
 	// distinguish between ModelExchange and CoSimulation
 	if (m_modelExchange) {
-		// store time, y and ydot, and output
-		m_fmuStateSize = sizeof(double)*4;
+		// store time, states and outputs
+		m_fmuStateSize = sizeof(double)*1;
+		$$serializationSizeVars$$
 	}
 	else {
-		// store time, y and output
-		m_fmuStateSize = sizeof(double)*3;
+		// store time and outputs
+		m_fmuStateSize = sizeof(double)*1;
+		$$serializationSizeVars$$
 	}
 }
 
@@ -155,18 +151,12 @@ void FMI_template::serializeFMUstate(void * FMUstate) {
 	if (m_modelExchange) {
 		*dataStart = m_tInput;
 		++dataStart;
-		*dataStart = m_yInput[0];
-		++dataStart;
-		*dataStart = m_ydot[0];
-		++dataStart;
-		*dataStart = m_realOutput[FMI_OUTPUT_X4];
+		$$serializeVars$$
 	}
 	else {
 		*dataStart = m_currentTimePoint;
 		++dataStart;
-		*dataStart = m_yInput[0];
-		++dataStart;
-		*dataStart = m_realOutput[FMI_OUTPUT_X4];
+		$$serializeVars$$
 	}
 }
 
@@ -176,19 +166,13 @@ void FMI_template::deserializeFMUstate(void * FMUstate) {
 	if (m_modelExchange) {
 		m_tInput = *dataStart;
 		++dataStart;
-		m_yInput[0] = *dataStart;
-		++dataStart;
-		m_ydot[0] = *dataStart;
-		++dataStart;
-		m_realOutput[FMI_OUTPUT_X4] = *dataStart;
+		$$deserializeVars$$
 		m_externalInputVarsModified = true;
 	}
 	else {
 		m_currentTimePoint = *dataStart;
 		++dataStart;
-		m_yInput[0] = *dataStart;
-		++dataStart;
-		m_realOutput[FMI_OUTPUT_X4] = *dataStart;
+		$$deserializeVars$$
 	}
 }
 

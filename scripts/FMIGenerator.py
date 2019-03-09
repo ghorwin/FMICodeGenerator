@@ -149,6 +149,25 @@ class FMIGenerator:
 		self.printMsg("Copying template directory to target directory (and renaming files)")
 		self.copyTemplateDirectory(templateDirPath)
 		
+		self.printMsg("Generating unique value references")
+		# first create a set of all predefined valueReferences
+		valueRefs = set()
+		for var in self.variables:
+			if var.valueRef != -1:
+				valueRefs.add(var.valueRef)
+		# start auto-numbering from valueRef 1 
+		nextValueRef = 1
+		for var in self.variables:
+			# generate value if auto-numbered
+			if var.valueRef == -1:
+				# find first unused index
+				i = nextValueRef
+				while i in valueRefs:
+					i = i + 1
+				nextValueRef = i
+				valueRefs.add(i) # add value ref to set of already used valueRefs
+				var.valueRef = nextValueRef # remember assigned value reference
+	
 		self.printMsg ("Adjusting template files (replacing placeholders)")
 		self.substitutePlaceholders()
 
@@ -221,7 +240,7 @@ class FMIGenerator:
 
 		# We process file after file
 		
-		# loop to walk through the new folder  
+		# loop to walk through the new folder
 		for root, dirs, files in os.walk(self.targetDirPath):
 			# process all files
 			for f in files:
@@ -249,7 +268,7 @@ class FMIGenerator:
 			
 				# 2. <modelName>.cpp
 				if f==self.modelName + ".cpp":
-					data = data.replace("$$GUID$$", str(guid))
+					data = self.adjustSourceCodeFiles(data, guid)
 	
 				# finally, write data back to file
 				try:
@@ -262,9 +281,8 @@ class FMIGenerator:
 
 	def adjustModelDescription(self, data, localTimeStamp, guid):
 		"""Adjusts content of `modelDescription.xml` file.
-		Reads the template file. Inserts strings for model name, description, 
+		Take the content of template file in argument data. Inserts strings for model name, description, 
 		date and time, GUID, ...
-		And writes the modified string to file again.
 
 		Arguments:
 
@@ -285,14 +303,6 @@ class FMIGenerator:
 		
 		# generate scalar variable section
 		
-		# first create a set of all predefined valueReferences
-		valueRefs = set()
-		
-		for var in self.variables:
-			if var.valueRef != -1:
-				valueRefs.add(var.valueRef)
-		
-		
 		VARIABLE_TEMPLATE = """
 		<!-- Index of variable = "$$index$$" -->
 		<ScalarVariable
@@ -310,7 +320,6 @@ class FMIGenerator:
 		
 		scalarVariableDefs = ""
 		# now add all variables one by one
-		nextValueRef = 1
 		idx = 0
 		dependList = ""
 		for var in self.variables:
@@ -321,16 +330,8 @@ class FMIGenerator:
 			varDefBlock = varDefBlock.replace("$$name$$",var.name)
 			
 			# generate value if auto-numbered
-			if var.valueRef == -1:
-				# find first unused index
-				i = nextValueRef
-				while i in valueRefs:
-					i = i + 1
-				nextValueRef = i
-				valueRefs.add(i)
-				varDefBlock = varDefBlock.replace("$$valueRef$$",str(nextValueRef))
-			else:
-				varDefBlock = varDefBlock.replace("$$valueRef$$",str(var.valueRef))
+			assert(var.valueRef != -1)
+			varDefBlock = varDefBlock.replace("$$valueRef$$",str(var.valueRef))	
 			
 			if var.causality == "input":
 				dependList = dependList + " " + str(idx)
@@ -361,6 +362,62 @@ class FMIGenerator:
 		return data
 
 
+	def adjustSourceCodeFiles(self, data, guid):
+		"""Adjusts content of `<modelName>.cpp` file.
+		Replaces the following placeholders:
+		
+		- $$variables$$ - defines for each published variables
+		- $$initialization$$ - start values for all input and output variables
+		- $$initialStatesME$$ - initialization code for Model Exchange
+		- $$initialStatesCS$$ - initialization code for Model Exchange
+		- $$getInputVars$$ - retrieves input/parameter values for access in C++ code
+		- $$setOutputVars$$ - sets calculated values for access in C++ code
+		- $$serializationSizeVars$$ - adds size for each input and output variable to be stored during serialization
+		- $$serializaVars$$ - code to serialize input/output vars
+		- $$deserializaVars$$ - code to deserialize input/output vars
+		
+		Arguments:
+
+		data -- string holding the contents of the <modelName>.cpp file
+		guid -- globally unique identifier
+
+		Returns:
+		
+		Returns the modified string.
+		
+		"""
+		
+		data.replace("$$GUID$$", str(guid))		
+
+		# generate variable defines
+		s = ""
+		for var in self.variables:
+			if var.causality == "input":
+				sdef = "#define FMI_INPUT_{} {}".format(var.name, var.valueRef)
+				s = s + sdef + "\n"
+				var.varDefine = "FMI_INPUT_{}".format(var.name)
+			elif var.causality == "output":
+				sdef = "#define FMI_OUTPUT_{} {}".format(var.name, var.valueRef)
+				s = s + sdef + "\n"
+				var.varDefine = "FMI_OUTPUT_{}".format(var.name)
+			elif var.causality == "parameter":
+				sdef = "#define FMI_PARA_{} {}".format(var.name, var.valueRef)
+				s = s + sdef + "\n"
+				var.varDefine = "FMI_PARA_{}".format(var.name)
+
+		data = data.replace("$$variables$$", s)
+		data = data.replace("$$initialization$$", "")		
+		data = data.replace("$$initialStatesME$$", "")		
+		data = data.replace("$$initialStatesCS$$", "")		
+		data = data.replace("$$getInputVars$$", "")		
+		data = data.replace("$$setOutputVars$$", "")		
+		data = data.replace("$$serializationSizeVars$$", "")		
+		data = data.replace("$$serializeVars$$", "")		
+		data = data.replace("$$deserializeVars$$", "")		
+
+		return data
+	
+	
 	def testBuildFMU(self):
 		"""Runs a cmake-based compilation of the generated FMU to check if the code compiles.
 		"""

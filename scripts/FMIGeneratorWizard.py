@@ -83,12 +83,14 @@ class PageBasicProperties(QtWidgets.QWizardPage):
 			self.page.ui.lineEditModelName.selectAll()
 			self.page.ui.lineEditModelName.setFocus()
 			return False
-		fmuTargetDir = self.page.ui.lineEditTargetDir.text().strip()
+		fmuTargetDir = self.page.ui.lineEditTargetDir.text().strip() # this is the base directory where the target directory is created
 		if len(fmuTargetDir) == 0:
 			QtWidgets.QMessageBox.critical(self, "Missing input", "A target directory is required.")
 			self.page.ui.lineEditTargetDir.selectAll()
 			self.page.ui.lineEditTargetDir.setFocus()
 			return False
+		# compose directory including subdir
+		fmuTargetDir = os.path.join(fmuTargetDir, fmuName)
 		# check if directory exists and is a file
 		if os.path.exists(fmuTargetDir):
 			if os.path.isfile(fmuTargetDir):

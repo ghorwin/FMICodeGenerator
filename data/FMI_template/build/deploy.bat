@@ -1,7 +1,7 @@
 @echo off
 :: script is supposed to be executed in /build directory
 
-if exist ..\..\bin\release_x64\FMI_template.dll goto DLL_EXISTS
+if exist ..\bin\release_x64\FMI_template.dll goto DLL_EXISTS
 echo "ERROR: File FMI_template.dll expected in directory ..\bin\release_x64\FMI_template.dll, but does not exist.
 exit /b 1
 :DLL_EXISTS

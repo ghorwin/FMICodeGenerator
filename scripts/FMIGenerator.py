@@ -541,28 +541,28 @@ class FMIGenerator:
 			if platform.system() == "Windows":
 				
 				# call batch file to build the FMI library
-				pipe = subprocess.Popen("build.bat", creationflags=subprocess.CREATE_NEW_CONSOLE, cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                
+				pipe = subprocess.Popen(["build_VC_x64.bat"], shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE, cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                
 				# retrieve output and error messages
-				outputMsg, errorMsg = pipe.communicate()  
+				outputMsg, errorMsg = pipe.communicate()
 				# get return code
-				rc = pipe.returncode 
+				rc = pipe.returncode
 	
 				# if return code is different from 0, print the error message
 				if rc != 0:
-					self.printMsg(errorMsg)
+					self.printMsg(str(outputMsg) + "\n" + str(errorMsg))
 					raise RuntimeError("Error during compilation of FMU.")
 
 				self.printMsg("Compiled FMU successfully")
 		
 				# call batch file to build the FMI library
-				pipe = subprocess.Popen("deploy.bat", creationflags=subprocess.CREATE_NEW_CONSOLE, cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                
+				pipe = subprocess.Popen(["deploy.bat"], shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE, cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                
 				# retrieve output and error messages
-				outputMsg, errorMsg = pipe.communicate()  
+				outputMsg, errorMsg = pipe.communicate()
 				# get return code
-				rc = pipe.returncode 
+				rc = pipe.returncode
 	
-				if dc != 0:
-					self.printMsg(errorMsg)
+				if rc != 0:
+					self.printMsg(str(outputMsg) + "\n" + str(errorMsg))
 					raise RuntimeError("Error during compilation of FMU")
 
 				self.printMsg("Successfully created {}".format(self.modelName + ".fmu")	)
@@ -593,6 +593,7 @@ class FMIGenerator:
 				self.printMsg("Successfully created {}".format(self.modelName + ".fmu")	)
 	
 		except Exception as e:
+			self.printMsg(str(e))
 			self.printMsg("Error building FMU.")
 			raise
 

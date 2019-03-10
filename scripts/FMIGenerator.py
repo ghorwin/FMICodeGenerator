@@ -384,7 +384,7 @@ class FMIGenerator:
 			if var.initial=="calculated":
 				varDefBlock = varDefBlock.replace("$$start$$","")
 			else:
-				varDefBlock = varDefBlock.replace("$$start$$"," start={}".format(var.startValue))
+				varDefBlock = varDefBlock.replace("$$start$$",' start="{}"'.format(var.startValue))
 		
 			scalarVariableDefs = scalarVariableDefs + "\n" + varDefBlock
 		

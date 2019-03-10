@@ -63,7 +63,7 @@ class FMIGeneratorWizard(QtWidgets.QWizard):
 		generatePage.pageBasicProps.loadDefaults.connect(generatePage.pageVars.onLoadDefaults)
 		
 		self.setWindowTitle("FMI Generator Wizard")
-		self.resize(1400,600)
+		self.resize(800,600)
 
 
 class PageBasicProperties(QtWidgets.QWizardPage):

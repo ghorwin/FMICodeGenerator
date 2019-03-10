@@ -54,32 +54,32 @@ cd <FmuModelName>/build
 ./deploy.sh
 ```
 
-# System requirements / setup
+## System requirements / setup
 
 The script runs with Python 2.7 and 3.x.
 
-## Linux
+#### Linux
 
 Simply install the python packages and pyqt5.
 
-### Ubuntu 16.04 - Python 2.7
+##### Ubuntu 16.04 - Python 2.7
 
 ```bash
 > sudo apt get install cmake built-essential qt5-default qt5-qmake qtcreator python-pyqt5 pyqt5-dev-tools 
 ```
 The package `pyqt5-dev-tools` contains the scripts `pyuic5` and `pyrcc5` needed for development of the FMIGenerator itself.
 
-### Ubuntu 16.04 - Python 3
+##### Ubuntu 16.04 - Python 3
 
 ```bash
 > sudo apt get install cmake built-essential qt5-default qt5-qmake qtcreator python3 python3-pyqt5 pyqt5-dev-tools 
 ```
 
-## Mac
+#### Mac
 
 Use homebrew and/or macports to install python and pyqt5 (or alternatively pip).
 
-## Windows
+#### Windows
 
 Things are bit more complicated for Windows. While the code can be compiled (thanks to the CMake build system) using quite a few build chains available on windows, the `batch`-scripts are currently expecting a standard Visual Studio 2015 installation (r`c:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat`) and 7zip must be installed with `7za` in the PATH. Also, `cmake` must be in in the PATH.
 

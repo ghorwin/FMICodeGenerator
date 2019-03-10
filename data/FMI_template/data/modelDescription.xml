@@ -3,6 +3,9 @@
 	fmiVersion="2.0"
 	modelName="$$modelName$$"
 	guid="{$$GUID$$}"
+	author="$$author$$"
+	copyright="$$copyright$$"
+	license="$$license$$"
 	description="$$description$$"
 	generationTool="ghorwin/FMICodeGenerator@github - C++ Code using FMI support functions from IBK@TU Dresden"
 	generationDateAndTime="$$dateandtime$$"
@@ -21,7 +24,7 @@
 
 	<ModelExchange
 		modelIdentifier="$$modelName$$"
-		completedlntegratorStepNotNeeded="true"
+		completedIntegratorStepNotNeeded="true"
 		canNotUseMemoryManagementFunctions="true"
 		canGetAndSetFMUstate="true"
 		canSerializeFMUstate="true"

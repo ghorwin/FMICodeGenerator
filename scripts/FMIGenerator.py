@@ -333,6 +333,12 @@ class FMIGenerator:
 		data = data.replace("$$description$$", self.description)
 		data = data.replace("$$modelName$$",self.modelName)
 		
+		# TODO : substitute remaining placeholders
+		data = data.replace("$$version$$","1.0.0")
+		data = data.replace("$$author$$","not specified")
+		data = data.replace("$$copyright$$","not specified")
+		data = data.replace("$$license$$","not specified")
+		
 		
 		# generate scalar variable section
 		

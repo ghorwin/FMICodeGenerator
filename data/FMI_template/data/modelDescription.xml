@@ -3,6 +3,7 @@
 	fmiVersion="2.0"
 	modelName="$$modelName$$"
 	guid="{$$GUID$$}"
+	version="$$version$$"
 	author="$$author$$"
 	copyright="$$copyright$$"
 	license="$$license$$"

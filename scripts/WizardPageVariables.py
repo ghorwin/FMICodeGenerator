@@ -126,6 +126,11 @@ class WizardPageVariables(QWidget):
 		fmiGenerator.readInputData(inputDataFile)
 		self.variables = fmiGenerator.variables
 		self.updateTable()
+		if len(self.variables) > 0:
+			self.ui.tableWidget.selectRow(0)
+			self.updateEditField(self.variables[0])
+		else:
+			self.ui.groupBox_2.setEnabled(False)
 		
 
 	@pyqtSlot()

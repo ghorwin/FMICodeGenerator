@@ -350,7 +350,7 @@ class FMIGenerator:
 			variability="$$variability$$"
 			causality="$$causality$$"
 			initial="$$initial$$">
-			<$$typeID$$ start="$$start$$"/>
+			<$$typeID$$$$start$$/>
 		</ScalarVariable>		
 		"""
 		
@@ -380,7 +380,11 @@ class FMIGenerator:
 			varDefBlock = varDefBlock.replace("$$initial$$",var.initial)
 
 			varDefBlock = varDefBlock.replace("$$typeID$$",var.typeID)
-			varDefBlock = varDefBlock.replace("$$start$$",var.startValue)
+			
+			if var.initial=="calculated":
+				varDefBlock = varDefBlock.replace("$$start$$","")
+			else:
+				varDefBlock = varDefBlock.replace("$$start$$"," start={}".format(var.startValue))
 		
 			scalarVariableDefs = scalarVariableDefs + "\n" + varDefBlock
 		

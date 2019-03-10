@@ -40,10 +40,8 @@
 import sys
 import os.path
 
-from PyQt5 import QtCore
-from PyQt5 import QtGui
+from PyQt5 import QtGui, QtCore, QtWidgets
 from PyQt5.QtCore import QObject, pyqtProperty, pyqtSignal 
-from PyQt5 import QtCore, QtWidgets
 
 from WizardPageBasicProperties import WizardPageBasicProperties
 from WizardPageVariables import WizardPageVariables

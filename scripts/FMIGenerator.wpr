@@ -17,7 +17,4 @@ proj.file-list = [loc('FMIGenerator.py'),
                   loc('WizardPageGenerate.py'),
                   loc('WizardPageVariables.py')]
 proj.file-type = 'shared'
-proj.launch-config = {loc('main.py'): ('project',
-                                       (u'Test01 --description="ttest01"',
-        ''))}
-proj.main-file = loc('FMIGeneratorWizard.py')
+proj.main-file = loc('main.py')

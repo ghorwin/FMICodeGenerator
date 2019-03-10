@@ -42,7 +42,7 @@ import platform
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtGui import QFont
 
-from ui.Ui_WizardPageGenerate import Ui_WizardPageGenerate
+from Ui_WizardPageGenerate import Ui_WizardPageGenerate
 
 class WizardPageGenerate(QWidget):
 	def __init__(self):

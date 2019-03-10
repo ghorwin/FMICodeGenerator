@@ -40,7 +40,7 @@ import sys
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem
 from PyQt5.QtCore import pyqtSlot, Qt
 
-from ui.Ui_WizardPageVariables import Ui_WizardPageVariables
+from Ui_WizardPageVariables import Ui_WizardPageVariables
 
 from FMIGenerator import FMIGenerator, VarDef, varDefFromJson
 

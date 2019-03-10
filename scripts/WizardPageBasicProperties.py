@@ -41,7 +41,7 @@ import os.path
 from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QDir
 
-from ui.Ui_WizardPageBasicProperties import Ui_WizardPageBasicProperties
+from Ui_WizardPageBasicProperties import Ui_WizardPageBasicProperties
 
 from FMIGenerator import FMIGenerator
 

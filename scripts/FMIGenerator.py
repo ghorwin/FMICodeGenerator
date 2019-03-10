@@ -456,13 +456,13 @@ class FMIGenerator:
 				sdef = "#define FMI_INPUT_{} {}".format(var.name, var.valueRef)
 				s = s + sdef + "\n"
 				var.varDefine = "FMI_INPUT_{}".format(var.name)
-				var.cppVariable = "m_{}Input[{}]".format(typePrefix, var.varDefine)
+				var.cppVariable = "m_{}Var[{}]".format(typePrefix, var.varDefine)
 				var.getStatement = "{} {} = {};".format(cppType, var.name, var.cppVariable)
 			elif var.causality == "output":
 				sdef = "#define FMI_OUTPUT_{} {}".format(var.name, var.valueRef)
 				s = s + sdef + "\n"
 				var.varDefine = "FMI_OUTPUT_{}".format(var.name)
-				var.cppVariable = "m_{}Output[{}]".format(typePrefix, var.varDefine)
+				var.cppVariable = "m_{}Var[{}]".format(typePrefix, var.varDefine)
 				if var.typeID == "String":
 					var.setStatement = '{} = ""; // TODO : store your results here'.format(var.cppVariable)
 				else:
@@ -471,7 +471,7 @@ class FMIGenerator:
 				sdef = "#define FMI_PARA_{} {}".format(var.name, var.valueRef)
 				s = s + sdef + "\n"
 				var.varDefine = "FMI_PARA_{}".format(var.name)
-				var.cppVariable = "m_{}Input[{}]".format(typePrefix, var.varDefine)
+				var.cppVariable = "m_{}Var[{}]".format(typePrefix, var.varDefine)
 				var.getStatement = "{} {} = {};".format(cppType, var.name, var.cppVariable)
 			else:
 				var.varDefine = "" # variable will not be used in cpp code

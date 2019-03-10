@@ -228,7 +228,7 @@ fmi2Status fmi2GetReal(void* c, const fmi2ValueReference vr[], size_t nvr, fmi2R
 	FMI_ASSERT(modelInstance != NULL);
 	for (size_t i=0; i<nvr; ++i) {
 		try {
-			modelInstance->getRealParameter(vr[i], value[i]);
+			modelInstance->getReal(vr[i], value[i]);
 		}
 		catch (std::exception & ex) {
 			std::string err = ex.what();
@@ -246,7 +246,7 @@ fmi2Status fmi2GetInteger(void* c, const fmi2ValueReference vr[], size_t nvr, fm
 	FMI_ASSERT(modelInstance != NULL);
 	for (size_t i=0; i<nvr; ++i) {
 		try {
-			modelInstance->getIntParameter(vr[i], value[i]);
+			modelInstance->getInt(vr[i], value[i]);
 		}
 		catch (std::exception & ex) {
 			std::string err = ex.what();
@@ -265,7 +265,7 @@ fmi2Status fmi2GetBoolean(void* c, const fmi2ValueReference vr[], size_t nvr, fm
 	for (size_t i=0; i<nvr; ++i) {
 		try {
 			bool val;
-			modelInstance->getBoolParameter(vr[i], val);
+			modelInstance->getBool(vr[i], val);
 			value[i] = val;
 		}
 		catch (std::exception & ex) {
@@ -284,7 +284,7 @@ fmi2Status fmi2GetString(void* c, const fmi2ValueReference vr[], size_t nvr, fmi
 	FMI_ASSERT(modelInstance != NULL);
 	for (size_t i=0; i<nvr; ++i) {
 		try {
-			modelInstance->getStringParameter(vr[i], value[i]);
+			modelInstance->getString(vr[i], value[i]);
 		}
 		catch (std::exception & ex) {
 			std::string err = ex.what();
@@ -302,7 +302,7 @@ fmi2Status fmi2SetReal (void* c, const fmi2ValueReference vr[], size_t nvr, cons
 	FMI_ASSERT(modelInstance != NULL);
 	for (size_t i=0; i<nvr; ++i) {
 		try {
-			modelInstance->setRealParameter(vr[i], value[i]);
+			modelInstance->setReal(vr[i], value[i]);
 		}
 		catch (std::exception & ex) {
 			std::string err = ex.what();
@@ -320,7 +320,7 @@ fmi2Status fmi2SetInteger(void* c, const fmi2ValueReference vr[], size_t nvr, co
 	FMI_ASSERT(modelInstance != NULL);
 	for (size_t i=0; i<nvr; ++i) {
 		try {
-			modelInstance->setIntParameter(vr[i], value[i]);
+			modelInstance->setInt(vr[i], value[i]);
 		}
 		catch (std::exception & ex) {
 			std::string err = ex.what();
@@ -338,7 +338,7 @@ fmi2Status fmi2SetBoolean(void* c, const fmi2ValueReference vr[], size_t nvr, co
 	FMI_ASSERT(modelInstance != NULL);
 	for (size_t i=0; i<nvr; ++i) {
 		try {
-			modelInstance->setBoolParameter(vr[i], value[i]);
+			modelInstance->setBool(vr[i], value[i]);
 		}
 		catch (std::exception & ex) {
 			std::string err = ex.what();
@@ -356,7 +356,7 @@ fmi2Status fmi2SetString(void* c, const fmi2ValueReference vr[], size_t nvr, con
 	FMI_ASSERT(modelInstance != NULL);
 	for (size_t i=0; i<nvr; ++i) {
 		try {
-			modelInstance->setStringParameter(vr[i], value[i]);
+			modelInstance->setString(vr[i], value[i]);
 		}
 		catch (std::exception & ex) {
 			std::string err = ex.what();

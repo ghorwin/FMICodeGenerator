@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "InstanceData.h"
 
 #include <stdexcept>
+#include <sstream>
 
 #include "fmi2Functions.h"
 #include "fmi2FunctionTypes.h"
@@ -70,71 +71,74 @@ void InstanceData::logger(fmi2Status state, fmi2String category, fmi2String mess
 
 template <typename T>
 void checkIfIDExists(const T & m, int varID) {
-	if (m.find(varID) == m.end() )
-		throw std::runtime_error("Invalid or unknown ID.");
+	if (m.find(varID) == m.end() ) {
+		std::stringstream strm;
+		strm << "Invalid or unknown value reference " << varID;
+		throw std::runtime_error(strm.str());
+	}
 }
 
-void InstanceData::setRealParameter(int varID, double value) {
-	checkIfIDExists(m_realInput, varID);
-	m_realInput[varID] = value;
+void InstanceData::setReal(int varID, double value) {
+	checkIfIDExists(m_realVar, varID);
+	m_realVar[varID] = value;
 	m_externalInputVarsModified = true;
 }
 
 
-void InstanceData::setIntParameter(int varID, int value) {
-	checkIfIDExists(m_integerInput, varID);
-	m_integerInput[varID] = value;
+void InstanceData::setInt(int varID, int value) {
+	checkIfIDExists(m_integerVar, varID);
+	m_integerVar[varID] = value;
 	m_externalInputVarsModified = true;
 }
 
 
-void InstanceData::setStringParameter(int varID, fmi2String value) {
-	checkIfIDExists(m_stringInput, varID);
-	m_stringInput[varID] = value;
+void InstanceData::setString(int varID, fmi2String value) {
+	checkIfIDExists(m_stringVar, varID);
+	m_stringVar[varID] = value;
 	m_externalInputVarsModified = true;
 }
 
 
-void InstanceData::setBoolParameter(int varID, bool value) {
-	checkIfIDExists(m_boolInput, varID);
-	m_boolInput[varID] = value;
+void InstanceData::setBool(int varID, bool value) {
+	checkIfIDExists(m_boolVar, varID);
+	m_boolVar[varID] = value;
 	m_externalInputVarsModified = true;
 }
 
 
-void InstanceData::getRealParameter(int varID, double & value) {
+void InstanceData::getReal(int varID, double & value) {
 	// update procedure for model exchange
 	if (m_modelExchange)
 		updateIfModified();
-	checkIfIDExists(m_realOutput, varID);
-	value = m_realOutput[varID];
+	checkIfIDExists(m_realVar, varID);
+	value = m_realVar[varID];
 }
 
 
-void InstanceData::getIntParameter(int varID, int & value) {
+void InstanceData::getInt(int varID, int & value) {
 	// update procedure for model exchange
 	if(m_modelExchange)
 		updateIfModified();
-	checkIfIDExists(m_integerOutput, varID);
-	value = m_integerOutput[varID];
+	checkIfIDExists(m_integerVar, varID);
+	value = m_integerVar[varID];
 }
 
 
-void InstanceData::getStringParameter(int varID, fmi2String & value) {
+void InstanceData::getString(int varID, fmi2String & value) {
 	// update procedure for model exchange
 	if(m_modelExchange)
 		updateIfModified();
-	checkIfIDExists(m_stringOutput, varID);
-	value = m_stringOutput[varID].c_str();
+	checkIfIDExists(m_stringVar, varID);
+	value = m_stringVar[varID].c_str();
 }
 
 
-void InstanceData::getBoolParameter(int varID, bool & value) {
+void InstanceData::getBool(int varID, bool & value) {
 	// update procedure for model exchange
 	if(m_modelExchange)
 		updateIfModified();
-	checkIfIDExists(m_boolOutput, varID);
-	value = m_boolOutput[varID];
+	checkIfIDExists(m_boolVar, varID);
+	value = m_boolVar[varID];
 }
 
 

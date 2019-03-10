@@ -132,28 +132,28 @@ public:
 	}
 
 	/*! Sets a new input parameter of type double. */
-	void setRealParameter(int varID, double value);
+	void setReal(int varID, double value);
 
 	/*! Sets a new input parameter of type int. */
-	void setIntParameter(int varID, int value);
+	void setInt(int varID, int value);
 
 	/*! Sets a new input parameter of type string. */
-	void setStringParameter(int varID, fmi2String value);
+	void setString(int varID, fmi2String value);
 
 	/*! Sets a new input parameter of type bool. */
-	void setBoolParameter(int varID, bool value);
+	void setBool(int varID, bool value);
 
 	/*! Retrieves an output parameter of type double. */
-	void getRealParameter(int varID, double & value);
+	void getReal(int varID, double & value);
 
 	/*! Retrieves an output parameter of type int. */
-	void getIntParameter(int varID, int & value);
+	void getInt(int varID, int & value);
 
 	/*! Retrieves an output parameter of type string. */
-	void getStringParameter(int varID, fmi2String & value);
+	void getString(int varID, fmi2String & value);
 
 	/*! Retrieves an output parameter of type bool. */
-	void getBoolParameter(int varID, bool & value);
+	void getBool(int varID, bool & value);
 
 	/*! Called from fmi2CompletedIntegratorStep(): only ModelExchange. */
 	void completedIntegratorStep();
@@ -212,15 +212,10 @@ public:
 	/*! If true, this is a ModelExchange FMU. */
 	bool							m_modelExchange;
 
-	std::map<int,int>				m_boolInput;
-	std::map<int,double>			m_realInput;
-	std::map<int,int>				m_integerInput;
-	std::map<int,std::string>		m_stringInput;
-
-	std::map<int,int>				m_boolOutput;
-	std::map<int,double>			m_realOutput;
-	std::map<int,int>				m_integerOutput;
-	std::map<int,std::string>		m_stringOutput;
+	std::map<int,int>				m_boolVar;
+	std::map<int,double>			m_realVar;
+	std::map<int,int>				m_integerVar;
+	std::map<int,std::string>		m_stringVar;
 
 	/*! Time point in [s] received by last call to fmi2SetTime(). */
 	double							m_tInput;

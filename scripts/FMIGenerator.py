@@ -224,6 +224,10 @@ class FMIGenerator:
 				# Move folder to thrash
 				send2trash(self.targetDirPath)
 				
+			# if parent directory does not yet exist, create it
+			parentDir = os.path.dirname(self.targetDirPath)
+			if not os.path.exists(parentDir):
+				os.makedirs(parentDir)
 			# Copy source folder to a new location(i.e. self.targetDirPath)
 			shutil.copytree(templatePath, self.targetDirPath)
 			# Set modified time of newly created folder
@@ -613,6 +617,12 @@ class FMIGenerator:
 		  "variables" : varArray
 		}
 		
+		# if parent directory does not yet exist, create it
+		parentDir = os.path.dirname(targetFile)
+		parentDir = os.path.abspath(parentDir)
+		if not os.path.exists(parentDir):
+			os.makedirs(parentDir)
+
 		with open(targetFile, 'w') as outfile:
 			json.dump(data, outfile, indent=4)		
 			

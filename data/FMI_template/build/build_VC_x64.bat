@@ -4,25 +4,6 @@
 set VCVARSALL_PATH="c:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
 call %VCVARSALL_PATH%
 
-:: For different Qt installations, please set the environment variables JOM_PATH and CMAKE_PREFIX_PATH
-:: for the current Windows user. Also, make sure cmake is in the PATH variable.
-:: Mind: the dlls in the release/win/VC14_xxx subdirectories must match the Qt version for building.
-::       You must copy the Qt dlls used for building into these directories.
-::
-:: For debugging crashes on Windows, change the CMAKE_BUILD_TYPE to "RelWithDebInfo".
-
-:: These environment variables can also be set externally
-if not defined JOM_PATH (
-	set JOM_PATH=c:\Qt\Qt5.10.1\Tools\QtCreator\bin
-)
-
-if not defined CMAKE_PREFIX_PATH (
-	set CMAKE_PREFIX_PATH=c:\Qt\Qt5.10.1\5.10.1\msvc2015_64
-)
-
-:: add search path for jom.exe
-set PATH=%PATH%;%JOM_PATH%
-
 :: FMU-specific variables - set by code generator
 set FMU_SHARED_LIB_NAME=FMI_template.dll
 
@@ -33,8 +14,8 @@ mkdir bb_VC_x64
 pushd bb_VC_x64
 
 :: configure makefiles and build
-cmake -G "NMake Makefiles JOM" %CMAKELISTSDIR% -DCMAKE_BUILD_TYPE:String="Release"
-jom
+cmake -G "NMake Makefiles" %CMAKELISTSDIR% -DCMAKE_BUILD_TYPE:String="Release"
+nmake
 if ERRORLEVEL 1 GOTO fail
 
 popd

@@ -1,36 +1,45 @@
-@echo on
-pause
+@echo off
 :: script is supposed to be executed in /build directory
-:: current working directory
-SET m = %~dp0FMI_template
-echo m
+
+if exist ..\..\bin\release_x64\FMI_template.dll goto DLL_EXISTS
+echo "ERROR: File FMI_template.dll expected in directory ..\bin\release_x64\FMI_template.dll, but does not exist.
+exit /b 1
+:DLL_EXISTS
 
 :: remove target directory if it exists
-@RD /S /Q "FMI_template"  
+if not exist FMI_template goto DIRECTORY_CLEAN
+echo Removing existing directory 'FMI_template'
+rd /S /Q "FMI_template"
+:DIRECTORY_CLEAN
 
 :: remove target FMU if it exists
-DEL /F /S /Q "FMI_template.fmu.zip"
-	
-::create subdir and change into it
-MKDIR FMI_template 
+if not exist FMI_template.fmu goto FMU_REMOVED
+echo Removing existing FMU file 'FMI_template.fmu'
+del /F /S /Q "FMI_template.fmu"
+:FMU_REMOVED
 
-cd FMI_template 
+::create subdir and change into it
+mkdir FMI_template
+
+cd FMI_template
 
 :: create binary dir for Windows
-MKDIR binaries\Windows64
+mkdir binaries\win64
 
 :: copy shared library, we expect it to be already renamed correctly
-xcopy ..\..\bin\release\FMI_template.so binaries\Windows64\FMI_template.so
-xcopy ..\..\data\modelDescription.xml
-cd..
-
-
-::create zip archive
-for /d %%X in (*) do "c:\Program Files\7-Zip\7z.exe" a -mx "%%X.zip" "%%X\*"
-
-
-ren "FMI_template.zip" "FMI_template.fmu.zip"
-echo "Created FMI_template.fmu"
+xcopy ..\..\bin\release_x64\FMI_template.dll binaries\win64\
+xcopy ..\..\data\modelDescription.xml .
+echo Created FMU directory structure
 
 ::change working directory back to original dir
-cd..
+cd ..
+
+::create zip archive
+echo Creating archive 'FMI_template.zip'
+7za a FMI_template.zip FMI_template/
+
+echo Renaming archive to 'FMI_template.fmu'
+rename FMI_template.zip FMI_template.fmu
+
+:: all ok
+exit /b 0

@@ -36,7 +36,9 @@ cd ..
 
 ::create zip archive
 echo Creating archive 'FMI_template.zip'
-7za a FMI_template.zip FMI_template/
+cd FMI_template
+7za a ../FMI_template.zip .
+cd ..
 
 echo Renaming archive to 'FMI_template.fmu'
 rename FMI_template.zip FMI_template.fmu

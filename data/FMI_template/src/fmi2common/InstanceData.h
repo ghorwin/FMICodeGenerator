@@ -181,8 +181,10 @@ public:
 	/*! Re-implement for setFMUState() support.
 		Copies the content of the memory array pointed to by FMUstate to the internal state of the FMU.
 		Memory array always has size m_fmuStateSize.
+
+		\return Returns false if checks during deserialization fail.
 	*/
-	virtual void deserializeFMUstate(void * FMUstate) { (void)FMUstate; }
+	virtual bool deserializeFMUstate(void * FMUstate) { (void)FMUstate; return true; }
 
 	/*! Called from either doStep() or terminate() in CoSimulation mode whenever
 		a communication interval has been completed and all related buffers can be cleared/output files can be

@@ -415,9 +415,6 @@ class FMIGenerator:
 		- $$initialStatesCS$$ - initialization code for Model Exchange
 		- $$getInputVars$$ - retrieves input/parameter values for access in C++ code
 		- $$setOutputVars$$ - sets calculated values for access in C++ code
-		- $$serializationSizeVars$$ - adds size for each input and output variable to be stored during serialization
-		- $$serializaVars$$ - code to serialize input/output vars
-		- $$deserializaVars$$ - code to deserialize input/output vars
 		
 		Arguments:
 
@@ -531,11 +528,6 @@ class FMIGenerator:
 				s = s + sdef + "\n"
 		data = data.replace("$$setOutputVars$$", s)		
 		
-		
-		data = data.replace("$$serializationSizeVars$$", "")		
-		data = data.replace("$$serializeVars$$", "")		
-		data = data.replace("$$deserializeVars$$", "")		
-
 		return data
 	
 	

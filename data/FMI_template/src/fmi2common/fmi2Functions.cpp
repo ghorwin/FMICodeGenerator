@@ -1,4 +1,4 @@
-/* 
+/*
 FMI Interface for Model Exchange and CoSimulation Version 2
 
 This file is part of FMICodeGenerator (https://github.com/ghorwin/FMICodeGenerator)
@@ -418,7 +418,8 @@ fmi2Status fmi2SetFMUstate(void* c, fmi2FMUstate FMUstate) {
 	}
 
 	// now copy FMU state into memory array
-	modelInstance->deserializeFMUstate(FMUstate);
+	if (!modelInstance->deserializeFMUstate(FMUstate))
+		return fmi2Error;
 
 	return fmi2OK;
 }

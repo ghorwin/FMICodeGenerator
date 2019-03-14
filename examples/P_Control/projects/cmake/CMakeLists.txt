@@ -1,4 +1,15 @@
-project( Math003Part3 )
+# CMake project file for generated FMI code
+#
+# This file is part of FMICodeGenerator (https://github.com/ghorwin/FMICodeGenerator)
+# 
+# BSD 3-Clause License
+#
+# Copyright (c) 2018, Andreas Nicolai
+# All rights reserved.
+#
+# see https://github.com/ghorwin/FMICodeGenerator/blob/master/LICENSE for details.
+
+project( P_Control )
 
 cmake_minimum_required(VERSION 3.5)
 

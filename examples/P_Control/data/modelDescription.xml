@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <fmiModelDescription
 	fmiVersion="2.0"
-	modelName="Part3"
-	guid="{471a3b52-4923-44d8-ab4a-fcdb813c7324}"
-	description="Part3 of Math003 Test Case"
-	generationTool="C++ Code using FMI support functions from IBK@TU Dresden"
-	generationDateAndTime="2018-08-01T12:49:19Z"
+	modelName="P_Control"
+	guid="{af41abcc-4692-11e9-a264-f0def1a04bd7}"
+	version="1.0.0"
+	author="not specified"
+	copyright="not specified"
+	license="not specified"
+	description="A stateless P-Controller"
+	generationTool="ghorwin/FMICodeGenerator@github - C++ Code using FMI support functions from IBK@TU Dresden"
+	generationDateAndTime="2019-03-14T08:52:23Z"
 	variableNamingConvention="structured"
 	numberOfEventIndicators="0">
 
@@ -20,15 +24,15 @@
 	-->
 
 	<ModelExchange
-		modelIdentifier="Part3"
-		completedlntegratorStepNotNeeded="true"
+		modelIdentifier="P_Control"
+		completedIntegratorStepNotNeeded="true"
 		canNotUseMemoryManagementFunctions="true"
 		canGetAndSetFMUstate="true"
 		canSerializeFMUstate="true"
 	/>
 
 	<CoSimulation
-		modelIdentifier="Part3"
+		modelIdentifier="P_Control"
 		canHandleVariableCommunicationStepSize="true"
 		canInterpolateInputs="false"
 		maxOutputDerivativeOrder="0"
@@ -50,25 +54,51 @@
 
 		<!-- For input variables we need to give a 'start' attribute -->
 		<!-- For output variables with initial="exact" we need to give a 'start' attribute -->
+		
 
 		<!-- Index of variable = "1" -->
 		<ScalarVariable
-			name="x3"
-			valueReference="3"
+			name="T"
+			valueReference="1"
 			variability="continuous"
-			causality="input">
-			<Real start="0.0"/>
-		</ScalarVariable>
+			causality="input"
+			initial="approx">
+			<Real start="293.15"/>
+		</ScalarVariable>		
+		
 
 		<!-- Index of variable = "2" -->
 		<ScalarVariable
-			name="x4"
-			valueReference="4"
+			name="P"
+			valueReference="2"
 			variability="continuous"
 			causality="output"
+			initial="calculated">
+			<Real/>
+		</ScalarVariable>		
+		
+
+		<!-- Index of variable = "3" -->
+		<ScalarVariable
+			name="T_limit"
+			valueReference="3"
+			variability="fixed"
+			causality="parameter"
 			initial="exact">
-			<Real start="0.0"/>
-		</ScalarVariable>
+			<Real start="276.15"/>
+		</ScalarVariable>		
+		
+
+		<!-- Index of variable = "4" -->
+		<ScalarVariable
+			name="k_P"
+			valueReference="4"
+			variability="fixed"
+			causality="parameter"
+			initial="exact">
+			<Real start="20000"/>
+		</ScalarVariable>		
+		
 
 	</ModelVariables>
 
@@ -77,7 +107,10 @@
 			<!-- dependencies must be defined for all output quantities. 'dependencyKind' is only needed
 				when some dependencies are constant factors or parameters.
 			-->
+			
 			<Unknown index="2" dependencies="1"/>
+		
+
 		</Outputs>
 	</ModelStructure>
 

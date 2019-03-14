@@ -1,18 +1,39 @@
-/*	Generic FMI Interface Implementation
-  Written by Andreas Nicolai (2018), andreas.nicolai@gmx.net
+/*
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+Generic FMI Interface Implementation
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+This file is part of FMICodeGenerator (https://github.com/ghorwin/FMICodeGenerator)
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+BSD 3-Clause License
+
+Copyright (c) 2018, Andreas Nicolai
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 */
 
 #ifndef InstanceDataH
@@ -111,28 +132,28 @@ public:
 	}
 
 	/*! Sets a new input parameter of type double. */
-	void setRealParameter(int varID, double value);
+	void setReal(int varID, double value);
 
 	/*! Sets a new input parameter of type int. */
-	void setIntParameter(int varID, int value);
+	void setInt(int varID, int value);
 
 	/*! Sets a new input parameter of type string. */
-	void setStringParameter(int varID, fmi2String value);
+	void setString(int varID, fmi2String value);
 
 	/*! Sets a new input parameter of type bool. */
-	void setBoolParameter(int varID, bool value);
+	void setBool(int varID, bool value);
 
 	/*! Retrieves an output parameter of type double. */
-	void getRealParameter(int varID, double & value);
+	void getReal(int varID, double & value);
 
 	/*! Retrieves an output parameter of type int. */
-	void getIntParameter(int varID, int & value);
+	void getInt(int varID, int & value);
 
 	/*! Retrieves an output parameter of type string. */
-	void getStringParameter(int varID, fmi2String & value);
+	void getString(int varID, fmi2String & value);
 
 	/*! Retrieves an output parameter of type bool. */
-	void getBoolParameter(int varID, bool & value);
+	void getBool(int varID, bool & value);
 
 	/*! Called from fmi2CompletedIntegratorStep(): only ModelExchange. */
 	void completedIntegratorStep();
@@ -160,8 +181,10 @@ public:
 	/*! Re-implement for setFMUState() support.
 		Copies the content of the memory array pointed to by FMUstate to the internal state of the FMU.
 		Memory array always has size m_fmuStateSize.
+
+		\return Returns false if checks during deserialization fail.
 	*/
-	virtual void deserializeFMUstate(void * FMUstate) { (void)FMUstate; }
+	virtual bool deserializeFMUstate(void * FMUstate) { (void)FMUstate; return true; }
 
 	/*! Called from either doStep() or terminate() in CoSimulation mode whenever
 		a communication interval has been completed and all related buffers can be cleared/output files can be
@@ -191,21 +214,10 @@ public:
 	/*! If true, this is a ModelExchange FMU. */
 	bool							m_modelExchange;
 
-	/*! Base directory for storing FMU specific results.
-		Set via setStringParameter() with parameter name "ResultsRootDir" with fixed ID 42.
-		String is an UTF8 encoded path.
-	*/
-	std::string						m_resultsRootDir;
-
-	std::map<int,int>				m_boolInput;
-	std::map<int,double>			m_realInput;
-	std::map<int,int>				m_integerInput;
-	std::map<int,std::string>		m_stringInput;
-
-	std::map<int,int>				m_boolOutput;
-	std::map<int,double>			m_realOutput;
-	std::map<int,int>				m_integerOutput;
-	std::map<int,std::string>		m_stringOutput;
+	std::map<int,int>				m_boolVar;
+	std::map<int,double>			m_realVar;
+	std::map<int,int>				m_integerVar;
+	std::map<int,std::string>		m_stringVar;
 
 	/*! Time point in [s] received by last call to fmi2SetTime(). */
 	double							m_tInput;

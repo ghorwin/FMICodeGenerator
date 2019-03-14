@@ -1,8 +1,18 @@
 # ----------------------------------
-# Project for FMU Test/Example cases
+# Qt Project for building FMU 
 # ----------------------------------
+#
+# This file is part of FMICodeGenerator (https://github.com/ghorwin/FMICodeGenerator)
+# 
+# BSD 3-Clause License
+#
+# Copyright (c) 2018, Andreas Nicolai
+# All rights reserved.
+#
+# see https://github.com/ghorwin/FMICodeGenerator/blob/master/LICENSE for details.
 
-TARGET = Math003Part3
+
+TARGET = P_Control
 TEMPLATE = lib
 
 # no GUI
@@ -25,7 +35,7 @@ else {
 	}
 }
 
-#DEFINES += FMI2_FUNCTION_PREFIX=Math003Part3_
+#DEFINES += FMI2_FUNCTION_PREFIX=P_Control_
 
 unix|mac {
 	VER_MAJ = 1
@@ -39,7 +49,7 @@ INCLUDEPATH = ../../src
 SOURCES += \
 	../../src/fmi2common/fmi2Functions.cpp \
 	../../src/fmi2common/InstanceData.cpp \
-	../../src/Math003Part3.cpp
+	../../src/P_Control.cpp
 
 HEADERS += \
 	../../src/fmi2common/fmi2Functions.h \
@@ -47,6 +57,6 @@ HEADERS += \
 	../../src/fmi2common/fmi2FunctionTypes.h \
 	../../src/fmi2common/fmi2TypesPlatform.h \
 	../../src/fmi2common/InstanceData.h \
-	../../src/Math003Part3.h
+	../../src/P_Control.h
 
 

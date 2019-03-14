@@ -1,21 +1,38 @@
-/* FMI Interface for Model Exchange and CoSimulation Version 2
-  Written by Andreas Nicolai (2018), andreas.nicolai@gmx.net
+/*
+FMI Interface for Model Exchange and CoSimulation Version 2
 
-  The details of the actual model in question are encapsulated in the
-  class derived from InstanceData.
+This file is part of FMICodeGenerator (https://github.com/ghorwin/FMICodeGenerator)
 
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
+BSD 3-Clause License
 
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
+Copyright (c) 2018, Andreas Nicolai
+All rights reserved.
 
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright notice, this
+  list of conditions and the following disclaimer.
+
+* Redistributions in binary form must reproduce the above copyright notice,
+  this list of conditions and the following disclaimer in the documentation
+  and/or other materials provided with the distribution.
+
+* Neither the name of the copyright holder nor the names of its
+  contributors may be used to endorse or promote products derived from
+  this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 */
 
 #include <memory>
@@ -211,7 +228,7 @@ fmi2Status fmi2GetReal(void* c, const fmi2ValueReference vr[], size_t nvr, fmi2R
 	FMI_ASSERT(modelInstance != NULL);
 	for (size_t i=0; i<nvr; ++i) {
 		try {
-			modelInstance->getRealParameter(vr[i], value[i]);
+			modelInstance->getReal(vr[i], value[i]);
 		}
 		catch (std::exception & ex) {
 			std::string err = ex.what();
@@ -229,7 +246,7 @@ fmi2Status fmi2GetInteger(void* c, const fmi2ValueReference vr[], size_t nvr, fm
 	FMI_ASSERT(modelInstance != NULL);
 	for (size_t i=0; i<nvr; ++i) {
 		try {
-			modelInstance->getIntParameter(vr[i], value[i]);
+			modelInstance->getInt(vr[i], value[i]);
 		}
 		catch (std::exception & ex) {
 			std::string err = ex.what();
@@ -248,7 +265,7 @@ fmi2Status fmi2GetBoolean(void* c, const fmi2ValueReference vr[], size_t nvr, fm
 	for (size_t i=0; i<nvr; ++i) {
 		try {
 			bool val;
-			modelInstance->getBoolParameter(vr[i], val);
+			modelInstance->getBool(vr[i], val);
 			value[i] = val;
 		}
 		catch (std::exception & ex) {
@@ -267,7 +284,7 @@ fmi2Status fmi2GetString(void* c, const fmi2ValueReference vr[], size_t nvr, fmi
 	FMI_ASSERT(modelInstance != NULL);
 	for (size_t i=0; i<nvr; ++i) {
 		try {
-			modelInstance->getStringParameter(vr[i], value[i]);
+			modelInstance->getString(vr[i], value[i]);
 		}
 		catch (std::exception & ex) {
 			std::string err = ex.what();
@@ -285,7 +302,7 @@ fmi2Status fmi2SetReal (void* c, const fmi2ValueReference vr[], size_t nvr, cons
 	FMI_ASSERT(modelInstance != NULL);
 	for (size_t i=0; i<nvr; ++i) {
 		try {
-			modelInstance->setRealParameter(vr[i], value[i]);
+			modelInstance->setReal(vr[i], value[i]);
 		}
 		catch (std::exception & ex) {
 			std::string err = ex.what();
@@ -303,7 +320,7 @@ fmi2Status fmi2SetInteger(void* c, const fmi2ValueReference vr[], size_t nvr, co
 	FMI_ASSERT(modelInstance != NULL);
 	for (size_t i=0; i<nvr; ++i) {
 		try {
-			modelInstance->setIntParameter(vr[i], value[i]);
+			modelInstance->setInt(vr[i], value[i]);
 		}
 		catch (std::exception & ex) {
 			std::string err = ex.what();
@@ -321,7 +338,7 @@ fmi2Status fmi2SetBoolean(void* c, const fmi2ValueReference vr[], size_t nvr, co
 	FMI_ASSERT(modelInstance != NULL);
 	for (size_t i=0; i<nvr; ++i) {
 		try {
-			modelInstance->setBoolParameter(vr[i], value[i]);
+			modelInstance->setBool(vr[i], value[i]);
 		}
 		catch (std::exception & ex) {
 			std::string err = ex.what();
@@ -339,7 +356,7 @@ fmi2Status fmi2SetString(void* c, const fmi2ValueReference vr[], size_t nvr, con
 	FMI_ASSERT(modelInstance != NULL);
 	for (size_t i=0; i<nvr; ++i) {
 		try {
-			modelInstance->setStringParameter(vr[i], value[i]);
+			modelInstance->setString(vr[i], value[i]);
 		}
 		catch (std::exception & ex) {
 			std::string err = ex.what();
@@ -401,7 +418,8 @@ fmi2Status fmi2SetFMUstate(void* c, fmi2FMUstate FMUstate) {
 	}
 
 	// now copy FMU state into memory array
-	modelInstance->deserializeFMUstate(FMUstate);
+	if (!modelInstance->deserializeFMUstate(FMUstate))
+		return fmi2Error;
 
 	return fmi2OK;
 }

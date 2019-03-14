@@ -1,8 +1,40 @@
 #!/bin/bash
 
-
-# Build script for building FMU
-
+# Build script for building FMU.
+#
+# This file is part of FMICodeGenerator (https://github.com/ghorwin/FMICodeGenerator)
+#
+# BSD 3-Clause License
+#
+# Copyright (c) 2018, Andreas Nicolai
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# * Redistributions of source code must retain the above copyright notice, this
+#   list of conditions and the following disclaimer.
+#
+# * Redistributions in binary form must reproduce the above copyright notice,
+#   this list of conditions and the following disclaimer in the documentation
+#   and/or other materials provided with the distribution.
+#
+# * Neither the name of the copyright holder nor the names of its
+#   contributors may be used to endorse or promote products derived from
+#   this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+#
 # Command line options:
 #   [reldeb|release|debug]		build type
 #   [2 [1..n]]					cpu count
@@ -11,16 +43,15 @@
 #   [off|threadChecker]			threadchecker (includes icc)
 #   [off|omp]					openmp (gcc and icc)
 #   [verbose]					enable cmake to call verbose makefiles
-
+#
+#
 # FMU-specific variables - set by code generator
-FMU_MODEL_NAME=Math003Part3
-FMU_SHARED_LIB_NAME=libMath003Part3
+FMU_SHARED_LIB_NAME=libP_Control
+FMU_SHARED_LIB_TARGET_NAME=P_Control
 FMU_SHARED_LIB_VERSION=1.0.0
 
-# get script location
 BUILD_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-# get directory of CMakeLists.txt file
-CMAKELISTSDIR=$BUILD_SCRIPT_DIR/../projects/cmake
+CMAKELISTSDIR=$(pwd)/../projects/cmake
 BUILDDIR="bb"
 
 # set defaults
@@ -138,11 +169,16 @@ cd $BUILD_SCRIPT_DIR &&
 mkdir -p ../bin/release &&
 # copy for Linux/Unix builds
 if [ -e $BUILDDIR/$FMU_SHARED_LIB_NAME.so ]; then
-  cp $BUILDDIR/$FMU_SHARED_LIB_NAME.so.$FMU_SHARED_LIB_VERSION ../bin/release/$FMU_MODEL_NAME.so &&
-  echo "Copied $FMU_MODEL_NAME.so to bin/release ***"
+  cp -f $BUILDDIR/$FMU_SHARED_LIB_NAME.so.$FMU_SHARED_LIB_VERSION ../bin/release/$FMU_SHARED_LIB_NAME.so.$FMU_SHARED_LIB_VERSION &&
+  echo "Copied $FMU_SHARED_LIB_NAME.so.$FMU_SHARED_LIB_VERSION to bin/release ***"
+  cp -f $BUILDDIR/$FMU_SHARED_LIB_NAME.so.$FMU_SHARED_LIB_VERSION ../bin/release/$FMU_SHARED_LIB_TARGET_NAME.so &&
+  echo "Created ../bin/release/$FMU_SHARED_LIB_TARGET_NAME.so ***"
 fi &&
 # copy for Mac builds
 if [ -e $BUILDDIR/$FMU_SHARED_LIB_NAME.dylib ]; then
-  cp $BUILDDIR/$FMU_SHARED_LIB_NAME.$FMU_SHARED_LIB_VERSION.dylib ../bin/release/$FMU_MODEL_NAME.dylib &&
-  echo "Copied $FMU_MODEL_NAME.dylib to bin/release ***"
+  cp -f $BUILDDIR/$FMU_SHARED_LIB_NAME.$FMU_SHARED_LIB_VERSION.dylib ../bin/release/$FMU_SHARED_LIB_NAME.$FMU_SHARED_LIB_VERSION.dylib &&
+  echo "Copied $FMU_SHARED_LIB_NAME.$FMU_SHARED_LIB_VERSION.dylib to bin/release ***"
+  cp -f $BUILDDIR/$FMU_SHARED_LIB_NAME.$FMU_SHARED_LIB_VERSION.dylib ../bin/release/$FMU_SHARED_LIB_TARGET_NAME.dylib &&
+  echo "Created ../bin/release/$FMU_SHARED_LIB_TARGET_NAME.dylib ***"
 fi
+

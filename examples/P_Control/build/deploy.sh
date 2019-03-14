@@ -3,31 +3,31 @@
 # script is supposed to be executed in /build directory
 
 # remove target directory if it exists
-if [ -d Math003Part3 ]; then
-  rm -rf Math003Part3 
+if [ -d P_Control ]; then
+  rm -rf P_Control 
 fi &&
 
 # remove target FMU if it exists
-if [ -f Math003Part3.fmu ]; then
-    rm Math003Part3.fmu 
+if [ -f P_Control.fmu ]; then
+    rm P_Control.fmu 
 fi &&
 
 # create subdir and change into it
-mkdir -p Math003Part3 &&
-cd Math003Part3 &&
+mkdir -p P_Control &&
+cd P_Control &&
 
 # create binary dir for Linux
 mkdir -p binaries/linux64 &&
 
 # copy shared library, we expect it to be already renamed correctly
-cp ../../bin/release/Math003Part3.so binaries/linux64/Math003Part3.so &&
+cp ../../bin/release/P_Control.so binaries/linux64/P_Control.so &&
 cp ../../data/modelDescription.xml . &&
 
 # create zip archive
-7za a ../Math003Part3.zip . | cat > /dev/null &&
+7za a ../P_Control.zip . | cat > /dev/null &&
 cd .. && 
-mv Math003Part3.zip Math003Part3.fmu &&
-echo "Created Math003Part3.fmu" &&
+mv P_Control.zip P_Control.fmu &&
+echo "Created P_Control.fmu" &&
 
 # change working directory back to original dir
 cd -

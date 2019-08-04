@@ -83,7 +83,7 @@ Use homebrew and/or macports to install python and pyqt5 (or alternatively pip).
 
 #### Windows
 
-Things are bit more complicated for Windows. While the code can be compiled (thanks to the CMake build system) using quite a few build chains available on windows, the `batch`-scripts are currently expecting a standard Visual Studio 2015 installation (r`c:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat`) and 7zip must be installed with `7za` in the PATH. Also, `cmake` must be in in the PATH.
+Things are bit more complicated for Windows. While the code can be compiled (thanks to the CMake build system) using quite a few build chains available on windows, the `batch`-scripts are currently expecting a standard Visual Studio 2015 installation (`c:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat`) and 7zip must be installed with `7za` in the PATH. Also, `cmake` must be in in the PATH.
 
 If your setup differs from that, edit the files `build_VC_x64.bat` and `deploy.bat` in directory `data/FMI_template/build`.
 

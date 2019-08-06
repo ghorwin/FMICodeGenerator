@@ -57,6 +57,8 @@ class VarDef:
 		self.causality = "" # parameter, calculatedParameter, input, output, local, independent
 		self.initial = "" # exact, approx, calculated
 		self.typeID = "" # Real, Integer, Boolean, String
+		self.description = "" # an optional description of the variable's meaning
+		self.unit = "" # the unit, only for Real-type variables
 		self.startValue = ""
 
 	def __init__(self, name, variability, causality, initial, typeID):
@@ -66,6 +68,8 @@ class VarDef:
 		self.causality = causality
 		self.initial = initial
 		self.typeID = typeID
+		self.description = "" # an optional description of the variable's meaning
+		self.unit = "" # the unit, only for Real-type variables
 		self.startValue = ""
 
 	def toJson(self):
@@ -76,11 +80,17 @@ class VarDef:
 		    "causality" : self.causality,
 		    "initial" : self.initial,
 		    "typeID" : self.typeID,
-		    "startValue" : self.startValue
+		    "startValue" : self.startValue,
+		    "description" : self.description,
+		    "unit" : self.unit
 		}
 
 def varDefFromJson(data):
 	v = VarDef(data['name'], data['variability'], data['causality'], data['initial'], data['typeID'])
+	if 'unit' in data:
+		v.unit = data['unit']
+	if 'description' in data:
+		v.description = data['description']
 	v.startValue = data['startValue']
 	v.valueRef = data['valueRef']
 	return v
@@ -347,12 +357,12 @@ class FMIGenerator:
 		VARIABLE_TEMPLATE = """
 		<!-- Index of variable = "$$index$$" -->
 		<ScalarVariable
-			name="$$name$$"
+			name="$$name$$"$$desc$$
 			valueReference="$$valueRef$$"
 			variability="$$variability$$"
 			causality="$$causality$$"
 			initial="$$initial$$">
-			<$$typeID$$$$start$$/>
+			<$$typeID$$$$start$$$$unit$$/>
 		</ScalarVariable>		
 		"""
 		
@@ -370,6 +380,11 @@ class FMIGenerator:
 			varDefBlock = varDefBlock.replace("$$index$$",str(idx))
 			varDefBlock = varDefBlock.replace("$$name$$",var.name)
 			
+			if len(var.description) != 0:
+				varDefBlock = varDefBlock.replace("$$desc$$", u'\n            description="{}"'.format(var.description))
+			else:
+				varDefBlock = varDefBlock.replace("$$desc$$","")
+			
 			# generate value if auto-numbered
 			assert(var.valueRef != -1)
 			varDefBlock = varDefBlock.replace("$$valueRef$$",str(var.valueRef))	
@@ -382,6 +397,11 @@ class FMIGenerator:
 			varDefBlock = varDefBlock.replace("$$initial$$",var.initial)
 
 			varDefBlock = varDefBlock.replace("$$typeID$$",var.typeID)
+			
+			if var.typeID == 'Real' and len(var.unit) > 0:
+				varDefBlock = varDefBlock.replace("$$unit$$",' unit="{}"'.format(var.unit))
+			else:
+				varDefBlock = varDefBlock.replace("$$unit$$","")
 			
 			if var.initial=="calculated":
 				varDefBlock = varDefBlock.replace("$$start$$","")

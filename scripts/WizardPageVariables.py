@@ -57,6 +57,7 @@ class WizardPageVariables(QWidget):
 		newVar = VarDef("ResultRootDir", "fixed", "parameter", "exact", "String")
 		newVar.valueRef = 42
 		newVar.startValue = "" # start value is empty, this parameter is automatically supplied by MasterSim
+		newVar.description = "A writeable directory generated for each slave of this FMU to store slave-specific output/data files."
 		
 		self.variables.append(newVar)
 		
@@ -105,6 +106,16 @@ class WizardPageVariables(QWidget):
 			item.setText("{}".format(var.startValue))
 			item.setFlags( Qt.ItemIsSelectable | Qt.ItemIsEnabled)
 			self.ui.tableWidget.setItem(i, 6, item)
+
+			item = QTableWidgetItem()
+			item.setText(var.unit)
+			item.setFlags( Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+			self.ui.tableWidget.setItem(i, 7, item)
+
+			item = QTableWidgetItem()
+			item.setText(var.description)
+			item.setFlags( Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+			self.ui.tableWidget.setItem(i, 8, item)
 			
 		self.ui.tableWidget.resizeColumnsToContents()
 
@@ -118,6 +129,8 @@ class WizardPageVariables(QWidget):
 		self.ui.comboBoxVariability.setCurrentIndex( self.ui.comboBoxVariability.findText(var.variability) )
 		self.ui.comboBoxInitial.setCurrentIndex( self.ui.comboBoxInitial.findText(var.initial) )
 		self.ui.comboBoxTypeID.setCurrentIndex( self.ui.comboBoxTypeID.findText(var.typeID) )
+		self.ui.lineEditUnit.setText( var.unit )
+		self.ui.lineEditDescription.setText( var.description )
 		self.ui.lineEditStart.setText( var.startValue )
 	
 	@pyqtSlot(str)
@@ -198,8 +211,22 @@ class WizardPageVariables(QWidget):
 		item.setText(text)
 		self.ui.tableWidget.setItem(currentRow,0,item)
 		self.ui.tableWidget.resizeColumnToContents(0)
-		
-		
+
+	
+	@pyqtSlot(str)
+	def on_lineEditDescription_textEdited(self,text):
+		# get current row
+		currentRow = self.ui.tableWidget.currentRow()
+		assert(currentRow >= 0 and currentRow < len(self.variables))
+		# update variable cache
+		self.variables[currentRow].description = text
+		# changing a property of a QTableWidgetItem requires removal of item, change of property and re-setting the item
+		item = self.ui.tableWidget.takeItem(currentRow,8)
+		item.setText(text)
+		self.ui.tableWidget.setItem(currentRow,8,item)
+		self.ui.tableWidget.resizeColumnToContents(8)
+
+	
 	@pyqtSlot(int)
 	def on_spinBoxValueRef_valueChanged(self, value):
 		# get current row
@@ -268,6 +295,13 @@ class WizardPageVariables(QWidget):
 		item.setText(text)
 		self.ui.tableWidget.setItem(currentRow,5,item)
 		self.ui.tableWidget.resizeColumnToContents(5)
+		# enable/disable unit line based on type
+		if text == 'Real':
+			self.ui.labelUnit.setEnabled(True)
+			self.ui.lineEditUnit.setEnabled(True)
+		else:
+			self.ui.labelUnit.setEnabled(False)
+			self.ui.lineEditUnit.setEnabled(False)
 
 	
 	@pyqtSlot(str)
@@ -282,3 +316,17 @@ class WizardPageVariables(QWidget):
 		item.setText(text)
 		self.ui.tableWidget.setItem(currentRow,6,item)
 		self.ui.tableWidget.resizeColumnToContents(6)
+
+
+	@pyqtSlot(str)
+	def on_lineEditUnit_textEdited(self,text):
+		# get current row
+		currentRow = self.ui.tableWidget.currentRow()
+		assert(currentRow >= 0 and currentRow < len(self.variables))
+		# update variable cache
+		self.variables[currentRow].unit = text
+		# changing a property of a QTableWidgetItem requires removal of item, change of property and re-setting the item
+		item = self.ui.tableWidget.takeItem(currentRow,7)
+		item.setText(text)
+		self.ui.tableWidget.setItem(currentRow,7,item)
+		self.ui.tableWidget.resizeColumnToContents(7)

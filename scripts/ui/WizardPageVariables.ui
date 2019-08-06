@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>885</width>
+    <width>1102</width>
     <height>539</height>
    </rect>
   </property>
@@ -32,7 +32,7 @@
          <number>0</number>
         </property>
         <property name="columnCount">
-         <number>7</number>
+         <number>9</number>
         </property>
         <attribute name="horizontalHeaderStretchLastSection">
          <bool>true</bool>
@@ -73,6 +73,16 @@
         <column>
          <property name="text">
           <string>Start value</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Unit</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Description</string>
          </property>
         </column>
        </widget>
@@ -127,77 +137,23 @@
       <string>Properties</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="0" colspan="2">
+      <item row="2" column="0">
+       <widget class="QLabel" name="labelUnit">
+        <property name="text">
+         <string>Unit:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Start value:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="3">
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="2" column="3">
-         <widget class="QComboBox" name="comboBoxInitial">
-          <item>
-           <property name="text">
-            <string>exact</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>approx</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>calculated</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>Causality:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Variability:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="lineEditName"/>
-        </item>
-        <item row="0" column="3">
-         <widget class="QComboBox" name="comboBoxVariability">
-          <property name="currentIndex">
-           <number>4</number>
-          </property>
-          <item>
-           <property name="text">
-            <string>constant</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>fixed</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>tunable</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>discrete</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>continuous</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="1" column="3">
          <widget class="QComboBox" name="comboBoxCausality">
           <property name="currentIndex">
            <number>4</number>
@@ -234,21 +190,7 @@
           </item>
          </widget>
         </item>
-        <item row="2" column="2">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>Initial:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Name:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
+        <item row="2" column="1">
          <widget class="QSpinBox" name="spinBoxValueRef">
           <property name="minimum">
            <number>-1</number>
@@ -261,33 +203,108 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Name:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
          <widget class="QLabel" name="label_2">
           <property name="text">
            <string>Value reference (-1 for auto):</string>
           </property>
          </widget>
         </item>
+        <item row="3" column="3">
+         <widget class="QComboBox" name="comboBoxInitial">
+          <item>
+           <property name="text">
+            <string>exact</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>approx</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>calculated</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Causality:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QComboBox" name="comboBoxVariability">
+          <property name="currentIndex">
+           <number>4</number>
+          </property>
+          <item>
+           <property name="text">
+            <string>constant</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>fixed</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>tunable</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>discrete</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>continuous</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Initial:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Variability:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLineEdit" name="lineEditName"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>Description:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" colspan="3">
+         <widget class="QLineEdit" name="lineEditDescription"/>
+        </item>
        </layout>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Start value:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLineEdit" name="lineEditStart"/>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_7">
-        <property name="text">
-         <string>Type:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
+      <item row="1" column="2">
        <widget class="QComboBox" name="comboBoxTypeID">
         <item>
          <property name="text">
@@ -310,6 +327,19 @@
          </property>
         </item>
        </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QLineEdit" name="lineEditStart"/>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_7">
+        <property name="text">
+         <string>Type:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLineEdit" name="lineEditUnit"/>
       </item>
      </layout>
     </widget>

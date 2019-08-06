@@ -104,6 +104,7 @@ class FMIGenerator:
 		modelName -- A user defined model name
 		description -- A user defined description
 		variables -- vector of type VarDefs with variable definitions (inputs, outputs, parameters) 
+		numberOfContinuousStates -- number of continuous states in the model (only exposed for ModelExchange functionality)
 		"""
 		self.targetDir = ""
 		
@@ -111,6 +112,7 @@ class FMIGenerator:
 		self.description = ""
 		self.variables = []
 		self.messages = []
+		self.numberOfContinuousStates = 0
 		
 		self.autobuild = True
 

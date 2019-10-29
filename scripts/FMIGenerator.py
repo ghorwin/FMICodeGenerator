@@ -486,10 +486,25 @@ class FMIGenerator:
 					var.setStatement = '{} = ""; // TODO : store your results here'.format(var.cppVariable)
 				else:
 					var.setStatement = "{} = 0; // TODO : store your results here".format(var.cppVariable)
+			elif var.causality == "calculatedParameter":
+				sdef = "#define FMI_PARA_{} {}".format(var.name, var.valueRef)
+				s = s + sdef + "\n"
+				var.varDefine = "FMI_PARA_{}".format(var.name)
+				var.cppVariable = "m_{}Var[{}]".format(typePrefix, var.varDefine)
+				if var.typeID == "String":
+					var.setStatement = '{} = ""; // TODO : store your results here'.format(var.cppVariable)
+				else:
+					var.setStatement = "{} = 0; // TODO : store your results here".format(var.cppVariable)
 			elif var.causality == "parameter":
 				sdef = "#define FMI_PARA_{} {}".format(var.name, var.valueRef)
 				s = s + sdef + "\n"
 				var.varDefine = "FMI_PARA_{}".format(var.name)
+				var.cppVariable = "m_{}Var[{}]".format(typePrefix, var.varDefine)
+				var.getStatement = "{} {} = {};".format(cppType, var.name, var.cppVariable)
+			elif var.causality == "local":
+				sdef = "#define FMI_LOCAL_{} {}".format(var.name, var.valueRef)
+				s = s + sdef + "\n"
+				var.varDefine = "FMI_LOCAL_{}".format(var.name)
 				var.cppVariable = "m_{}Var[{}]".format(typePrefix, var.varDefine)
 				var.getStatement = "{} {} = {};".format(cppType, var.name, var.cppVariable)
 			else:
@@ -515,7 +530,7 @@ class FMIGenerator:
 			
 		sOut = ""
 		for var in self.variables:
-			if var.causality == "output":
+			if var.causality == "output" or var.causality == "local":
 				if var.typeID == "String":
 					sdef = '\t\t{} = \"{}\";'.format(var.cppVariable, var.startValue)
 				else:
@@ -537,7 +552,7 @@ class FMIGenerator:
 		# compose getter block
 		s = ""
 		for var in self.variables:
-			if var.causality == "input" or var.causality == "parameter":
+			if var.causality == "input" or var.causality == "parameter" or var.causality == "local":
 				sdef = "\t" + var.getStatement
 				s = s + sdef + "\n"		
 		data = data.replace("$$getInputVars$$", s)
@@ -545,7 +560,7 @@ class FMIGenerator:
 		# compose setter block
 		s = ""
 		for var in self.variables:
-			if var.causality == "output":
+			if var.causality == "output" or var.causality == "calculatedParameter":
 				sdef = "\t" + var.setStatement
 				s = s + sdef + "\n"
 		data = data.replace("$$setOutputVars$$", s)		

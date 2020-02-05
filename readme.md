@@ -87,6 +87,10 @@ Things are bit more complicated for Windows. While the code can be compiled (tha
 
 If your setup differs from that, edit the files `build_VC_x64.bat` and `deploy.bat` in directory `data/FMI_template/build`.
 
+# License
+
+The FMICodeGenerator is provided under a *BSD 3-Clause License*.
+
 # Developer Information
 
 ## Directory Structure of the FMICodeGenerator repository

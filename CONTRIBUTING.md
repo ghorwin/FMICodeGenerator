@@ -1,0 +1,1 @@
+The FMICodeGenerator is provided under a *BSD 3-Clause License*. By contributing code/wiki/documentation content, you agree to place your contribution unter the same license. This will ensure, that the entire FMICodeGeneator project remains a free and open-source project.

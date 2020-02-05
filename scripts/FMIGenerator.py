@@ -161,7 +161,7 @@ class FMIGenerator:
 		# this python script: ../data/FMIProject
 
 		# get the path of the current python script
-		scriptpath = os.path.abspath(os.path.dirname(sys.argv[0]))
+		scriptpath = os.path.dirname(os.path.abspath(__file__))
 		self.printMsg("Script path        : {}".format(scriptpath))
 
 		# relative path (from script file) to resource/template directory

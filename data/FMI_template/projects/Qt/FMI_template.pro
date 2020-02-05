@@ -44,6 +44,10 @@ unix|mac {
 	VERSION = $${VER_MAJ}.$${VER_MIN}.$${VER_PAT}
 }
 
+unix {
+        QMAKE_POST_LINK += $$quote(mv $${DESTDIR}/lib$${TARGET}.so $${DESTDIR}/$${TARGET}.so)
+}
+
 INCLUDEPATH = ../../src
 
 SOURCES += \

@@ -52,7 +52,8 @@ from FMIGenerator import FMIGenerator, VarDef
 class FMIGeneratorWizard(QtWidgets.QWizard):
 	def __init__(self, parent=None):
 		super(FMIGeneratorWizard, self).__init__(parent)
-		self.addPage(PageBasicProperties(self))
+		basicPropsPage = PageBasicProperties(self)
+		self.addPage(basicPropsPage)
 		self.addPage(PageVariables(self))
 		generatePage = PageGenerate(self)
 		generatePage.pageBasicProps = self.page(0).page # get WizardPageBasicProperties
@@ -61,6 +62,11 @@ class FMIGeneratorWizard(QtWidgets.QWizard):
 		
 		# connect the signal/slots between pages
 		generatePage.pageBasicProps.loadDefaults.connect(generatePage.pageVars.onLoadDefaults)
+		
+		# debug helper code
+		#basicPropsPage.page.ui.lineEditModelName.setText("P_Control")
+		#basicPropsPage.page.ui.lineEditTargetDir.setText("/home/ghorwin/git/FMICodeGenerator/examples")
+		#basicPropsPage.page.on_lineEditModelName_editingFinished()
 		
 		self.setWindowTitle("FMI Generator Wizard")
 		self.resize(800,600)
@@ -119,6 +125,35 @@ class PageVariables(QtWidgets.QWizardPage):
 
 	def validatePage(self):
 		# check all variables for valid combinations of parameters
+		# variables must not start with a number and must not container non-Ascii chars
+		
+		capitalized_var_names = set()
+		
+		for i in range(len(self.page.variables)):
+			varname = self.page.variables[i].name
+			
+			# check if the leading character is a number
+			if len(varname) == 0:
+				QtWidgets.QMessageBox.critical(self, "Invalid variable name", "Please specify names for all variables!")
+				return False
+			if varname[0] >= '0' and varname[0] <= '9':
+				QtWidgets.QMessageBox.critical(self, "Invalid variable name", "Variables must not begin with a number.")
+				return False
+			for a in varname:
+				if a == ' ' or a == '\t':
+					QtWidgets.QMessageBox.critical(self, "Invalid variable name", "Variables must not contain spaces or tab characters.")
+					return False
+				lowerCaseChar = (ord(a) >= ord('a') and ord(a) <= ord('z'))
+				upperCaseChar = (ord(a) >= ord('A') and ord(a) <= ord('Z'))
+				if not lowerCaseChar and not upperCaseChar:
+					QtWidgets.QMessageBox.critical(self, "Invalid variable name", "Variable names must only use ASCII characters (a-z, A-Z).")
+					return False
+			capVarName = varname.upper()
+			if capVarName in capitalized_var_names:
+				QtWidgets.QMessageBox.critical(self, "Invalid variable name", "Variable names must be unique (case in-sensitive).")
+				return False
+			capitalized_var_names.add(capVarName)
+				
 		return True
 
 

@@ -39,6 +39,7 @@
 import sys
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem
 from PyQt5.QtCore import pyqtSlot, Qt
+from PyQt5.QtGui import QFontMetrics
 
 from Ui_WizardPageVariables import Ui_WizardPageVariables
 
@@ -64,6 +65,7 @@ class WizardPageVariables(QWidget):
 		self.updateTable()
 		self.ui.tableWidget.selectRow(0)
 		self.show()
+		
 
 	def updateTable(self):
 		"""Syncronizes self.variables with table widget"""
@@ -118,6 +120,10 @@ class WizardPageVariables(QWidget):
 			self.ui.tableWidget.setItem(i, 8, item)
 			
 		self.ui.tableWidget.resizeColumnsToContents()
+		self.ui.tableWidget.setAlternatingRowColors(True)
+		f = QFontMetrics(self.ui.tableWidget.font())
+		self.ui.tableWidget.verticalHeader().setDefaultSectionSize(f.lineSpacing())
+		self.ui.tableWidget.setMinimumHeight(f.lineSpacing()*8)
 
 	
 	def updateEditField(self, var):
@@ -132,7 +138,8 @@ class WizardPageVariables(QWidget):
 		self.ui.lineEditUnit.setText( var.unit )
 		self.ui.lineEditDescription.setText( var.description )
 		self.ui.lineEditStart.setText( var.startValue )
-	
+
+
 	@pyqtSlot(str)
 	def onLoadDefaults(self, inputDataFile):
 		fmiGenerator = FMIGenerator()
@@ -205,7 +212,7 @@ class WizardPageVariables(QWidget):
 		currentRow = self.ui.tableWidget.currentRow()
 		assert(currentRow >= 0 and currentRow < len(self.variables))
 		# update variable cache
-		self.variables[currentRow].name = text
+		self.variables[currentRow].name = text.strip()
 		# changing a property of a QTableWidgetItem requires removal of item, change of property and re-setting the item
 		item = self.ui.tableWidget.takeItem(currentRow,0)
 		item.setText(text)

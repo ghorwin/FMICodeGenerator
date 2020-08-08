@@ -1,0 +1,3 @@
+*.so1.0.0
+*.dylib
+/libRealInputTest.so.1.0.0

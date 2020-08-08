@@ -1,0 +1,39 @@
+{
+    "variables": [
+        {
+            "variability": "continuous", 
+            "causality": "input", 
+            "name": "A", 
+            "typeID": "Real", 
+            "valueRef": -1, 
+            "initial": "approx", 
+            "startValue": "", 
+            "unit": "", 
+            "description": ""
+        }, 
+        {
+            "variability": "continuous", 
+            "causality": "input", 
+            "name": "B", 
+            "typeID": "Real", 
+            "valueRef": -1, 
+            "initial": "approx", 
+            "startValue": "", 
+            "unit": "", 
+            "description": ""
+        }, 
+        {
+            "variability": "continuous", 
+            "causality": "input", 
+            "name": "C", 
+            "typeID": "Real", 
+            "valueRef": -1, 
+            "initial": "approx", 
+            "startValue": "", 
+            "unit": "", 
+            "description": ""
+        }
+    ], 
+    "modelName": "RealInputTest", 
+    "description": "A test whether real inputs are handled correctly."
+}

@@ -67,14 +67,14 @@ Simply install the python packages and pyqt5.
 _Ubuntu 16.04 - Python 2.7_
 
 ```bash
-> sudo apt get install cmake built-essential qt5-default qt5-qmake qtcreator python-pyqt5 pyqt5-dev-tools 
+> sudo apt get install cmake built-essential qt5-default qt5-qmake qtcreator python-pyqt5 pyqt5-dev-tools p7zip-full
 ```
 The package `pyqt5-dev-tools` contains the scripts `pyuic5` and `pyrcc5` needed for development of the FMIGenerator itself.
 
 _Ubuntu 16.04 - Python 3_
 
 ```bash
-> sudo apt get install cmake built-essential qt5-default qt5-qmake qtcreator python3 python3-pyqt5 pyqt5-dev-tools 
+> sudo apt get install cmake built-essential qt5-default qt5-qmake qtcreator python3 python3-pyqt5 pyqt5-dev-tools p7zip-full
 ```
 
 #### Mac

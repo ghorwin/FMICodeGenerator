@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fmiModelDescription
+	fmiVersion="2.0"
+	modelName="Test5"
+	guid="{d19c22c0-275f-11eb-a623-f0761c781221}"
+	version="1.0.0"
+	author="not specified"
+	copyright="not specified"
+	license="not specified"
+	description=""
+	generationTool="ghorwin/FMICodeGenerator@github - C++ Code using FMI support functions from IBK@TU Dresden"
+	generationDateAndTime="2020-11-15T05:30:05Z"
+	variableNamingConvention="structured"
+	numberOfEventIndicators="0">
+
+	<!-- The following properties are the defaults and can be omitted
+		needsExecutionTool="false"
+		canBeInstantiatedOnlyOncePerProcess="false"
+		providesDirectionalDerivative="false"
+
+		CoSim only:
+		canRunAsynchronuously = "false"
+
+	-->
+
+	<ModelExchange
+		modelIdentifier="Test5"
+		completedIntegratorStepNotNeeded="true"
+		canNotUseMemoryManagementFunctions="true"
+		canGetAndSetFMUstate="true"
+		canSerializeFMUstate="true"
+	/>
+
+	<CoSimulation
+		modelIdentifier="Test5"
+		canHandleVariableCommunicationStepSize="true"
+		canInterpolateInputs="false"
+		maxOutputDerivativeOrder="0"
+		canNotUseMemoryManagementFunctions="true"
+		canGetAndSetFMUstate="true"
+		canSerializeFMUstate="true"
+	/>
+
+	<LogCategories>
+		<Category name="logStatusWarning" />
+		<Category name="logStatusError" />
+		<Category name="logAll" />
+		<Category name="logFmi2Call" />
+	</LogCategories>
+
+	<DefaultExperiment startTime="0.0" stopTime="10.0" tolerance="1e-06"/>
+
+	<ModelVariables>
+
+		<!-- For input variables we need to give a 'start' attribute -->
+		<!-- For output variables with initial="exact" we need to give a 'start' attribute -->
+		
+
+		<!-- Index of variable = "1" -->
+		<ScalarVariable
+			name="ResultRootDir"
+            description="A writeable directory generated for each slave of this FMU to store slave-specific output/data files."
+			valueReference="42"
+			variability="fixed"
+			causality="parameter"
+			initial="exact">
+			<String start="C:\Users\Lisa\Desktop\Ires\FMICodeGenerator\ResultRootDir"/>
+		</ScalarVariable>		
+		
+
+		<!-- Index of variable = "2" -->
+		<ScalarVariable
+			name="TW"
+            description="wall temperature"
+			valueReference="1"
+			variability="continuous"
+			causality="input"
+			initial="approx">
+			<Real start="25" unit="C"/>
+		</ScalarVariable>		
+		
+
+		<!-- Index of variable = "3" -->
+		<ScalarVariable
+			name="EnergySourceOut"
+            description="determined energy source"
+			valueReference="2"
+			variability="discrete"
+			causality="output"
+			initial="exact">
+			<Real start="600000" unit="J/m3s"/>
+		</ScalarVariable>		
+		
+
+		<!-- Index of variable = "4" -->
+		<ScalarVariable
+			name="EnergySourceIn"
+            description="current energy source"
+			valueReference="3"
+			variability="discrete"
+			causality="input"
+			initial="exact">
+			<Real start="600000" unit="J/m3s"/>
+		</ScalarVariable>		
+		
+
+	</ModelVariables>
+
+	<ModelStructure>
+		<Outputs>
+			<!-- dependencies must be defined for all output quantities. 'dependencyKind' is only needed
+				when some dependencies are constant factors or parameters.
+			-->
+			
+			<Unknown index="3" dependencies="2 4"/>
+		
+
+		</Outputs>
+	</ModelStructure>
+
+</fmiModelDescription>
+

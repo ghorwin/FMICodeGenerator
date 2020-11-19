@@ -1,3 +1,4 @@
 *.so1.0.0
 *.dylib
 /libP_Control.so.1.0.0
+*.so

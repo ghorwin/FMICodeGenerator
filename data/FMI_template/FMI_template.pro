@@ -20,18 +20,18 @@ QT -= core gui
 
 CONFIG(debug, debug|release) {
 	windows {
-		DLLDESTDIR = ../../bin/debug$${DIR_PREFIX}
+		DLLDESTDIR = bin/debug$${DIR_PREFIX}
 	}
 	else {
-		DESTDIR = ../../bin/debug$${DIR_PREFIX}
+		DESTDIR = bin/debug$${DIR_PREFIX}
 	}
 }
 else {
 	windows {
-		DLLDESTDIR = ../../bin/release$${DIR_PREFIX}
+		DLLDESTDIR = bin/release$${DIR_PREFIX}
 	}
 	else {
-		DESTDIR = ../../bin/release$${DIR_PREFIX}
+		DESTDIR = bin/release$${DIR_PREFIX}
 	}
 }
 
@@ -48,19 +48,20 @@ unix {
         QMAKE_POST_LINK += $$quote(mv $${DESTDIR}/lib$${TARGET}.so $${DESTDIR}/$${TARGET}.so)
 }
 
-INCLUDEPATH = ../../src
+
+INCLUDEPATH = src
 
 SOURCES += \
-	../../src/fmi2common/fmi2Functions.cpp \
-	../../src/fmi2common/InstanceData.cpp \
-	../../src/FMI_template.cpp
+	src/fmi2common/fmi2Functions.cpp \
+	src/fmi2common/InstanceData.cpp \
+	src/FMI_template.cpp
 
 HEADERS += \
-	../../src/fmi2common/fmi2Functions.h \
-	../../src/fmi2common/fmi2Functions_complete.h \
-	../../src/fmi2common/fmi2FunctionTypes.h \
-	../../src/fmi2common/fmi2TypesPlatform.h \
-	../../src/fmi2common/InstanceData.h \
-	../../src/FMI_template.h
+	src/fmi2common/fmi2Functions.h \
+	src/fmi2common/fmi2Functions_complete.h \
+	src/fmi2common/fmi2FunctionTypes.h \
+	src/fmi2common/fmi2TypesPlatform.h \
+	src/fmi2common/InstanceData.h \
+	src/FMI_template.h
 
 

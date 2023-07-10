@@ -7,7 +7,7 @@ call %VCVARSALL_PATH%
 :: FMU-specific variables - set by code generator
 set FMU_SHARED_LIB_NAME=FMI_template.dll
 
-set CMAKELISTSDIR=%CD%\..\projects\cmake
+set CMAKELISTSDIR=%CD%\..
 
 :: create and change into build subdir
 mkdir bb_VC_x64

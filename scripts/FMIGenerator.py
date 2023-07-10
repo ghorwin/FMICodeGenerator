@@ -105,7 +105,7 @@ class FMIGenerator:
 		""" Constructor, initializes member variables.
 
 		Member variables:
-		
+
 		targetDir -- Target directory can be relative (to current working directory) or
 					 absolute. FMU directory is created below this directory, for example:
 					    <target path>/<modelName>/
@@ -113,24 +113,24 @@ class FMIGenerator:
 					 is created directly below the current working directory.
 		modelName -- A user defined model name
 		description -- A user defined description
-		variables -- vector of type VarDefs with variable definitions (inputs, outputs, parameters) 
+		variables -- vector of type VarDefs with variable definitions (inputs, outputs, parameters)
 		numberOfContinuousStates -- number of continuous states in the model (only exposed for ModelExchange functionality)
 		"""
 		self.targetDir = ""
-		
+
 		self.modelName = ""
 		self.description = ""
 		self.variables = []
 		self.messages = []
 		self.numberOfContinuousStates = 0
-		
+
 		self.autobuild = True
 
 
 	def printMsg(self, text):
 		print(text)
 		self.messages.append(text)
-		
+
 
 	def generate(self):
 
@@ -138,8 +138,8 @@ class FMIGenerator:
 
 		Functionality: first a template folder structure is copied to the target location. Then,
 		placeholders in the original files are substituted.
-		
-		Target directory is generated using targetDir member variable, for relative directory, 
+
+		Target directory is generated using targetDir member variable, for relative directory,
 		the target directory is created from `<current working directory>/<targetDir>/<modelName>`.
 		For absolute file paths the target directory is `<targetDir>/<modelName>`.
         """
@@ -169,25 +169,25 @@ class FMIGenerator:
 		templateDirPath = os.path.abspath(templateDirPath)
 		self.printMsg("Template location  : {}".format(templateDirPath))
 
-		# user may have specified "FMI_template" as model name 
+		# user may have specified "FMI_template" as model name
 		# (which would be weird and break the code, hence a warning)
 		if self.modelName == "FMI_template":
 			printMsg("WARNING: model name is same as template folder name. This may not work!")
-		
+
 		# store input data into <targetDir>/<modelName>.input so that it can be read again by wizard to
 		# populate input data
 		self.writeInputData(self.targetDirPath + ".input")
-		
+
 		self.printMsg("Copying template directory to target directory (and renaming files)")
 		self.copyTemplateDirectory(templateDirPath)
-		
+
 		self.printMsg("Generating unique value references")
 		# first create a set of all predefined valueReferences
 		valueRefs = set()
 		for var in self.variables:
 			if var.valueRef != -1:
 				valueRefs.add(var.valueRef)
-		# start auto-numbering from valueRef 1 
+		# start auto-numbering from valueRef 1
 		nextValueRef = 1
 		for var in self.variables:
 			# generate value if auto-numbered
@@ -199,22 +199,22 @@ class FMIGenerator:
 				nextValueRef = i
 				valueRefs.add(i) # add value ref to set of already used valueRefs
 				var.valueRef = nextValueRef # remember assigned value reference
-	
+
 		self.printMsg ("Adjusting template files (replacing placeholders)")
 		self.substitutePlaceholders()
 
 		if self.autobuild:
 			self.printMsg("Test-building FMU")
 			self.testBuildFMU()
-		
+
 		# *** Done with FMU generation ***
 
 
 
 	def copyTemplateDirectory(self, templatePath):
-		"""Copies the template folder to the new location. Replaces the old name of directories, files 
+		"""Copies the template folder to the new location. Replaces the old name of directories, files
 		and script in the files with the newly user defined name (i.e.modelName).
-		
+
 		Path to target directory is stored in self.targetDirPath.
 		If target directory exists already, it is moved to trash first.
 
@@ -223,9 +223,9 @@ class FMIGenerator:
 		Arguments:
 
 		templatePath -- The absolute path to the template directory.
-		
+
 		Example::
-		
+
 		   self.copyTemplateDirectory("../data/FMI_template")
 		   # will rename "FMI_template" to "testFMU" after copying
 		"""
@@ -235,7 +235,7 @@ class FMIGenerator:
 			if os.path.exists(self.targetDirPath):
 				# Move folder to thrash
 				send2trash(self.targetDirPath)
-				
+
 			# if parent directory does not yet exist, create it
 			parentDir = os.path.dirname(self.targetDirPath)
 			if not os.path.exists(parentDir):
@@ -249,19 +249,19 @@ class FMIGenerator:
 
 		try:
 			# rename files that must be named according as the modelName
-			os.rename(self.targetDirPath + "/" + TEMPLATE_FOLDER_NAME + ".pro", 
+			os.rename(self.targetDirPath + "/" + TEMPLATE_FOLDER_NAME + ".pro",
 			          self.targetDirPath + "/" + self.modelName + ".pro")
-			os.rename(self.targetDirPath + "/src/" + TEMPLATE_FOLDER_NAME + ".cpp", 
+			os.rename(self.targetDirPath + "/src/" + TEMPLATE_FOLDER_NAME + ".cpp",
 			          self.targetDirPath + "/src/" + self.modelName + ".cpp")
-			os.rename(self.targetDirPath + "/src/" + TEMPLATE_FOLDER_NAME + ".h", 
+			os.rename(self.targetDirPath + "/src/" + TEMPLATE_FOLDER_NAME + ".h",
 			          self.targetDirPath + "/src/" + self.modelName + ".h")
 		except:
 			raise RuntimeError("Cannot rename template files")
 
 
-	def substitutePlaceholders(self):  
+	def substitutePlaceholders(self):
 		"""Processes all template files and replaces placeholders within the files with generated values.
-		
+
 		1. It generates a globally unique identifier.
 		2. It generates a local time stamp.
 		3. It replaces placeholders.
@@ -275,15 +275,15 @@ class FMIGenerator:
 		localTime = time.strftime('%Y-%m-%dT%I:%M:%SZ',time.localtime())
 
 		# We process file after file
-		
+
 		# loop to walk through the new folder
 		for root, dirs, files in os.walk(self.targetDirPath):
 			# process all files
 			for f in files:
-	
+
 				# compose full file path
 				src = os.path.join(root, f)
-	
+
 				try:
 					# read file into memory, variable 'data'
 					if sys.version_info[0] < 3:
@@ -296,20 +296,20 @@ class FMIGenerator:
 				except Exception as e:
 					self.printMsg(str(e))
 					raise RuntimeError("Error reading file: {}".format(src))
-	
+
 				# generic data adjustment
 				data = data.replace(TEMPLATE_FOLDER_NAME, self.modelName)
 
 				# special handling for certain file types
-				
+
 				# 1. modelDescription.xml
 				if f == "modelDescription.xml":
 					data = self.adjustModelDescription(data, localTime, guid)
-			
+
 				# 2. <modelName>.cpp
 				if f==self.modelName + ".cpp":
 					data = self.adjustSourceCodeFiles(data, guid)
-	
+
 				# finally, write data back to file
 				try:
 					if sys.version_info[0] < 3:
@@ -326,7 +326,7 @@ class FMIGenerator:
 
 	def adjustModelDescription(self, data, localTimeStamp, guid):
 		"""Adjusts content of `modelDescription.xml` file.
-		Take the content of template file in argument data. Inserts strings for model name, description, 
+		Take the content of template file in argument data. Inserts strings for model name, description,
 		date and time, GUID, ...
 
 		Arguments:
@@ -336,24 +336,24 @@ class FMIGenerator:
 		guid -- globally unique identifier
 
 		Returns:
-		
+
 		Returns string with modified modelDescription.xml file
 		"""
 
 		data = data.replace("$$dateandtime$$",localTimeStamp)
-		data = data.replace("$$GUID$$", str(guid))        
+		data = data.replace("$$GUID$$", str(guid))
 		data = data.replace("$$description$$", self.description)
 		data = data.replace("$$modelName$$",self.modelName)
-		
+
 		# TODO : substitute remaining placeholders
 		data = data.replace("$$version$$","1.0.0")
 		data = data.replace("$$author$$","not specified")
 		data = data.replace("$$copyright$$","not specified")
 		data = data.replace("$$license$$","not specified")
-		
-		
+
+
 		# generate scalar variable section
-		
+
 		VARIABLE_TEMPLATE = """
 		<!-- Index of variable = "$$index$$" -->
 		<ScalarVariable
@@ -363,12 +363,12 @@ class FMIGenerator:
 			causality="$$causality$$"
 			initial="$$initial$$">
 			<$$typeID$$$$start$$$$unit$$/>
-		</ScalarVariable>		
+		</ScalarVariable>
 		"""
-		
+
 		MODEL_STRUCTURE_TEMPLATE = """			<Unknown index="$$index$$" dependencies="$$dependlist$$"/>
 		"""
-		
+
 		scalarVariableDefs = ""
 		# now add all variables one by one
 		idx = 0
@@ -379,42 +379,42 @@ class FMIGenerator:
 			varDefBlock = VARIABLE_TEMPLATE
 			varDefBlock = varDefBlock.replace("$$index$$",str(idx))
 			varDefBlock = varDefBlock.replace("$$name$$",var.name)
-			
+
 			if len(var.description) != 0:
 				varDefBlock = varDefBlock.replace("$$desc$$", u'\n            description="{}"'.format(var.description))
 			else:
 				varDefBlock = varDefBlock.replace("$$desc$$","")
-			
+
 			# generate value if auto-numbered
 			assert(var.valueRef != -1)
-			varDefBlock = varDefBlock.replace("$$valueRef$$",str(var.valueRef))	
-			
+			varDefBlock = varDefBlock.replace("$$valueRef$$",str(var.valueRef))
+
 			if var.causality == "input":
 				dependList = dependList + " " + str(idx)
-			
+
 			varDefBlock = varDefBlock.replace("$$variability$$",var.variability)
 			varDefBlock = varDefBlock.replace("$$causality$$",var.causality)
 			varDefBlock = varDefBlock.replace("$$initial$$",var.initial)
 
 			varDefBlock = varDefBlock.replace("$$typeID$$",var.typeID)
-			
+
 			if var.typeID == 'Real' and len(var.unit) > 0:
 				varDefBlock = varDefBlock.replace("$$unit$$",' unit="{}"'.format(var.unit))
 			else:
 				varDefBlock = varDefBlock.replace("$$unit$$","")
-			
+
 			if var.initial=="calculated":
 				varDefBlock = varDefBlock.replace("$$start$$","")
 			else:
 				varDefBlock = varDefBlock.replace("$$start$$",' start="{}"'.format(var.startValue))
-		
+
 			scalarVariableDefs = scalarVariableDefs + "\n" + varDefBlock
-		
+
 		data = data.replace("$$scalarVariables$$",scalarVariableDefs)
 
 		dependList = dependList.strip()
-		
-		# output dependency block	
+
+		# output dependency block
 		modelStructureDefs = ""
 		for var in self.variables:
 			if var.causality == "output":
@@ -422,7 +422,7 @@ class FMIGenerator:
 				dependsDef = dependsDef.replace("$$index$$",str(var.idx))
 				dependsDef = dependsDef.replace("$$dependlist$$", dependList)
 				modelStructureDefs = modelStructureDefs + "\n" + dependsDef
-	
+
 		data = data.replace("$$outputDependencies$$", modelStructureDefs)
 		return data
 
@@ -430,26 +430,26 @@ class FMIGenerator:
 	def adjustSourceCodeFiles(self, data, guid):
 		"""Adjusts content of `<modelName>.cpp` file.
 		Replaces the following placeholders:
-		
+
 		- $$variables$$ - defines for each published variables
 		- $$initialization$$ - start values for all input and output variables
 		- $$initialStatesME$$ - initialization code for Model Exchange
 		- $$initialStatesCS$$ - initialization code for Model Exchange
 		- $$getInputVars$$ - retrieves input/parameter values for access in C++ code
 		- $$setOutputVars$$ - sets calculated values for access in C++ code
-		
+
 		Arguments:
 
 		data -- string holding the contents of the <modelName>.cpp file
 		guid -- globally unique identifier
 
 		Returns:
-		
+
 		Returns the modified string.
-		
+
 		"""
-		
-		data = data.replace("$$GUID$$", str(guid))		
+
+		data = data.replace("$$GUID$$", str(guid))
 
 		# generate variable defines
 		s = ""
@@ -470,7 +470,7 @@ class FMIGenerator:
 				typePrefix = "string"
 				cppType = "const std::string &"
 			assert(typePrefix)
-			
+
 			if var.causality == "input":
 				sdef = "#define FMI_INPUT_{} {}".format(var.name, var.valueRef)
 				s = s + sdef + "\n"
@@ -509,10 +509,10 @@ class FMIGenerator:
 				var.getStatement = "{} {} = {};".format(cppType, var.name, var.cppVariable)
 			else:
 				var.varDefine = "" # variable will not be used in cpp code
-				
+
 
 		data = data.replace("$$variables$$", s)
-		
+
 		# generate initialization code
 		sIn = ""
 		for var in self.variables:
@@ -527,7 +527,7 @@ class FMIGenerator:
 				sIn = sIn + sdef + "\n"
 		if len(sIn) > 0:
 			sIn = "\t// initialize input variables and/or parameters\n" + sIn + "\n"
-			
+
 		sOut = ""
 		for var in self.variables:
 			if var.causality == "output" or var.causality == "local":
@@ -541,100 +541,100 @@ class FMIGenerator:
 				sOut = sOut + sdef + "\n"
 		if len(sOut) > 0:
 			sOut = "\t// initialize output variables\n" + sOut + "\n"
-		
-		data = data.replace("$$initialization$$", sIn + sOut)		
-		
+
+		data = data.replace("$$initialization$$", sIn + sOut)
+
 		# todo states
-		
-		data = data.replace("$$initialStatesME$$", "")		
-		data = data.replace("$$initialStatesCS$$", "")		
-		
+
+		data = data.replace("$$initialStatesME$$", "")
+		data = data.replace("$$initialStatesCS$$", "")
+
 		# compose getter block
 		s = ""
 		for var in self.variables:
 			if var.causality == "input" or var.causality == "parameter" or var.causality == "local":
 				sdef = "\t" + var.getStatement
-				s = s + sdef + "\n"		
+				s = s + sdef + "\n"
 		data = data.replace("$$getInputVars$$", s)
-		
+
 		# compose setter block
 		s = ""
 		for var in self.variables:
 			if var.causality == "output" or var.causality == "calculatedParameter":
 				sdef = "\t" + var.setStatement
 				s = s + sdef + "\n"
-		data = data.replace("$$setOutputVars$$", s)		
-		
+		data = data.replace("$$setOutputVars$$", s)
+
 		return data
-	
-	
+
+
 	def testBuildFMU(self):
 		"""Runs a cmake-based compilation of the generated FMU to check if the code compiles.
 		"""
-		
+
 		# generate path to /build subdir
 		buildDir = os.path.join(self.targetDirPath, "build")
 		binDir = os.path.join(self.targetDirPath, "bin/release")
-	
+
 		self.printMsg("We are now test-building the FMU. You should first implement your FMU functionality and afterwards "
 		      "build and deploy the FMU!")
 		try:
 
 			# Different script handling based on platform
 			if platform.system() == "Windows":
-				
+
 				# call batch file to build the FMI library
-				pipe = subprocess.Popen(["build_VC_x64.bat"], shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE, cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                
+				pipe = subprocess.Popen(["build_VC_x64.bat"], shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE, cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 				# retrieve output and error messages
 				outputMsg, errorMsg = pipe.communicate()
 				# get return code
 				rc = pipe.returncode
-	
+
 				# if return code is different from 0, print the error message
 				if rc != 0:
 					self.printMsg(str(outputMsg) + "\n" + str(errorMsg))
 					raise RuntimeError("Error during compilation of FMU.")
 
 				self.printMsg("Compiled FMU successfully")
-		
+
 				# call batch file to build the FMI library
-				pipe = subprocess.Popen(["deploy.bat"], shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE, cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                
+				pipe = subprocess.Popen(["deploy.bat"], shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE, cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
 				# retrieve output and error messages
 				outputMsg, errorMsg = pipe.communicate()
 				# get return code
 				rc = pipe.returncode
-	
+
 				if rc != 0:
 					self.printMsg(str(outputMsg) + "\n" + str(errorMsg))
 					raise RuntimeError("Error during compilation of FMU")
 
 				self.printMsg("Successfully created {}".format(self.modelName + ".fmu")	)
-	
+
 			else:
 				# shell file execution for Mac & Linux
-				pipe = subprocess.Popen(["bash", './build.sh'], cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
-				outputMsg,errorMsg = pipe.communicate()  
-				rc = pipe.returncode             
-	
+				pipe = subprocess.Popen(["bash", './build.sh'], cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+				outputMsg,errorMsg = pipe.communicate()
+				rc = pipe.returncode
+
 				if rc != 0:
 					self.printMsg(errorMsg)
 					raise RuntimeError("Error during compilation of FMU")
 
 				self.printMsg("Compiled FMU successfully")
-	
+
 				# Deployment
-	
+
 				# shell file execution for Mac & Linux
-				deploy = subprocess.Popen(["bash", './deploy.sh'], cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)                           
-				outputMsg,errorMsg = deploy.communicate()  
-				dc = deploy.returncode             
-	
+				deploy = subprocess.Popen(["bash", './deploy.sh'], cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
+				outputMsg,errorMsg = deploy.communicate()
+				dc = deploy.returncode
+
 				if dc != 0:
 					self.printMsg(errorMsg)
 					raise RuntimeError("Error during assembly of FMU")
 
 				self.printMsg("Successfully created {}".format(self.modelName + ".fmu")	)
-	
+
 		except Exception as e:
 			self.printMsg(str(e))
 			self.printMsg("Error building FMU.")
@@ -642,20 +642,20 @@ class FMIGenerator:
 
 
 	def writeInputData(self, targetFile):
-		"""Writes all input data to FMIGenerator to file so it can be read later by the FMIGeneratorWizard to 
+		"""Writes all input data to FMIGenerator to file so it can be read later by the FMIGeneratorWizard to
 		populate the dialog again (greatly helps in testing the code)"""
-		
+
 		varArray = []
-		
+
 		for v in self.variables:
 			varArray.append(v.toJson())
-		
+
 		data = {
 		  "modelName" : self.modelName,
 		  "description" : self.description,
 		  "variables" : varArray
 		}
-		
+
 		# if parent directory does not yet exist, create it
 		parentDir = os.path.dirname(targetFile)
 		parentDir = os.path.abspath(parentDir)
@@ -663,9 +663,9 @@ class FMIGenerator:
 			os.makedirs(parentDir)
 
 		with open(targetFile, 'w') as outfile:
-			json.dump(data, outfile, indent=4)		
-			
-	
+			json.dump(data, outfile, indent=4)
+
+
 	def readInputData(self, targetFile):
 		with open(targetFile, 'r') as f:
 			data = json.load(f)

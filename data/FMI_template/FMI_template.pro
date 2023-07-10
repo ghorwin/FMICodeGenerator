@@ -45,7 +45,12 @@ unix|mac {
 }
 
 unix {
-        QMAKE_POST_LINK += $$quote(mv $${DESTDIR}/lib$${TARGET}.so $${DESTDIR}/$${TARGET}.so)
+	# move actual lib to TARGET.so
+	QMAKE_POST_LINK += $$quote(mv $${DESTDIR}/lib$${TARGET}.so.$${VER_MAJ}.$${VER_MIN}.$${VER_PAT} $${DESTDIR}/$${TARGET}.so)  &&
+	# remove symlinks
+	QMAKE_POST_LINK += $$quote(rm $${DESTDIR}/lib$${TARGET}.so.$${VER_MAJ}.$${VER_MIN})  &&
+	QMAKE_POST_LINK += $$quote(rm $${DESTDIR}/lib$${TARGET}.so.$${VER_MAJ}) &&
+	QMAKE_POST_LINK += $$quote(rm $${DESTDIR}/lib$${TARGET}.so)
 }
 
 

@@ -249,8 +249,8 @@ class FMIGenerator:
 
 		try:
 			# rename files that must be named according as the modelName
-			os.rename(self.targetDirPath + "/projects/Qt/" + TEMPLATE_FOLDER_NAME + ".pro", 
-			          self.targetDirPath + "/projects/Qt/" + self.modelName + ".pro")
+			os.rename(self.targetDirPath + "/" + TEMPLATE_FOLDER_NAME + ".pro", 
+			          self.targetDirPath + "/" + self.modelName + ".pro")
 			os.rename(self.targetDirPath + "/src/" + TEMPLATE_FOLDER_NAME + ".cpp", 
 			          self.targetDirPath + "/src/" + self.modelName + ".cpp")
 			os.rename(self.targetDirPath + "/src/" + TEMPLATE_FOLDER_NAME + ".h", 

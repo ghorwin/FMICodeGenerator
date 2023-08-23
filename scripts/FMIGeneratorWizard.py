@@ -140,13 +140,14 @@ class PageVariables(QtWidgets.QWizardPage):
 				QtWidgets.QMessageBox.critical(self, "Invalid variable name", "Variables must not begin with a number.")
 				return False
 			for a in varname:
-				if a == ' ' or a == '\t':
-					QtWidgets.QMessageBox.critical(self, "Invalid variable name", "Variables must not contain spaces or tab characters.")
+				if a in ' \t.*-/\\!"':
+					QtWidgets.QMessageBox.critical(self, "Invalid variable name", "Variables must not contain spaces or tab characters or other special characters.")
 					return False
 				lowerCaseChar = (ord(a) >= ord('a') and ord(a) <= ord('z'))
 				upperCaseChar = (ord(a) >= ord('A') and ord(a) <= ord('Z'))
-				if not lowerCaseChar and not upperCaseChar:
-					QtWidgets.QMessageBox.critical(self, "Invalid variable name", "Variable names must only use ASCII characters (a-z, A-Z).")
+				isNumber = (ord(a) >= ord('0') and ord(a) <= ord('9'))
+				if not isNumber and not lowerCaseChar and not upperCaseChar and a!='_':
+					QtWidgets.QMessageBox.critical(self, "Invalid variable name", "Variable names must only use ASCII characters (a-z, A-Z) and or numbers or '_' characters.")
 					return False
 			capVarName = varname.upper()
 			if capVarName in capitalized_var_names:

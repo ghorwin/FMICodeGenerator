@@ -371,7 +371,6 @@ class FMIGenerator:
 				when some dependencies are constant factors or parameters.
 			-->
 			$$outputDependencies$$
-
 		</Outputs>"""
 
 		OUTPUT_TEMPLATE = """

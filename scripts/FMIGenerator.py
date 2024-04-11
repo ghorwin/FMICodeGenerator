@@ -366,7 +366,16 @@ class FMIGenerator:
 		</ScalarVariable>
 		"""
 
-		MODEL_STRUCTURE_TEMPLATE = """			<Unknown index="$$index$$" dependencies="$$dependlist$$"/>
+		MODEL_STRUCTURE_TEMPLATE = """<Outputs>
+			<!-- dependencies must be defined for all output quantities. 'dependencyKind' is only needed
+				when some dependencies are constant factors or parameters.
+			-->
+			$$outputDependencies$$
+
+		</Outputs>"""
+
+		OUTPUT_TEMPLATE = """
+			<Unknown index="$$index$$" dependencies="$$dependlist$$"/>
 		"""
 
 		scalarVariableDefs = ""
@@ -416,12 +425,17 @@ class FMIGenerator:
 
 		# output dependency block
 		modelStructureDefs = ""
+		modelOutputsDefs = ""
 		for var in self.variables:
 			if var.causality == "output":
-				dependsDef = MODEL_STRUCTURE_TEMPLATE
+				dependsDef = OUTPUT_TEMPLATE
 				dependsDef = dependsDef.replace("$$index$$",str(var.idx))
 				dependsDef = dependsDef.replace("$$dependlist$$", dependList)
-				modelStructureDefs = modelStructureDefs + "\n" + dependsDef
+				modelOutputsDefs = modelOutputsDefs + "\n" + dependsDef
+
+		if (modelOutputsDefs != ""):
+			modelStructureDefs = MODEL_STRUCTURE_TEMPLATE
+			modelStructureDefs = modelStructureDefs.replace("$$outputDependencies$$",modelOutputsDefs)
 
 		data = data.replace("$$outputDependencies$$", modelStructureDefs)
 		return data

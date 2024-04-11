@@ -59,13 +59,9 @@
 	</ModelVariables>
 
 	<ModelStructure>
-		<Outputs>
-			<!-- dependencies must be defined for all output quantities. 'dependencyKind' is only needed
-				when some dependencies are constant factors or parameters.
-			-->
-			$$outputDependencies$$
 
-		</Outputs>
+		$$outputDependencies$$
+
 	</ModelStructure>
 
 </fmiModelDescription>

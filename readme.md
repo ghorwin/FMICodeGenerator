@@ -3,7 +3,7 @@
 ## What is this FMI/FMU stuff?
 
 FMU stands for _Functional Mockup Unit_ and FMI for _Functional Mockup Interface_. The latter is an industry standard
-for simulation model runtime coupling, and basically defines an API and a meta data description file and directory structure for model exchange: see [FMI-Standard webpage](https://fmi-standard.org) for details.
+for simulation model runtime coupling, and basically defines an API and a meta data description file and directory structure: see [FMI-Standard webpage](https://fmi-standard.org) for details.
 
 ## The Motivation
 

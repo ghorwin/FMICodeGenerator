@@ -366,8 +366,14 @@ class FMIGenerator:
 		</ScalarVariable>
 		"""
 
-		MODEL_STRUCTURE_TEMPLATE = """			<Unknown index="$$index$$" dependencies="$$dependlist$$"/>
-		"""
+		MODEL_STRUCTURE_OUTPUTS_TEMPLATE = """<Outputs>
+			<!-- dependencies must be defined for all output quantities. 'dependencyKind' is only needed
+				when some dependencies are constant factors or parameters.
+			-->
+$$outputUnknowns$$
+		</Outputs>"""
+
+		MODEL_STRUCTURE_OUTPUTS_UNKNOWN_TEMPLATE = """			<Unknown index="$$index$$" dependencies="$$dependlist$$"/>"""
 
 		scalarVariableDefs = ""
 		# now add all variables one by one
@@ -415,15 +421,22 @@ class FMIGenerator:
 		dependList = dependList.strip()
 
 		# output dependency block
+		# we first generate the individual '<Unknown index=....' lines, and insert these later in
+		# the model structure template
 		modelStructureDefs = ""
+		modelOutputUnknowns = ""
 		for var in self.variables:
 			if var.causality == "output":
-				dependsDef = MODEL_STRUCTURE_TEMPLATE
+				dependsDef = MODEL_STRUCTURE_OUTPUTS_UNKNOWN_TEMPLATE
 				dependsDef = dependsDef.replace("$$index$$",str(var.idx))
 				dependsDef = dependsDef.replace("$$dependlist$$", dependList)
-				modelStructureDefs = modelStructureDefs + "\n" + dependsDef
-
+				modelOutputUnknowns = modelOutputUnknowns + "\n" + dependsDef
+		# modelOutputUnkowns may be empty, if we do not have any outputs. In this case,
+		# we replace the placeholder with an empty string. Otherwise we populate it first.
+		if len(modelOutputUnknowns) != 0:
+			modelStructureDefs = MODEL_STRUCTURE_OUTPUTS_TEMPLATE.replace("$$outputUnknowns$$", modelOutputUnknowns)
 		data = data.replace("$$outputDependencies$$", modelStructureDefs)
+		
 		return data
 
 

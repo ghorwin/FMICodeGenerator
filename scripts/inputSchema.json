@@ -61,50 +61,49 @@
             "type": "array",
             "items": {
                 "type": "object",
-                "patternProperties": {
-                    "": {
-                        "type": "object",
-                        "properties": {
-                            "valueRef": {
-                                "description": "Value reference for the variable",
-                                "type": "integer",
-                                "minimum": 0
-                            },
-                            "variability": {
-                                "description": "Variability tag for the variable",
-                                "type": "string",
-                                "enum": ["constant", "fixed", "tunable", "discrete", "continuous"]
-                            },
-                            "causality": {
-                                "description": "Causality tag for the variable",
-                                "type": "string",
-                                "enum": ["input", "output", "local", "parameter", "calculatedParameter", "independent"]
-                            },
-                            "initial": {
-                                "description": "Initial tag for the variable",
-                                "type": "string",
-                                "enum": ["exact", "approx", "calculated"]
-                            },
-                            "typeID": {
-                                "description": "Type ID for the variable",
-                                "type": "string",
-                                "enum": ["Real", "Integer", "Boolean", "String"]
-                            },
-                            "startValue": {
-                                "description": "Start value of the variable"
-                            },
-                            "description": {
-                                "description": "Description of the variable",
-                                "type": "string"
-                            },
-                            "unit": {
-                                "description": "Physical unit of the variable",
-                                "type": "string"
-                            }
-                        },
-                        "required": ["variability", "causality", "initial", "typeID"]
+                "properties": {
+                    "name": {
+                        "description": "Name of the variable",
+                        "type": "string"
+                    },
+                    "valueRef": {
+                        "description": "Value reference for the variable",
+                        "type": "integer",
+                        "minimum": 0
+                    },
+                    "variability": {
+                        "description": "Variability tag for the variable",
+                        "type": "string",
+                        "enum": ["constant", "fixed", "tunable", "discrete", "continuous"]
+                    },
+                    "causality": {
+                        "description": "Causality tag for the variable",
+                        "type": "string",
+                        "enum": ["input", "output", "local", "parameter", "calculatedParameter", "independent"]
+                    },
+                    "initial": {
+                        "description": "Initial tag for the variable",
+                        "type": "string",
+                        "enum": ["exact", "approx", "calculated"]
+                    },
+                    "typeID": {
+                        "description": "Type ID for the variable",
+                        "type": "string",
+                        "enum": ["Real", "Integer", "Boolean", "String"]
+                    },
+                    "startValue": {
+                        "description": "Start value of the variable"
+                    },
+                    "description": {
+                        "description": "Description of the variable",
+                        "type": "string"
+                    },
+                    "unit": {
+                        "description": "Physical unit of the variable",
+                        "type": "string"
                     }
-                }
+                },
+                "required": ["name", "variability", "causality", "initial", "typeID"]
             }
         }
     },

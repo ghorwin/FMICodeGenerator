@@ -55,13 +55,10 @@
 		<!-- For input variables we need to give a 'start' attribute -->
 		<!-- For output variables with initial="exact" we need to give a 'start' attribute -->
 		$$scalarVariables$$
-
 	</ModelVariables>
 
 	<ModelStructure>
-
 		$$outputDependencies$$
-
 	</ModelStructure>
 
 </fmiModelDescription>

@@ -1,0 +1,17 @@
+{
+    "modelName": "TestWithoutOutputs",
+    "description": "dfsfds",
+    "variables": [
+        {
+            "name": "ResultRootDir",
+            "valueRef": 42,
+            "variability": "fixed",
+            "causality": "parameter",
+            "initial": "exact",
+            "typeID": "String",
+            "startValue": "",
+            "description": "A writeable directory generated for each slave of this FMU to store slave-specific output/data files.",
+            "unit": ""
+        }
+    ]
+}

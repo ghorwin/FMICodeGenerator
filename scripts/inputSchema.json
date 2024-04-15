@@ -1,0 +1,115 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema",
+    "$id": "https://who.cares/about-this.json",
+    "title": "Python FMU Generator input",
+    "description": "Input file of the Python FMU Generator",
+    "type": "object",
+    "properties": {
+        "modelName": {
+            "description": "Model name",
+            "type": "string"
+        },
+        "description": {
+            "description": "Model description",
+            "type": "string"
+        },
+        "fmuDestination": {
+            "description": "Output path for the generated FMU",
+            "type": "string"
+        },
+        "pythonSource": {
+            "description": "Path of the input Python code",
+            "type": "string"
+        },
+        "spycicLocation": {
+            "description": "Path to the Spycic library",
+            "type": "string"
+        },
+        "pythonFunctions": {
+            "description": "Python functions to be imported from the Python code",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "propertyNames": {
+                    "enum": ["initME", "initCS", "updateME", "stepCS"]
+                },
+                "patternProperties": {
+                    "": {
+                        "type": "object",
+                        "properties": {
+                            "pythonName": {
+                                "description": "Name of the function in the Python code",
+                                "type": "string"
+                            },
+                            "arguments": {
+                                "description": "Array of function arguments",
+                                "type": "array"
+                            },
+                            "output": {
+                                "description": "Output variable for the function",
+                                "type": "string"
+                            }
+                        },
+                        "required": ["pythonName", "arguments", "output"],
+                        "additionalProperties": false
+                    }
+                }
+            }
+        },
+        "variables": {
+            "description": "Array containing the variables of the model",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "patternProperties": {
+                    "": {
+                        "type": "object",
+                        "properties": {
+                            "valueRef": {
+                                "description": "Value reference for the variable",
+                                "type": "integer",
+                                "minimum": 0
+                            },
+                            "variability": {
+                                "description": "Variability tag for the variable",
+                                "type": "string",
+                                "enum": ["constant", "fixed", "tunable", "discrete", "continuous"]
+                            },
+                            "causality": {
+                                "description": "Causality tag for the variable",
+                                "type": "string",
+                                "enum": ["input", "output", "local", "parameter", "calculatedParameter", "independent"]
+                            },
+                            "initial": {
+                                "description": "Initial tag for the variable",
+                                "type": "string",
+                                "enum": ["exact", "approx", "calculated"]
+                            },
+                            "typeID": {
+                                "description": "Type ID for the variable",
+                                "type": "string",
+                                "enum": ["Real", "Integer", "Boolean", "String"]
+                            },
+                            "startValue": {
+                                "description": "Start value of the variable"
+                            },
+                            "description": {
+                                "description": "Description of the variable",
+                                "type": "string"
+                            },
+                            "unit": {
+                                "description": "Physical unit of the variable",
+                                "type": "string"
+                            }
+                        },
+                        "required": ["variability", "causality", "initial", "typeID"]
+                    }
+                }
+            }
+        }
+    },
+    "required": ["modelName", "description", "variables"],
+    "dependentRequired": {
+        "pythonSource": ["pythonFunctions"]
+    }
+}

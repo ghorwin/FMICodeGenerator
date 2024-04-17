@@ -1,0 +1,15 @@
+{
+    "modelName": "myModel",
+    "variables": [
+        {
+            "variability": "continuous",
+            "causality": "input",
+            "initial": "approx",
+            "typeID": "Real",
+            "startValue": 271.5,
+            "description": "",
+            "unit": "K"
+        }
+    ],
+    "pythonSource": "path/to/python/source.py"
+}

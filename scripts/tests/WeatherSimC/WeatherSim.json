@@ -3,9 +3,9 @@
     "description": "A simple FMU that gives a temperature at a given time in a day.",
     "variables": [
         {
-            "name": "tempIn",
+            "name": "tempOut",
             "variability": "continuous",
-            "causality": "input",
+            "causality": "output",
             "initial": "approx",
             "typeID": "Real",
             "startValue": 271.5,
@@ -14,19 +14,17 @@
         }
     ],
 	"pythonSource": "WeatherSim.py",
-    "pythonFunctions": [
-	    {
-		    "initCS": {
-                "pythonName": "init",
-                "arguments": [],
-                "output": "tempIn"
-            },
-		    "stepCS": {
-                "pythonName": "do_step",
-                "arguments": ["start_time", "stop_time"],
-                "output": "tempIn"
-            }
+    "pythonFunctions": {
+        "initCS": {
+            "pythonName": "init",
+            "arguments": [],
+            "output": "tempOut"
+        },
+        "stepCS": {
+            "pythonName": "do_step",
+            "arguments": ["start_time", "stop_time"],
+            "output": "tempOut"
         }
-    ],
+    },
     "spycicLocation": "path/to/spycic"
 }

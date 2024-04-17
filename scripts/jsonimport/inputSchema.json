@@ -1,5 +1,5 @@
 {
-    "$schema": "https://json-schema.org/draft-07/schema",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "$id": "https://who.cares/about-this.json",
     "title": "Python FMU Generator input",
     "description": "Input file of the Python FMU Generator",
@@ -7,7 +7,8 @@
     "properties": {
         "modelName": {
             "description": "Model name",
-            "type": "string"
+            "type": "string",
+            "minLength": 1
         },
         "description": {
             "description": "Model description",
@@ -27,38 +28,36 @@
         },
         "pythonFunctions": {
             "description": "Python functions to be imported from the Python code",
-            "type": "array",
-            "items": {
-                "type": "object",
-                "propertyNames": {
-                    "enum": ["initME", "initCS", "updateME", "stepCS"]
-                },
-                "patternProperties": {
-                    "": {
-                        "type": "object",
-                        "properties": {
-                            "pythonName": {
-                                "description": "Name of the function in the Python code",
-                                "type": "string"
-                            },
-                            "arguments": {
-                                "description": "Array of function arguments",
-                                "type": "array"
-                            },
-                            "output": {
-                                "description": "Output variable for the function",
-                                "type": "string"
-                            }
+            "type": "object",
+            "propertyNames": {
+                "enum": ["initME", "initCS", "updateME", "stepCS"]
+            },
+            "patternProperties": {
+                "": {
+                    "type": "object",
+                    "properties": {
+                        "pythonName": {
+                            "description": "Name of the function in the Python code",
+                            "type": "string"
                         },
-                        "required": ["pythonName", "arguments", "output"],
-                        "additionalProperties": false
-                    }
+                        "arguments": {
+                            "description": "Array of function arguments",
+                            "type": "array"
+                        },
+                        "output": {
+                            "description": "Output variable for the function",
+                            "type": "string"
+                        }
+                    },
+                    "required": ["pythonName", "arguments", "output"],
+                    "additionalProperties": false
                 }
             }
         },
         "variables": {
             "description": "Array containing the variables of the model",
             "type": "array",
+            "minItems": 1,
             "items": {
                 "type": "object",
                 "properties": {
@@ -107,7 +106,7 @@
             }
         }
     },
-    "required": ["modelName", "description", "variables"],
+    "required": ["modelName", "variables"],
     "dependentRequired": {
         "pythonSource": ["pythonFunctions"]
     }

@@ -1,0 +1,49 @@
+{
+    "modelName": "myModel",
+    "description": "Test case",
+    "variables": [
+        {
+            "name": "tempIn",
+            "variability": "continuous",
+            "causality": "input",
+            "initial": "approx",
+            "typeID": "Real",
+            "startValue": 271.5,
+            "description": "",
+            "unit": "K"
+        },
+        {
+            "name": "tempOut1",
+            "variability": "continuous",
+            "causality": "output",
+            "initial": "approx",
+            "typeID": "Real",
+            "startValue": 271.5,
+            "description": "",
+            "unit": "K"
+        },
+        {
+            "name": "tempOut2",
+            "variability": "continuous",
+            "causality": "output",
+            "initial": "approx",
+            "typeID": "Real",
+            "startValue": 271.5,
+            "description": "",
+            "unit": "K"
+        }
+    ],
+	"pythonSource": "testCode.py",
+    "pythonFunctions": {
+        "initCS": {
+            "pythonName": "init",
+            "arguments": [],
+            "output": "tempOut1"
+        },
+        "stepCS": {
+            "pythonName": "do_step",
+            "arguments": ["start_time", "tempOut1"],
+            "output": "tempOut2"
+        }
+    }
+}

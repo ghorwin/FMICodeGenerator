@@ -1,0 +1,26 @@
+{
+    "modelName": "myModel",
+    "description": "Test case",
+    "variables": [
+        {
+            "name": "dummy",
+            "variability": "continuous",
+            "causality": "input",
+            "initial": "approx",
+            "typeID": "Real",
+            "startValue": 271.5,
+            "description": "",
+            "unit": "K"
+        },
+        {
+            "name": "badlyTyped",
+            "variability": "discrete",
+            "causality": "output",
+            "initial": "exact",
+            "typeID": "Integer",
+            "startValue": 1.2,
+            "description": "",
+            "unit": "M"
+        }
+    ]
+}

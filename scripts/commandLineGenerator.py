@@ -5,8 +5,6 @@
 # barebone of the modelDescription.xml and the implementation files. Currently, command line
 # arguments exist only for model name and description (so, no variables in your FMU).
 #
-# Feel free to copy this file and add code that populates the FMIGenerator.variables array with data before
-# calling fmiGenerator.generate()
 #
 #
 #
@@ -49,6 +47,8 @@ from FMIGenerator import *
 parser = argparse.ArgumentParser()
 parser.add_argument("modelName", type=str, help="ID Name of FMU, will be used for directory names, generated FMU name and model name.")
 parser.add_argument("--description", type=str, help="Description of the FMU/model")
+# TODO1: add arguments for variables
+# TODO2: add arguments for Python/C++ source files
 args = parser.parse_args()
 
 # create storage class instance

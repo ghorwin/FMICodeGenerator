@@ -25,20 +25,17 @@ class JSONInputReader:
                 raise self.JSONError(e)
             except jsonschema.ValidationError as e:
                 raise JSONError(e)
+        print(jsonInput)
         return jsonInput
     
     def stripFunctionDefinition(self, s):
         # Remove type hints
         noTypeHints = re.sub(':.*,', ' ', s)
-        print(noTypeHints)
         #noTypeHints = re.sub(':.*\x29', ' ', noTypeHints) # Replace `\)` with `\x29` to avoid deprecation warnings
         noTypeHints = re.sub(':.*\)', ' ', noTypeHints)
-        print(noTypeHints)
         noTypeHints = re.sub('->.*:', ':', noTypeHints)
-        print(noTypeHints)
         # Remove `def`, parentheses and colons
         noTypeHints = noTypeHints.replace("def", "").replace("(", " ").replace(")", " ").replace(",", " ").replace(":", "")
-        print(noTypeHints)
         return noTypeHints
 
     def findFunctionDefinition(self, line):
@@ -46,7 +43,6 @@ class JSONInputReader:
         line = line.split('#')[0].strip()
         result = re.search(regexp, line)
         if result:
-            print(result.group())
             noTypeHints = self.stripFunctionDefinition(result.group())
             nameAndArguments = noTypeHints.split()
             # Discard internal/private functions
@@ -65,7 +61,6 @@ class JSONInputReader:
                 defMatch = self.findFunctionDefinition(currentLine.strip())
                 if defMatch is not None:
                     pyFunctions.update(defMatch)
-        print(pyFunctions)
         return pyCode, pyFunctions
 
     def checkVariableConsistency(self, jsonInput):
@@ -136,25 +131,34 @@ class JSONInputReader:
                 raise ConsistencyError(f"Variable {outputVariable} has causality {varMap[outputVariable]}, thus cannot be the output of function {pythonFunctionName}")
 
     def readInput(self, inputFilePath):
-        modelDescription = self.readJSONFile(inputFilePath)
-        varList = self.checkVariableConsistency(modelDescription)
+        modelInput = self.readJSONFile(inputFilePath)
+        varList = self.checkVariableConsistency(modelInput)
 
         # Turn the path to the Python source, the Spycic library and the destination folder
         # from "relative to the JSON" to "absolute"
         baseFolderPath = Path(inputFilePath).parent.resolve()
-        pythonSourcePath = (baseFolderPath / Path(modelDescription['pythonSource'])).resolve()
-        if 'spycicLocation' in modelDescription:
-            spycicPath = (baseFolderPath / Path(modelDescription['spycicLocation'])).resolve()
+        pythonSourcePath = (baseFolderPath / Path(modelInput['pythonSource'])).resolve()
+        modelInput['pythonSource'] = pythonSourcePath
+        if 'spycicLocation' in modelInput:
+            spycicPath = (baseFolderPath / Path(modelInput['spycicLocation'])).resolve()
         else:
             spycicPath = (baseFolderPath / 'spycic').resolve()
-        if 'fmuDestination' in modelDescription:
-            fmuPath = (baseFolderPath / Path(modelDescription['fmuDestination'])).resolve()
+        modelInput['spycicLocation'] = spycicPath
+        if 'fmuDestination' in modelInput:
+            fmuPath = (baseFolderPath / Path(modelInput['fmuDestination'])).resolve()
         else:
             fmuPath = baseFolderPath
+        modelInput['fmuDestination'] = fmuPath
+
+        # Add a default description if necessary
+        if 'description' not in modelInput or modelInput['description'] == "":
+            modelInput["description"] = f"Model {modelInput['modelName']}"
+
         pyCode, pyFunctions = self.readPythonFile(pythonSourcePath)
-        self.checkFunctionConsistency(modelDescription, pyFunctions, varList)
-        
-        
+        self.checkFunctionConsistency(modelInput, pyFunctions, varList)
+
+        modelInput['pythonCode'] = pyCode
+        return modelInput
 
 # Run as first-level code using `python3 JSONInputReader.py path/to/the/input/file.json`
 if __name__ == '__main__':

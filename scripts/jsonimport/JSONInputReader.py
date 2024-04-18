@@ -37,7 +37,7 @@ class JSONInputReader:
 
     def _readJSONFile(self, path):
         """Can raise FileNotFoundError"""
-        inputSchemaPath = ((Path(__file__).parent) / "inputSchema.json").resolve()
+        inputSchemaPath = ((Path(__file__).parent) / "inputSchema.json").resolve().as_posix()
         with open(path) as jf, open(inputSchemaPath) as js:
             jsonInput = json.load(jf)
             jsonInputSchema = json.load(js)
@@ -108,27 +108,29 @@ class JSONInputReader:
                 by :func:`_checkVariableConsistency`
         """
         varMap.update({'start_time' : 'input', 'stop_time' : 'input', 'step_size' : 'input'})
-        for functionName, functionAttributes in jsonInput['pythonFunctions'].items():
-            pythonFunctionName = functionAttributes['pythonName']
-            # Check that the pythonName is actually the name of a function from the Python source
-            if pythonFunctionName not in pyFunctions:
-                raise ConsistencyError(f"Function {pythonFunctionName} does not exist in the Python source file")
-            # Check that the function has the right number of arguments
-            if len(functionAttributes['arguments']) != pyFunctions[pythonFunctionName]:
-                raise ConsistencyError("Function {} should receive {} argument(s) but is given input {}"
-                                    .format(pythonFunctionName,pyFunctions[pythonFunctionName],functionAttributes['arguments']))
-            # Check that no argument has causality 'output'
-            for functionArgument in functionAttributes['arguments']:
-                if functionArgument not in varMap:
-                    raise ConsistencyError(f"Argument {functionArgument} of function {pythonFunctionName} does not exist")
-                if varMap[functionArgument] == 'output':
-                    raise ConsistencyError(f"Output variable {functionArgument} cannot be used as an argument of function {pythonFunctionName}")
-            # Check that the output is declared and has causality 'output' or 'local'
-            outputVariable = functionAttributes['output']
-            if outputVariable not in varMap:
-                raise ConsistencyError(f"Output {outputVariable} of function {pythonFunctionName} does not exist")
-            if varMap[outputVariable] not in ['output', 'local']:
-                raise ConsistencyError(f"Variable {outputVariable} has causality {varMap[outputVariable]}, thus cannot be the output of function {pythonFunctionName}")
+        for function in jsonInput['pythonFunctions'].values():
+            for functionAttributes in function:
+                print(functionAttributes)
+                pythonFunctionName = functionAttributes['pythonName']
+                # Check that the pythonName is actually the name of a function from the Python source
+                if pythonFunctionName not in pyFunctions:
+                    raise ConsistencyError(f"Function {pythonFunctionName} does not exist in the Python source file")
+                # Check that the function has the right number of arguments
+                if len(functionAttributes['arguments']) != pyFunctions[pythonFunctionName]:
+                    raise ConsistencyError("Function {} should receive {} argument(s) but is given input {}"
+                                        .format(pythonFunctionName,pyFunctions[pythonFunctionName],functionAttributes['arguments']))
+                # Check that no argument has causality 'output'
+                for functionArgument in functionAttributes['arguments']:
+                    if functionArgument not in varMap:
+                        raise ConsistencyError(f"Argument {functionArgument} of function {pythonFunctionName} does not exist")
+                    if varMap[functionArgument] == 'output':
+                        raise ConsistencyError(f"Output variable {functionArgument} cannot be used as an argument of function {pythonFunctionName}")
+                # Check that the output is declared and has causality 'output' or 'local'
+                outputVariable = functionAttributes['output']
+                if outputVariable not in varMap:
+                    raise ConsistencyError(f"Output {outputVariable} of function {pythonFunctionName} does not exist")
+                if varMap[outputVariable] not in ['output', 'local']:
+                    raise ConsistencyError(f"Variable {outputVariable} has causality {varMap[outputVariable]}, thus cannot be the output of function {pythonFunctionName}")
 
     def readInput(self, inputFilePath):
         modelInput = self._readJSONFile(inputFilePath)
@@ -136,19 +138,20 @@ class JSONInputReader:
 
         # Turn the path to the Python source, the Spycic library and the destination folder
         # from "relative to the JSON" to "absolute"
-        baseFolderPath = Path(inputFilePath).parent.resolve()
-        pythonSourcePath = (baseFolderPath / Path(modelInput['pythonSource'])).resolve()
-        modelInput['pythonSource'] = pythonSourcePath
+        baseFolderPath = Path(inputFilePath).parent
+        pythonSourcePath = baseFolderPath / Path(modelInput['pythonSource'])
+        modelInput['pythonSource'] = str(pythonSourcePath.resolve())
         if 'spycicLocation' in modelInput:
-            spycicPath = (baseFolderPath / Path(modelInput['spycicLocation'])).resolve()
+            spycicPath = baseFolderPath / Path(modelInput['spycicLocation'])
         else:
-            spycicPath = (baseFolderPath / 'spycic').resolve()
-        modelInput['spycicLocation'] = spycicPath
+            spycicPath = baseFolderPath / 'spycic'
+            print(f"WARNING: path to Spycic not provided, defaulting to {str(spycicPath.resolve())}")
+        modelInput['spycicLocation'] = str(spycicPath.resolve())
         if 'fmuDestination' in modelInput:
-            fmuPath = (baseFolderPath / Path(modelInput['fmuDestination'])).resolve()
+            fmuPath = baseFolderPath / Path(modelInput['fmuDestination'])
         else:
             fmuPath = baseFolderPath
-        modelInput['fmuDestination'] = fmuPath
+        modelInput['fmuDestination'] = str(fmuPath.resolve())
 
         # Add a default description if necessary
         if 'description' not in modelInput or modelInput['description'] == "":
@@ -157,7 +160,7 @@ class JSONInputReader:
         pyCode, pyFunctions = self._readPythonFile(pythonSourcePath)
         self._checkFunctionConsistency(modelInput, pyFunctions, varList)
 
-        modelInput['pythonCode'] = pyCode
+        modelInput['pythonSource'] = pyCode
         return modelInput
 
 # Run as first-level code using `python3 JSONInputReader.py path/to/the/input/file.json`

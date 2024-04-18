@@ -25,15 +25,19 @@
     ],
 	"pythonSource": "testCode.py",
     "pythonFunctions": {
-        "initCS": {
-            "pythonName": "init",
-            "arguments": [],
-            "output": "tempOut"
-        },
-        "stepCS": {
-            "pythonName": "do_step",
-            "arguments": ["not_a_variable", "stop_time"],
-            "output": "tempOut"
-        }
+        "initCS": [
+            {
+                "pythonName": "init",
+                "arguments": [],
+                "output": "tempOut"
+            }
+        ],
+        "stepCS": [
+            {
+                "pythonName": "do_step",
+                "arguments": ["not_a_variable", "stop_time"],
+                "output": "tempOut"
+            }
+        ]
     }
 }

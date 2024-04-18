@@ -35,23 +35,26 @@
             },
             "patternProperties": {
                 "": {
-                    "type": "object",
-                    "properties": {
-                        "pythonName": {
-                            "description": "Name of the function in the Python code",
-                            "type": "string"
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "pythonName": {
+                                "description": "Name of the function in the Python code",
+                                "type": "string"
+                            },
+                            "arguments": {
+                                "description": "Array of function arguments",
+                                "type": "array"
+                            },
+                            "output": {
+                                "description": "Output variable for the function",
+                                "type": "string"
+                            }
                         },
-                        "arguments": {
-                            "description": "Array of function arguments",
-                            "type": "array"
-                        },
-                        "output": {
-                            "description": "Output variable for the function",
-                            "type": "string"
-                        }
-                    },
-                    "required": ["pythonName", "arguments", "output"],
-                    "additionalProperties": false
+                        "required": ["pythonName", "arguments", "output"],
+                        "additionalProperties": false
+                    }
                 }
             }
         },

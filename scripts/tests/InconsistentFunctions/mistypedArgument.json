@@ -35,15 +35,19 @@
     ],
 	"pythonSource": "testCode.py",
     "pythonFunctions": {
-        "initCS": {
-            "pythonName": "init",
-            "arguments": [],
-            "output": "tempOut1"
-        },
-        "stepCS": {
-            "pythonName": "do_step",
-            "arguments": ["start_time", "tempOut1"],
-            "output": "tempOut2"
-        }
+        "initCS": [
+            {
+                "pythonName": "init",
+                "arguments": [],
+                "output": "tempOut1"
+            }
+        ],
+        "stepCS": [
+            {
+                "pythonName": "do_step",
+                "arguments": ["start_time", "tempOut1"],
+                "output": "tempOut2"
+            }
+        ]
     }
 }

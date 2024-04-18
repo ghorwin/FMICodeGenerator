@@ -22,5 +22,18 @@
             "description": "",
             "unit": "M"
         }
-    ]
+    ],
+	"pythonSource": "InconsistentFunctions/testCode.py",
+    "pythonFunctions": {
+        "initCS": {
+            "pythonName": "init",
+            "arguments": [],
+            "output": "tempOut"
+        },
+        "stepCS": {
+            "pythonName": "do_step",
+            "arguments": ["start_time", "stop_time"],
+            "output": "tempOut"
+        }
+    }
 }

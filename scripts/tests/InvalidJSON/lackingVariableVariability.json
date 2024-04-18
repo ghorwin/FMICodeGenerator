@@ -11,5 +11,17 @@
             "unit": "K"
         }
     ],
-    "pythonSource": "path/to/python/source.py"
+    "pythonSource": "InconsistentFunctions/testCode.py",
+    "pythonFunctions": {
+        "initCS": {
+            "pythonName": "init",
+            "arguments": [],
+            "output": "tempOut"
+        },
+        "stepCS": {
+            "pythonName": "do_step",
+            "arguments": ["start_time", "stop_time"],
+            "output": "tempOut"
+        }
+    }
 }

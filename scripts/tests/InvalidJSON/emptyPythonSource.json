@@ -3,7 +3,7 @@
     "description": "Test case",
     "variables": [
         {
-            "name": "dummy",
+            "name": "tempIn",
             "variability": "continuous",
             "causality": "input",
             "initial": "approx",
@@ -13,17 +13,17 @@
             "unit": "K"
         },
         {
-            "name": "badlyTyped",
-            "variability": "discrete",
+            "name": "tempOut",
+            "variability": "continuous",
             "causality": "output",
-            "initial": "exact",
+            "initial": "approx",
             "typeID": "Real",
-            "startValue": "1.",
+            "startValue": 271.5,
             "description": "",
-            "unit": "M"
+            "unit": "K"
         }
     ],
-	"pythonSource": "InconsistentFunctions/testCode.py",
+	"pythonSource": "",
     "pythonFunctions": {
         "initCS": {
             "pythonName": "init",

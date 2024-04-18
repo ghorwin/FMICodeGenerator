@@ -25,6 +25,10 @@ class TestInvalidJSON:
         with pytest.raises(JSONError):
             runFrom('InvalidJSON/emptyModelName.json')
 
+    def test_empty_pythonSource(self):
+        with pytest.raises(JSONError):
+            runFrom('InvalidJSON/emptyPythonSource.json')
+
     def test_empty_variables(self):
         with pytest.raises(JSONError):
             runFrom('InvalidJSON/emptyVariables.json')
@@ -36,6 +40,10 @@ class TestInvalidJSON:
     def test_lacking_python_functions(self):
         with pytest.raises(JSONError):
             runFrom('InvalidJSON/lackingPythonFunctions.json')
+
+    def test_lacking_pythonSource(self):
+        with pytest.raises(JSONError):
+            runFrom('InvalidJSON/lackingPythonSource.json')
 
     def test_lacking_variable_causality(self):
         with pytest.raises(JSONError):

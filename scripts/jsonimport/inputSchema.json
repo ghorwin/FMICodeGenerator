@@ -20,7 +20,8 @@
         },
         "pythonSource": {
             "description": "Path of the input Python code",
-            "type": "string"
+            "type": "string",
+            "minLength": 1
         },
         "spycicLocation": {
             "description": "Path to the Spycic library",
@@ -106,8 +107,5 @@
             }
         }
     },
-    "required": ["modelName", "variables"],
-    "dependentRequired": {
-        "pythonSource": ["pythonFunctions"]
-    }
+    "required": ["modelName", "variables", "pythonSource", "pythonFunctions"]
 }

@@ -139,16 +139,22 @@ class JSONInputReader:
         modelDescription = self.readJSONFile(inputFilePath)
         varList = self.checkVariableConsistency(modelDescription)
 
-        # Turn the path to the Python and Spycic sources from "relative to the JSON" to "relative to the generator"
-        if 'pythonSource' in modelDescription:
-            pythonSourcePath = (Path(inputFilePath).parent / Path(modelDescription['pythonSource'])).resolve()
-            if 'spycicLocation' in modelDescription:
-                spycicPath = (Path(inputFilePath).parent / Path(modelDescription['spycicLocation'])).resolve()
-            else:
-                spycicPath = (Path(inputFilePath).parent / 'spycic').resolve()
-            pyCode, pyFunctions = self.readPythonFile(pythonSourcePath)
-            self.checkFunctionConsistency(modelDescription, pyFunctions, varList)
-
+        # Turn the path to the Python source, the Spycic library and the destination folder
+        # from "relative to the JSON" to "absolute"
+        baseFolderPath = Path(inputFilePath).parent.resolve()
+        pythonSourcePath = (baseFolderPath / Path(modelDescription['pythonSource'])).resolve()
+        if 'spycicLocation' in modelDescription:
+            spycicPath = (baseFolderPath / Path(modelDescription['spycicLocation'])).resolve()
+        else:
+            spycicPath = (baseFolderPath / 'spycic').resolve()
+        if 'fmuDestination' in modelDescription:
+            fmuPath = (baseFolderPath / Path(modelDescription['fmuDestination'])).resolve()
+        else:
+            fmuPath = baseFolderPath
+        pyCode, pyFunctions = self.readPythonFile(pythonSourcePath)
+        self.checkFunctionConsistency(modelDescription, pyFunctions, varList)
+        
+        
 
 # Run as first-level code using `python3 JSONInputReader.py path/to/the/input/file.json`
 if __name__ == '__main__':

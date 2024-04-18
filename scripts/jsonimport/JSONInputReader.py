@@ -13,7 +13,29 @@ class ConsistencyError(Exception):
 
 class JSONInputReader:
 
-    def readJSONFile(self, path):
+    def __stripFunctionDefinition(self, s):
+        # Remove type hints
+        noTypeHints = re.sub(':.*,', ' ', s)
+        #noTypeHints = re.sub(':.*\x29', ' ', noTypeHints) # Replace `\)` with `\x29` to avoid deprecation warnings
+        noTypeHints = re.sub(':.*\)', ' ', noTypeHints)
+        noTypeHints = re.sub('->.*:', ':', noTypeHints)
+        # Remove `def`, parentheses and colons
+        noTypeHints = noTypeHints.replace("def", "").replace("(", " ").replace(")", " ").replace(",", " ").replace(":", "")
+        return noTypeHints
+
+    def __findFunctionDefinition(self, line):
+        regexp = '^def.*:$'
+        line = line.split('#')[0].strip()
+        result = re.search(regexp, line)
+        if result:
+            noTypeHints = self.__stripFunctionDefinition(result.group())
+            nameAndArguments = noTypeHints.split()
+            # Discard internal/private functions
+            if not nameAndArguments[0].startswith("_"):
+                return {nameAndArguments[0] : len(nameAndArguments) - 1}
+        return None
+
+    def _readJSONFile(self, path):
         """Can raise FileNotFoundError"""
         inputSchemaPath = ((Path(__file__).parent) / "inputSchema.json").resolve()
         with open(path) as jf, open(inputSchemaPath) as js:
@@ -27,30 +49,8 @@ class JSONInputReader:
                 raise JSONError(e)
         print(jsonInput)
         return jsonInput
-    
-    def stripFunctionDefinition(self, s):
-        # Remove type hints
-        noTypeHints = re.sub(':.*,', ' ', s)
-        #noTypeHints = re.sub(':.*\x29', ' ', noTypeHints) # Replace `\)` with `\x29` to avoid deprecation warnings
-        noTypeHints = re.sub(':.*\)', ' ', noTypeHints)
-        noTypeHints = re.sub('->.*:', ':', noTypeHints)
-        # Remove `def`, parentheses and colons
-        noTypeHints = noTypeHints.replace("def", "").replace("(", " ").replace(")", " ").replace(",", " ").replace(":", "")
-        return noTypeHints
 
-    def findFunctionDefinition(self, line):
-        regexp = '^def.*:$'
-        line = line.split('#')[0].strip()
-        result = re.search(regexp, line)
-        if result:
-            noTypeHints = self.stripFunctionDefinition(result.group())
-            nameAndArguments = noTypeHints.split()
-            # Discard internal/private functions
-            if not nameAndArguments[0].startswith("_"):
-                return {nameAndArguments[0] : len(nameAndArguments) - 1}
-        return None
-
-    def readPythonFile(self, path):
+    def _readPythonFile(self, path):
         """Can raise FileNotFoundError"""
         pyCode = ''
         pyFunctions = {}
@@ -58,12 +58,12 @@ class JSONInputReader:
             # Read the source code line by line, so as to keep track of function definitions in a single pass
             for currentLine in pf:
                 pyCode = pyCode + f"{currentLine}"
-                defMatch = self.findFunctionDefinition(currentLine.strip())
+                defMatch = self.__findFunctionDefinition(currentLine.strip())
                 if defMatch is not None:
                     pyFunctions.update(defMatch)
         return pyCode, pyFunctions
 
-    def checkVariableConsistency(self, jsonInput):
+    def _checkVariableConsistency(self, jsonInput):
         """Checks that the variables declared in the JSON input are consistent:
             * variable names and value references are unique;
             * the start value has the type declared in the `typeID` attribute.
@@ -93,7 +93,7 @@ class JSONInputReader:
                 raise ConsistencyError(f"Start value for variable {var['name']} is of type {type(var['startValue'])}, expected {var['typeID']}")
         return varMap
             
-    def checkFunctionConsistency(self, jsonInput, pyFunctions, varMap):
+    def _checkFunctionConsistency(self, jsonInput, pyFunctions, varMap):
         """Checks that the functions declared in the JSON input and the Python source file are consistent:
             * each function declared in the JSON input exists in the Python source, with the same number of arguments;
             * function arguments declared in the JSON input are, either non-output variables declared in this file,
@@ -103,9 +103,9 @@ class JSONInputReader:
         Args:
             jsonInput: deserialized JSON input
             pyFunctions: dictionary mapping the public functions declared in the Python source code to their number of
-                arguments, as returned by :func:`readPythonFile`
+                arguments, as returned by :func:`_readPythonFile`
             varMap: dictionary mapping the variables declared in the JSON input to their causality string, as returned
-                by :func:`checkVariableConsistency`
+                by :func:`_checkVariableConsistency`
         """
         varMap.update({'start_time' : 'input', 'stop_time' : 'input', 'step_size' : 'input'})
         for functionName, functionAttributes in jsonInput['pythonFunctions'].items():
@@ -131,8 +131,8 @@ class JSONInputReader:
                 raise ConsistencyError(f"Variable {outputVariable} has causality {varMap[outputVariable]}, thus cannot be the output of function {pythonFunctionName}")
 
     def readInput(self, inputFilePath):
-        modelInput = self.readJSONFile(inputFilePath)
-        varList = self.checkVariableConsistency(modelInput)
+        modelInput = self._readJSONFile(inputFilePath)
+        varList = self._checkVariableConsistency(modelInput)
 
         # Turn the path to the Python source, the Spycic library and the destination folder
         # from "relative to the JSON" to "absolute"
@@ -154,8 +154,8 @@ class JSONInputReader:
         if 'description' not in modelInput or modelInput['description'] == "":
             modelInput["description"] = f"Model {modelInput['modelName']}"
 
-        pyCode, pyFunctions = self.readPythonFile(pythonSourcePath)
-        self.checkFunctionConsistency(modelInput, pyFunctions, varList)
+        pyCode, pyFunctions = self._readPythonFile(pythonSourcePath)
+        self._checkFunctionConsistency(modelInput, pyFunctions, varList)
 
         modelInput['pythonCode'] = pyCode
         return modelInput

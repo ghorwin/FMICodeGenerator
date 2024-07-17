@@ -1,7 +1,8 @@
 @echo off
 
 :: setup VC environment variables
-call "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat"
+set VCVARSALL_PATH="c:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" x64
+call %VCVARSALL_PATH%
 
 :: FMU-specific variables - set by code generator
 set FMU_SHARED_LIB_NAME=FMI_template.dll

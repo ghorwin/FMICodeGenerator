@@ -74,15 +74,15 @@ class VarDef:
 
 	def toJson(self):
 		return {
-		    "name" : self.name,
-		    "valueRef" : self.valueRef,
-		    "variability" : self.variability,
-		    "causality" : self.causality,
-		    "initial" : self.initial,
-		    "typeID" : self.typeID,
-		    "startValue" : self.startValue,
-		    "description" : self.description,
-		    "unit" : self.unit
+			"name" : self.name,
+			"valueRef" : self.valueRef,
+			"variability" : self.variability,
+			"causality" : self.causality,
+			"initial" : self.initial,
+			"typeID" : self.typeID,
+			"startValue" : self.startValue,
+			"description" : self.description,
+			"unit" : self.unit
 		}
 
 def varDefFromJson(data):
@@ -250,11 +250,11 @@ class FMIGenerator:
 		try:
 			# rename files that must be named according as the modelName
 			os.rename(self.targetDirPath + "/" + TEMPLATE_FOLDER_NAME + ".pro",
-			          self.targetDirPath + "/" + self.modelName + ".pro")
+					  self.targetDirPath + "/" + self.modelName + ".pro")
 			os.rename(self.targetDirPath + "/src/" + TEMPLATE_FOLDER_NAME + ".cpp",
-			          self.targetDirPath + "/src/" + self.modelName + ".cpp")
+					  self.targetDirPath + "/src/" + self.modelName + ".cpp")
 			os.rename(self.targetDirPath + "/src/" + TEMPLATE_FOLDER_NAME + ".h",
-			          self.targetDirPath + "/src/" + self.modelName + ".h")
+					  self.targetDirPath + "/src/" + self.modelName + ".h")
 		except:
 			raise RuntimeError("Cannot rename template files")
 
@@ -436,7 +436,7 @@ $$outputUnknowns$$
 		if len(modelOutputUnknowns) != 0:
 			modelStructureDefs = MODEL_STRUCTURE_OUTPUTS_TEMPLATE.replace("$$outputUnknowns$$", modelOutputUnknowns)
 		data = data.replace("$$outputDependencies$$", modelStructureDefs)
-		
+
 		return data
 
 
@@ -590,7 +590,7 @@ $$outputUnknowns$$
 		binDir = os.path.join(self.targetDirPath, "bin/release")
 
 		self.printMsg("We are now test-building the FMU. You should first implement your FMU functionality and afterwards "
-		      "build and deploy the FMU!")
+					  "build and deploy the FMU!")
 		try:
 
 			# Different script handling based on platform
@@ -664,9 +664,9 @@ $$outputUnknowns$$
 			varArray.append(v.toJson())
 
 		data = {
-		  "modelName" : self.modelName,
-		  "description" : self.description,
-		  "variables" : varArray
+			"modelName" : self.modelName,
+			"description" : self.description,
+			"variables" : varArray
 		}
 
 		# if parent directory does not yet exist, create it

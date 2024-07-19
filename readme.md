@@ -7,7 +7,7 @@ for simulation model runtime coupling, and basically defines an API and a meta d
 
 ## The Motivation
 
-When you want an efficient FMU slave, there's probably no way around a native C/C++ implementation. However, implementing the C interface functions, the data handling, input/output variable handling and advanced features like **saving and restoring the FMU state** is not so simple and straight-forward.
+When you want an **efficient/fast** FMU slave, there's probably no way around a native C/C++ implementation. However, implementing the C interface functions, the data handling, input/output variable handling and advanced features like **saving and restoring the FMU state** is not so simple and straight-forward.
 
 However, the process of setting up the FMU (core files, `modelDescription.xml`, directory structure) is pretty similar for most projects and can be automated with a configurable code generator - hence this project.
 

@@ -1,0 +1,31 @@
+{
+    "modelName": "myModel",
+    "variables": [
+        {
+            "name": "dummy",
+            "variability": "continuous",
+            "causality": "input",
+            "typeID": "Real",
+            "startValue": 271.5,
+            "description": "",
+            "unit": "K"
+        }
+    ],
+    "pythonSource": "path/to/python/source.py",
+    "pythonFunctions": {
+        "initCS": [
+            {
+                "pythonName": "init",
+                "arguments": [],
+                "output": "tempOut"
+            }
+        ],
+        "stepCS": [
+            {
+                "pythonName": "do_step",
+                "arguments": ["startTime", "stop_time"],
+                "output": "tempOut"
+            }
+        ]
+    }
+}

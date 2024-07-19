@@ -1,0 +1,34 @@
+{
+    "modelName": "WeatherSimC",
+    "description": "A simple FMU that gives a temperature at a given time in a day.",
+    "variables": [
+        {
+            "name": "tempOut",
+            "variability": "continuous",
+            "causality": "output",
+            "initial": "approx",
+            "typeID": "Real",
+            "startValue": 271.5,
+            "description": "",
+            "unit": "K"
+        }
+    ],
+	"pythonSource": "WeatherSim.py",
+    "pythonFunctions": {
+        "initCS": [
+            {
+                "pythonName": "init",
+                "arguments": [],
+                "output": "tempOut"
+            }
+        ],
+        "stepCS": [
+            {
+                "pythonName": "do_step",
+                "arguments": ["start_time", "stop_time"],
+                "output": "tempOut"
+            }
+        ]
+    },
+    "spycicLocation": "path/to/spycic"
+}

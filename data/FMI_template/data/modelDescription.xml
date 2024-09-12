@@ -8,7 +8,7 @@
 	copyright="$$copyright$$"
 	license="$$license$$"
 	description="$$description$$"
-	generationTool="ghorwin/FMICodeGenerator@github - C++ Code using FMI support functions from IBK@TU Dresden"
+	generationTool="FMICodeGenerator from https://github.com/ghorwin/FMICodeGenerator"
 	generationDateAndTime="$$dateandtime$$"
 	variableNamingConvention="structured"
 	numberOfEventIndicators="0">

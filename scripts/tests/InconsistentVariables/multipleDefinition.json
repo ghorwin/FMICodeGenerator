@@ -1,0 +1,43 @@
+{
+    "modelName": "myModel",
+    "description": "Test case",
+    "variables": [
+        {
+            "name": "definedTwice",
+            "variability": "continuous",
+            "causality": "input",
+            "initial": "approx",
+            "typeID": "Real",
+            "startValue": 271.5,
+            "description": "",
+            "unit": "K"
+        },
+        {
+            "name": "definedTwice",
+            "variability": "discrete",
+            "causality": "output",
+            "initial": "exact",
+            "typeID": "Integer",
+            "startValue": 271,
+            "description": "",
+            "unit": "M"
+        }
+    ],
+	"pythonSource": "InconsistentFunctions/testCode.py",
+    "pythonFunctions": {
+        "initCS": [
+            {
+                "pythonName": "init",
+                "arguments": [],
+                "output": "tempOut"
+            }
+        ],
+        "stepCS": [
+            {
+                "pythonName": "do_step",
+                "arguments": ["startTime", "stop_time"],
+                "output": "tempOut"
+            }
+        ]
+    }
+}

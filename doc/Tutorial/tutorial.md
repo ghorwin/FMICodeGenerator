@@ -25,7 +25,7 @@ Participants should have a basic understanding of FMI-concepts and ME/CS modes. 
 
 - C/C++ compiler: on Windows MinGW or Visual Studio is recommended (I use MinGW32-8.1 x64); on Linux gcc/clang; on Mac default compiler
 - CMake
-- FMICodeGenerator (OpenSource)
 - MasterSim (OpenSource) or any other FMI Co-Simulation-Master
 - OpenModelica (OpenSource) or any other FMI ModelExchange-Master
+- (optional) FMICodeGenerator (OpenSource)
 

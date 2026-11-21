@@ -51,7 +51,7 @@ FMU_SHARED_LIB_TARGET_NAME=P_Control
 FMU_SHARED_LIB_VERSION=1.0.0
 
 BUILD_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
-CMAKELISTSDIR=$(pwd)/../projects/cmake
+CMAKELISTSDIR=$(pwd)/..
 BUILDDIR="bb"
 
 # set defaults
@@ -169,15 +169,11 @@ cd $BUILD_SCRIPT_DIR &&
 mkdir -p ../bin/release &&
 # copy for Linux/Unix builds
 if [ -e $BUILDDIR/$FMU_SHARED_LIB_NAME.so ]; then
-  cp -f $BUILDDIR/$FMU_SHARED_LIB_NAME.so.$FMU_SHARED_LIB_VERSION ../bin/release/$FMU_SHARED_LIB_NAME.so.$FMU_SHARED_LIB_VERSION &&
-  echo "Copied $FMU_SHARED_LIB_NAME.so.$FMU_SHARED_LIB_VERSION to bin/release ***"
   cp -f $BUILDDIR/$FMU_SHARED_LIB_NAME.so.$FMU_SHARED_LIB_VERSION ../bin/release/$FMU_SHARED_LIB_TARGET_NAME.so &&
   echo "Created ../bin/release/$FMU_SHARED_LIB_TARGET_NAME.so ***"
 fi &&
 # copy for Mac builds
 if [ -e $BUILDDIR/$FMU_SHARED_LIB_NAME.dylib ]; then
-  cp -f $BUILDDIR/$FMU_SHARED_LIB_NAME.$FMU_SHARED_LIB_VERSION.dylib ../bin/release/$FMU_SHARED_LIB_NAME.$FMU_SHARED_LIB_VERSION.dylib &&
-  echo "Copied $FMU_SHARED_LIB_NAME.$FMU_SHARED_LIB_VERSION.dylib to bin/release ***"
   cp -f $BUILDDIR/$FMU_SHARED_LIB_NAME.$FMU_SHARED_LIB_VERSION.dylib ../bin/release/$FMU_SHARED_LIB_TARGET_NAME.dylib &&
   echo "Created ../bin/release/$FMU_SHARED_LIB_TARGET_NAME.dylib ***"
 fi

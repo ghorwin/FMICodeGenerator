@@ -36,17 +36,13 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os.path
-from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox
-from PyQt5.QtCore import pyqtSlot, pyqtSignal, QDir
+from PyQt5.QtWidgets import QWidget, QFileDialog
+from PyQt5.QtCore import pyqtSlot, QDir
 
 from Ui_WizardPageBasicProperties import Ui_WizardPageBasicProperties
 
-from FMIGenerator import FMIGenerator
-
 
 class WizardPageBasicProperties(QWidget):
-	loadDefaults = pyqtSignal('QString')
-	
 	def __init__(self):
 		super().__init__()
 		self.ui = Ui_WizardPageBasicProperties()
@@ -56,23 +52,10 @@ class WizardPageBasicProperties(QWidget):
 	
 	@pyqtSlot()
 	def on_lineEditModelName_editingFinished(self):
-		# auto-generate filename for FMU unless previously entered/selected
+		# show resulting FMU project directory
 		targetFileName = os.path.join(self.ui.lineEditTargetDir.text(), self.ui.lineEditModelName.text().strip())
 		targetFileName = os.path.normpath(targetFileName)
-		if self.ui.lineEditFMUFilePath.text() == targetFileName:
-			return
 		self.ui.lineEditFMUFilePath.setText(targetFileName)
-		inputDataCacheFile = targetFileName + ".input"
-		if (os.path.exists(inputDataCacheFile)):
-			res = QMessageBox.question(self, "Import previous definitions", 
-			                           "A file with input data for the same FMU exists. Re-load input data?")
-			if res == QMessageBox.No:
-				return
-			fmiGenerator = FMIGenerator()
-			fmiGenerator.readInputData(inputDataCacheFile)
-			self.ui.plainTextEditDescription.setPlainText(fmiGenerator.description)
-			self.loadDefaults.emit(inputDataCacheFile)
-			
 
 
 	@pyqtSlot()

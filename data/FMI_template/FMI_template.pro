@@ -59,7 +59,8 @@ INCLUDEPATH = src
 SOURCES += \
 	src/fmi2common/fmi2Functions.cpp \
 	src/fmi2common/InstanceData.cpp \
-	src/FMI_template.cpp
+	src/FMI_template.cpp \
+	src/FMI_template_generated.cpp
 
 HEADERS += \
 	src/fmi2common/fmi2Functions.h \
@@ -67,6 +68,7 @@ HEADERS += \
 	src/fmi2common/fmi2FunctionTypes.h \
 	src/fmi2common/fmi2TypesPlatform.h \
 	src/fmi2common/InstanceData.h \
-	src/FMI_template.h
+	src/FMI_template.h \
+	src/FMI_template_generated.h
 
 

@@ -2,14 +2,14 @@
 <fmiModelDescription
 	fmiVersion="2.0"
 	modelName="P_Control"
-	guid="{af41abcc-4692-11e9-a264-f0def1a04bd7}"
-	version="1.0.0"
+	guid="{73f33f36-5fcb-4a14-92d7-3e65d584ff44}"
+	version="1.3.0"
 	author="not specified"
 	copyright="not specified"
 	license="not specified"
 	description="A stateless P-Controller"
-	generationTool="ghorwin/FMICodeGenerator@github - C++ Code using FMI support functions from IBK@TU Dresden"
-	generationDateAndTime="2019-03-14T08:52:23Z"
+	generationTool="FMICodeGenerator from https://github.com/ghorwin/FMICodeGenerator"
+	generationDateAndTime="2026-11-21T21:43:57Z"
 	variableNamingConvention="structured"
 	numberOfEventIndicators="0">
 
@@ -64,7 +64,7 @@
 			causality="input"
 			initial="approx">
 			<Real start="293.15"/>
-		</ScalarVariable>		
+		</ScalarVariable>
 		
 
 		<!-- Index of variable = "2" -->
@@ -75,7 +75,7 @@
 			causality="output"
 			initial="calculated">
 			<Real/>
-		</ScalarVariable>		
+		</ScalarVariable>
 		
 
 		<!-- Index of variable = "3" -->
@@ -86,7 +86,7 @@
 			causality="parameter"
 			initial="exact">
 			<Real start="276.15"/>
-		</ScalarVariable>		
+		</ScalarVariable>
 		
 
 		<!-- Index of variable = "4" -->
@@ -97,9 +97,8 @@
 			causality="parameter"
 			initial="exact">
 			<Real start="20000"/>
-		</ScalarVariable>		
+		</ScalarVariable>
 		
-
 	</ModelVariables>
 
 	<ModelStructure>
@@ -107,10 +106,8 @@
 			<!-- dependencies must be defined for all output quantities. 'dependencyKind' is only needed
 				when some dependencies are constant factors or parameters.
 			-->
-			
-			<Unknown index="2" dependencies="1"/>
-		
 
+			<Unknown index="2" dependencies="1"/>
 		</Outputs>
 	</ModelStructure>
 

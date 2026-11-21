@@ -42,41 +42,62 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import argparse
+import sys
 from FMIGenerator import *
 
 # commandline argument parser
-parser = argparse.ArgumentParser()
-parser.add_argument("modelName", type=str, help="ID Name of FMU, will be used for directory names, generated FMU name and model name.")
+parser = argparse.ArgumentParser(description="Generates a new FMU project, or updates an existing FMU project.")
+parser.add_argument("modelName", type=str, nargs='?',
+					help="ID Name of FMU, will be used for directory names, generated FMU name and model name. "
+						 "Not needed with --input or --update.")
 parser.add_argument("--description", type=str, help="Description of the FMU/model")
+parser.add_argument("--target-dir", type=str, default="",
+					help="Directory in which the FMU project directory <modelName> is created (default: current directory).")
+parser.add_argument("--input", type=str,
+					help="Read model name, description and variables from this .input file when creating a new project.")
+parser.add_argument("--update", type=str, metavar="PROJECT_DIR",
+					help="Update the existing FMU project in PROJECT_DIR using its <modelName>.input file. "
+						 "Only generated files are overwritten, user code is kept.")
+parser.add_argument("--overwrite", action="store_true",
+					help="When creating a new project, move an existing target directory to the trash.")
+parser.add_argument("--no-build", action="store_true", help="Skip test-build of the FMU.")
 args = parser.parse_args()
 
 # create storage class instance
 fmiGenerator = FMIGenerator()
+fmiGenerator.autobuild = not args.no_build
+fmiGenerator.overwrite = args.overwrite
 
-# store command line arguments
-fmiGenerator.modelName = args.modelName
-if args.description is not None:
-	fmiGenerator.description = args.description
-else:
-	print("WARNING: Model description missing.")
-
-# setup variables (test code below)
-if False:
-	v = VarDef("InputVar1", "continuous", "input", "exact", "Real") # valueRef will be given automatically
-	v.startValue = "15"
-	fmiGenerator.variables.append(v)
-
-
-# call function of generator to create model
 try:
-	fmiGenerator.generate()
+	if args.update is not None:
+		inputFile = findProjectInputFile(args.update)
+		if inputFile is None:
+			raise RuntimeError("No (unique) .input file found in project directory '{}'.".format(args.update))
+		print("Reading project data from '{}'".format(inputFile))
+		fmiGenerator.readInputData(inputFile)
+		if args.description is not None:
+			fmiGenerator.description = args.description
+		fmiGenerator.update(args.update)
+	else:
+		if args.input is not None:
+			fmiGenerator.readInputData(args.input)
+		if args.modelName is not None:
+			fmiGenerator.modelName = args.modelName
+		if args.description is not None:
+			fmiGenerator.description = args.description
+		if not fmiGenerator.description:
+			print("WARNING: Model description missing.")
+		fmiGenerator.targetDir = args.target_dir
+
+		# setup variables (test code below)
+		if False:
+			v = VarDef("InputVar1", "continuous", "input", "exact", "Real") # valueRef will be given automatically
+			v.startValue = "15"
+			fmiGenerator.variables.append(v)
+
+		# call function of generator to create model
+		fmiGenerator.generate()
 except Exception as e:
 	print("ERROR: Error during FMU generation")
 	print(e)
-	
-
-
-
-
-
-
+	sys.exit(1)

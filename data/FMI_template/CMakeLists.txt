@@ -20,6 +20,7 @@ include_directories(
 
 add_library( ${PROJECT_NAME} SHARED
 	${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}.cpp
+	${PROJECT_SOURCE_DIR}/src/${PROJECT_NAME}_generated.cpp
 	${PROJECT_SOURCE_DIR}/src/fmi2common/fmi2Functions.cpp
 	${PROJECT_SOURCE_DIR}/src/fmi2common/InstanceData.cpp
 )

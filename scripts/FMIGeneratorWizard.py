@@ -41,33 +41,125 @@ import os.path
 
 from PyQt5 import QtWidgets
 
+from WizardPageProject import WizardPageProject
 from WizardPageBasicProperties import WizardPageBasicProperties
 from WizardPageVariables import WizardPageVariables
 from WizardPageGenerate import WizardPageGenerate
-from FMIGenerator import FMIGenerator, VarDef
+from FMIGenerator import FMIGenerator, VarDef, findProjectInputFile
+
+# page IDs
+PAGE_PROJECT = 0
+PAGE_BASIC_PROPERTIES = 1
+PAGE_VARIABLES = 2
+PAGE_GENERATE = 3
+
+# wizard modes
+MODE_NEW = "new"
+MODE_UPDATE = "update"
 
 
 class FMIGeneratorWizard(QtWidgets.QWizard):
 	def __init__(self, parent=None):
 		super().__init__(parent)
-		basicPropsPage = PageBasicProperties(self)
-		self.addPage(basicPropsPage)
-		self.addPage(PageVariables(self))
-		generatePage = PageGenerate(self)
-		generatePage.pageBasicProps = self.page(0).page # get WizardPageBasicProperties
-		generatePage.pageVars = self.page(1).page # get WizardPageVariables
-		self.addPage(generatePage)
-		
-		# connect the signal/slots between pages
-		generatePage.pageBasicProps.loadDefaults.connect(generatePage.pageVars.onLoadDefaults)
-		
+
+		# mode is set by project page: MODE_NEW or MODE_UPDATE
+		self.mode = MODE_NEW
+		# in update mode: absolute path to the existing project directory
+		self.projectDir = ""
+
+		self.setPage(PAGE_PROJECT, PageProject(self))
+		self.setPage(PAGE_BASIC_PROPERTIES, PageBasicProperties(self))
+		self.setPage(PAGE_VARIABLES, PageVariables(self))
+		self.setPage(PAGE_GENERATE, PageGenerate(self))
+
 		# debug helper code
-		#basicPropsPage.page.ui.lineEditModelName.setText("P_Control")
-		#basicPropsPage.page.ui.lineEditTargetDir.setText("/home/ghorwin/git/FMICodeGenerator/examples")
-		#basicPropsPage.page.on_lineEditModelName_editingFinished()
-		
+		#self.page(PAGE_BASIC_PROPERTIES).page.ui.lineEditModelName.setText("P_Control")
+		#self.page(PAGE_BASIC_PROPERTIES).page.ui.lineEditTargetDir.setText("/home/ghorwin/git/FMICodeGenerator/examples")
+		#self.page(PAGE_BASIC_PROPERTIES).page.on_lineEditModelName_editingFinished()
+
 		self.setWindowTitle("FMI Generator Wizard")
 		self.resize(800,600)
+
+
+	def basicPropsPage(self):
+		return self.page(PAGE_BASIC_PROPERTIES).page
+
+
+	def variablesPage(self):
+		return self.page(PAGE_VARIABLES).page
+
+
+class PageProject(QtWidgets.QWizardPage):
+	def __init__(self, parent=None):
+		super().__init__(parent)
+		layout = QtWidgets.QVBoxLayout()
+		self.page = WizardPageProject()
+		layout.addWidget(self.page)
+		self.setLayout(layout)
+		self.setTitle("FMU project")
+
+
+	def nextId(self):
+		# when opening an existing project, model name and location are fixed: skip basic properties page
+		if self.page.openExisting():
+			return PAGE_VARIABLES
+		return PAGE_BASIC_PROPERTIES
+
+
+	def validatePage(self):
+		wizard = self.wizard()
+		if not self.page.openExisting():
+			wizard.mode = MODE_NEW
+			wizard.projectDir = ""
+			return True
+
+		projectDir = self.page.ui.lineEditProjectDir.text().strip()
+		if len(projectDir) == 0 or not os.path.isdir(projectDir):
+			QtWidgets.QMessageBox.critical(self, "Invalid input", "Please select an existing FMU project directory.")
+			self.page.ui.lineEditProjectDir.setFocus()
+			return False
+		projectDir = os.path.abspath(projectDir)
+
+		inputFile = findProjectInputFile(projectDir)
+		if inputFile is None:
+			QtWidgets.QMessageBox.critical(self, "Invalid project directory",
+										   "The directory '{}' does not contain a (unique) FMU project file '<model name>.input'."
+										   .format(projectDir))
+			return False
+
+		fmiGenerator = FMIGenerator()
+		try:
+			fmiGenerator.readInputData(inputFile)
+		except Exception as e:
+			QtWidgets.QMessageBox.critical(self, "Error reading project file",
+										   "Cannot read project file '{}':\n{}".format(inputFile, e))
+			return False
+		if not fmiGenerator.modelName:
+			fmiGenerator.modelName = os.path.basename(projectDir)
+
+		if not os.path.isfile(os.path.join(projectDir, "src", fmiGenerator.modelName + ".cpp")):
+			QtWidgets.QMessageBox.critical(self, "Invalid project directory",
+										   "The directory '{}' does not contain the source file 'src/{}.cpp'."
+										   .format(projectDir, fmiGenerator.modelName))
+			return False
+
+		if os.path.dirname(inputFile) != projectDir:
+			QtWidgets.QMessageBox.information(self, "Old project format",
+											  "The project file was found outside the project directory ('{}'). "
+											  "When updating, the project file will be written into the project directory."
+											  .format(inputFile))
+
+		wizard.mode = MODE_UPDATE
+		wizard.projectDir = projectDir
+
+		# populate basic properties (used during generation) and variables
+		basicProps = wizard.basicPropsPage()
+		basicProps.ui.lineEditModelName.setText(fmiGenerator.modelName)
+		basicProps.ui.lineEditTargetDir.setText(os.path.dirname(projectDir))
+		basicProps.ui.lineEditFMUFilePath.setText(projectDir)
+		basicProps.ui.plainTextEditDescription.setPlainText(fmiGenerator.description)
+		wizard.variablesPage().onLoadDefaults(inputFile)
+		return True
 
 
 class PageBasicProperties(QtWidgets.QWizardPage):
@@ -96,18 +188,17 @@ class PageBasicProperties(QtWidgets.QWizardPage):
 			return False
 		# compose directory including subdir
 		fmuTargetDir = os.path.join(fmuTargetDir, fmuName)
-		# check if directory exists and is a file
+		# refuse to overwrite an existing directory/file - existing projects must be opened instead
 		if os.path.exists(fmuTargetDir):
 			if os.path.isfile(fmuTargetDir):
-				QtWidgets.QMessageBox.critical(self, "Invalid input", "There exists already a file at '{}'.".format(fmuTargetDir))
-				self.page.ui.lineEditTargetDir.selectAll()
-				self.page.ui.lineEditTargetDir.setFocus()
-				return False
-			res = QtWidgets.QMessageBox.question(self, "Invalid input", "Target directory exists. Overwrite?")
-			if res == QtWidgets.QMessageBox.No:
-				self.page.ui.lineEditTargetDir.selectAll()
-				self.page.ui.lineEditTargetDir.setFocus()
-				return False
+				msg = "There exists already a file at '{}'.".format(fmuTargetDir)
+			else:
+				msg = ("The directory '{}' exists already. To update an existing FMU project, go back and "
+					   "select 'Open an existing FMU project'.".format(fmuTargetDir))
+			QtWidgets.QMessageBox.critical(self, "Invalid input", msg)
+			self.page.ui.lineEditModelName.selectAll()
+			self.page.ui.lineEditModelName.setFocus()
+			return False
 		# input is ok, proceed to next page
 		return True
 
@@ -124,12 +215,12 @@ class PageVariables(QtWidgets.QWizardPage):
 	def validatePage(self):
 		# check all variables for valid combinations of parameters
 		# variables must not start with a number and must not container non-Ascii chars
-		
+
 		capitalized_var_names = set()
-		
+
 		for i in range(len(self.page.variables)):
 			varname = self.page.variables[i].name
-			
+
 			# check if the leading character is a number
 			if len(varname) == 0:
 				QtWidgets.QMessageBox.critical(self, "Invalid variable name", "Please specify names for all variables!")
@@ -152,7 +243,7 @@ class PageVariables(QtWidgets.QWizardPage):
 				QtWidgets.QMessageBox.critical(self, "Invalid variable name", "Variable names must be unique (case in-sensitive).")
 				return False
 			capitalized_var_names.add(capVarName)
-				
+
 		return True
 
 
@@ -163,36 +254,60 @@ class PageGenerate(QtWidgets.QWizardPage):
 		self.page = WizardPageGenerate()
 		layout.addWidget(self.page)
 		self.setLayout(layout)
-		self.setTitle("Ready to generate FMU")
+
+
+	def initializePage(self):
+		wizard = self.wizard()
+		self.page.ui.plainTextEditLog.clear()
+		if wizard.mode == MODE_UPDATE:
+			self.setTitle("Ready to update FMU project")
+			self.setSubTitle("Only generated files are overwritten in '{}'; previous versions are kept in the "
+							 "'.backup' subdirectory. Your source code is not modified.".format(wizard.projectDir))
+			self.setButtonText(QtWidgets.QWizard.FinishButton, "Update FMU")
+		else:
+			self.setTitle("Ready to generate FMU")
+			self.setSubTitle("")
+			self.setButtonText(QtWidgets.QWizard.FinishButton, "Generate FMU")
+
 
 	def validatePage(self):
-		# here we generate the actual FMU
-		
+		# here we generate/update the actual FMU
+		wizard = self.wizard()
+		basicProps = wizard.basicPropsPage()
+
 		fmiGenerator = FMIGenerator()
-		
+
 		# basic properties
-		fmiGenerator.modelName = self.pageBasicProps.ui.lineEditModelName.text().strip()
-		fmiGenerator.description = self.pageBasicProps.ui.plainTextEditDescription.toPlainText()
-		fmiGenerator.targetDir = self.pageBasicProps.ui.lineEditTargetDir.text()
-		
+		fmiGenerator.modelName = basicProps.ui.lineEditModelName.text().strip()
+		fmiGenerator.description = basicProps.ui.plainTextEditDescription.toPlainText()
+		fmiGenerator.targetDir = basicProps.ui.lineEditTargetDir.text()
+
 		# variables
-		fmiGenerator.variables = self.pageVars.variables
+		fmiGenerator.variables = wizard.variablesPage().variables
 
 		fmiGenerator.autobuild = self.page.ui.checkBoxTestBuild.isChecked()
-		
+
 		try:
-			fmiGenerator.generate()
+			if wizard.mode == MODE_UPDATE:
+				fmiGenerator.update(wizard.projectDir)
+			else:
+				fmiGenerator.generate()
 			msgs = "\n".join(fmiGenerator.messages)
 			self.page.ui.plainTextEditLog.setPlainText(msgs)
 		except Exception as e:
 			msgs = "\n".join(fmiGenerator.messages)
 			self.page.ui.plainTextEditLog.setPlainText(msgs)
-			res = QtWidgets.QMessageBox.critical(self, "FMI Generation Error", "Some error occurred during FMI generation:\n{}".format(str(e)))
+			QtWidgets.QMessageBox.critical(self, "FMI Generation Error", "Some error occurred during FMI generation:\n{}".format(str(e)))
 			return False
-		
-		QtWidgets.QMessageBox.information(self, "FMU Generation Completed", 
-		                                  "FMU source code directory '{}' created successfully."
-		                                  .format(self.pageBasicProps.ui.lineEditTargetDir.text()))
+
+		if wizard.mode == MODE_UPDATE:
+			QtWidgets.QMessageBox.information(self, "FMU Update Completed",
+											  "FMU project '{}' updated. Please check the generation log for details."
+											  .format(fmiGenerator.targetDirPath))
+		else:
+			QtWidgets.QMessageBox.information(self, "FMU Generation Completed",
+											  "FMU source code directory '{}' created successfully."
+											  .format(fmiGenerator.targetDirPath))
 		return True
 
 if __name__ == '__main__':

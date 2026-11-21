@@ -4,7 +4,7 @@
 call "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat"
 
 :: FMU-specific variables - set by code generator
-set FMU_SHARED_LIB_NAME=FMI_template.dll
+set FMU_SHARED_LIB_NAME=P_Control.dll
 
 set CMAKELISTSDIR=%CD%\..
 

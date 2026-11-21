@@ -43,37 +43,18 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "fmi2common/fmi2FunctionTypes.h"
 #include "P_Control.h"
 
-// FMI interface variables
-
-#define FMI_INPUT_T 1
-#define FMI_OUTPUT_P 2
-#define FMI_PARA_T_limit 3
-#define FMI_PARA_k_P 4
-
-
-// *** Variables and functions to be implemented in user code. ***
-
-// *** GUID that uniquely identifies this FMU code
-const char * const InstanceData::GUID = "{af41abcc-4692-11e9-a264-f0def1a04bd7}";
-
-// *** Factory function, creates model specific instance of InstanceData-derived class
-InstanceData * InstanceData::create() {
-	return new P_Control; // caller takes ownership
-}
+// This file is created once by FMICodeGenerator and is never overwritten afterwards.
+// It is yours to edit. Variable definitions (value references, struct FMIVariables),
+// the GUID and the functions initFMIVariables(), readFMIVariables() and writeFMIVariables()
+// are generated in P_Control_generated.h/.cpp - these files are regenerated whenever
+// the FMU project is updated.
 
 
 P_Control::P_Control() :
 	InstanceData()
 {
-	// initialize input variables and/or parameters
-	m_realVar[FMI_INPUT_T] = 293.15;
-	m_realVar[FMI_PARA_T_limit] = 276.15;
-	m_realVar[FMI_PARA_k_P] = 20000;
-
-	// initialize output variables
-	m_realVar[FMI_OUTPUT_P] = 0;
-
-
+	// initialize all FMI variables with their start values
+	initFMIVariables();
 }
 
 
@@ -86,15 +67,9 @@ void P_Control::init() {
 	logger(fmi2OK, "progress", "Starting initialization.");
 
 	if (m_modelExchange) {
-		// initialize states
-		
-
 		// TODO : implement your own initialization code here
 	}
 	else {
-		// initialize states, these are used for our internal time integration
-		
-
 		// TODO : implement your own initialization code here
 
 		// initialize integrator for co-simulation
@@ -110,17 +85,18 @@ void P_Control::updateIfModified() {
 	if (!m_externalInputVarsModified)
 		return;
 
-	// get input variables
-	double T = m_realVar[FMI_INPUT_T];
-	double T_limit = m_realVar[FMI_PARA_T_limit];
-	double k_P = m_realVar[FMI_PARA_k_P];
+	// get current values of all variables
+	FMIVariables v;
+	readFMIVariables(v);
 
+	// P-controller: heating power is proportional to the temperature difference below the limit
+	if (v.T < v.T_limit)
+		v.P = v.k_P*(v.T_limit - v.T);
+	else
+		v.P = 0;
 
-	// TODO : implement your code here
-
-	// output variables
-	m_realVar[FMI_OUTPUT_P] = 0; // TODO : store your results here
-
+	// store output variables
+	writeFMIVariables(v);
 
 	// reset externalInputVarsModified flag
 	m_externalInputVarsModified = false;
@@ -133,19 +109,18 @@ void P_Control::integrateTo(double tCommunicationIntervalEnd) {
 	// state of FMU before integration:
 	//   m_currentTimePoint = t_IntervalStart;
 
-	// get input variables
-	double T = m_realVar[FMI_INPUT_T];
-	double T_limit = m_realVar[FMI_PARA_T_limit];
-	double k_P = m_realVar[FMI_PARA_k_P];
+	// get current values of all variables
+	FMIVariables v;
+	readFMIVariables(v);
 
+	// P-controller: heating power is proportional to the temperature difference below the limit
+	if (v.T < v.T_limit)
+		v.P = v.k_P*(v.T_limit - v.T);
+	else
+		v.P = 0;
 
-
-	// TODO : implement your code here
-
-
-	// output variables
-	m_realVar[FMI_OUTPUT_P] = 0; // TODO : store your results here
-
+	// store output variables
+	writeFMIVariables(v);
 
 	m_currentTimePoint = tCommunicationIntervalEnd;
 
@@ -154,193 +129,46 @@ void P_Control::integrateTo(double tCommunicationIntervalEnd) {
 }
 
 
-void P_Control::computeFMUStateSize() {
-	// store time, states and outputs
-	m_fmuStateSize = sizeof(double)*1;
-	// we store all cached variables
-
-	// for all 4 maps, we store the size for sanity checks
-	m_fmuStateSize += sizeof(int)*4;
-
-	// serialization of the maps: first the valueRef, then the actual value
-
-	m_fmuStateSize += (sizeof(int) + sizeof(double))*m_realVar.size();
-	m_fmuStateSize += (sizeof(int) + sizeof(int))*m_integerVar.size();
-	m_fmuStateSize += (sizeof(int) + sizeof(int))*m_boolVar.size(); // booleans are stored as int
-
-	// strings are serialized in checkable format: first length, then zero-terminated string
-	for (std::map<int, std::string>::const_iterator it = m_stringVar.begin();
-		 it != m_stringVar.end(); ++it)
-	{
-		m_fmuStateSize += sizeof(int) + sizeof(int) + it->second.size() + 1; // add one char for \0
-	}
+// *** Serialization of user-defined FMU state ***
+//
+// The FMU state (time point and all FMI variables) is serialized by the generated code in
+// P_Control_generated.cpp. The following functions handle additional, model-specific state data,
+// for example state variables and already computed derivatives (ModelExchange) or the state of your own
+// time integrator (CoSimulation). Use the SERIALIZE/DESERIALIZE macros from P_Control_generated.h.
+// The number of bytes written by serializeUserState() and read by deserializeUserState() must
+// match the value returned by userStateSize().
 
 
-	// other variables: distinguish between ModelExchange and CoSimulation
+size_t P_Control::userStateSize() const {
+	size_t s = 0;
 	if (m_modelExchange) {
-
-		// TODO : store state variables and already computed derivatives
-
+		// TODO : add size of state variables and already computed derivatives
 	}
 	else {
-
-		// TODO : store integrator state
-
+		// TODO : add size of integrator state
 	}
+	return s;
 }
 
 
-// macro for storing a POD and increasing the pointer to the linear memory array
-#define SERIALIZE(type, storageDataPtr, value)\
-{\
-  *reinterpret_cast<type *>(storageDataPtr) = (value);\
-  (storageDataPtr) = reinterpret_cast<char *>(storageDataPtr) + sizeof(type);\
-}
-
-// macro for retrieving a POD and increasing the pointer to the linear memory array
-#define DESERIALIZE(type, storageDataPtr, value)\
-{\
-  (value) = *reinterpret_cast<type *>(storageDataPtr);\
-  (storageDataPtr) = reinterpret_cast<const char *>(storageDataPtr) + sizeof(type);\
-}
-
-
-template <typename T>
-bool deserializeMap(P_Control * obj, const char * & dataPtr, const char * typeID, std::map<int, T> & varMap) {
-	// now de-serialize the maps: first the size (for checking), then each key-value pair
-	int mapsize;
-	DESERIALIZE(const int, dataPtr, mapsize);
-	if (mapsize != static_cast<int>(varMap.size())) {
-		std::stringstream strm;
-		strm << "Bad binary data or invalid/uninitialized model data. "<< typeID << "-Map size mismatch.";
-		obj->logger(fmi2Error, "deserialization", strm.str());
-		return false;
-	}
-	for (int i=0; i<mapsize; ++i) {
-		int valueRef;
-		T val;
-		DESERIALIZE(const int, dataPtr, valueRef);
-		if (varMap.find(valueRef) == varMap.end()) {
-			std::stringstream strm;
-			strm << "Bad binary data or invalid/uninitialized model data. "<< typeID << "-Variable with value ref "<< valueRef
-				 << " does not exist in "<< typeID << "-variable map.";
-			obj->logger(fmi2Error, "deserialization", strm.str());
-			return false;
-		}
-		DESERIALIZE(const T, dataPtr, val);
-		varMap[valueRef] = val;
-	}
-	return true;
-}
-
-
-
-void P_Control::serializeFMUstate(void * FMUstate) {
-	char * dataPtr = reinterpret_cast<char*>(FMUstate);
+void P_Control::serializeUserState(char * & dataPtr) const {
+	(void)dataPtr;
 	if (m_modelExchange) {
-		SERIALIZE(double, dataPtr, m_tInput);
-
-		// TODO ModelExchange-specific serialization
+		// TODO ModelExchange-specific serialization, e.g. SERIALIZE(double, dataPtr, m_myState);
 	}
 	else {
-		SERIALIZE(double, dataPtr, m_currentTimePoint);
-
 		// TODO CoSimulation-specific serialization
 	}
-
-	// write map size for checking
-	int mapSize = static_cast<int>(m_realVar.size());
-	SERIALIZE(int, dataPtr, mapSize);
-	// now serialize all members of the map
-	for (std::map<int,double>::const_iterator it = m_realVar.begin(); it != m_realVar.end(); ++it) {
-		SERIALIZE(int, dataPtr, it->first);
-		SERIALIZE(double, dataPtr, it->second);
-	}
-	mapSize = static_cast<int>(m_integerVar.size());
-	SERIALIZE(int, dataPtr, mapSize);
-	for (std::map<int,int>::const_iterator it = m_integerVar.begin(); it != m_integerVar.end(); ++it) {
-		SERIALIZE(int, dataPtr, it->first);
-		SERIALIZE(int, dataPtr, it->second);
-	}
-	mapSize = static_cast<int>(m_boolVar.size());
-	SERIALIZE(int, dataPtr, mapSize);
-	for (std::map<int,int>::const_iterator it = m_boolVar.begin(); it != m_boolVar.end(); ++it) {
-		SERIALIZE(int, dataPtr, it->first);
-		SERIALIZE(int, dataPtr, it->second);
-	}
-	mapSize = static_cast<int>(m_stringVar.size());
-	SERIALIZE(int, dataPtr, mapSize);
-	for (std::map<int, std::string>::const_iterator it = m_stringVar.begin();
-		 it != m_stringVar.end(); ++it)
-	{
-		SERIALIZE(int, dataPtr, it->first);				// map key
-		SERIALIZE(int, dataPtr, static_cast<int>(it->second.size()));		// string size
-		std::memcpy(dataPtr, it->second.c_str(), it->second.size()+1); // also copy the trailing \0
-		dataPtr += it->second.size()+1;
-	}
 }
 
 
-bool P_Control::deserializeFMUstate(void * FMUstate) {
-	const char * dataPtr = reinterpret_cast<const char*>(FMUstate);
+bool P_Control::deserializeUserState(const char * & dataPtr) {
+	(void)dataPtr;
 	if (m_modelExchange) {
-		DESERIALIZE(const double, dataPtr, m_tInput);
-
-		// TODO ModelExchange-specific deserialization
-		m_externalInputVarsModified = true;
+		// TODO ModelExchange-specific deserialization, e.g. DESERIALIZE(const double, dataPtr, m_myState);
 	}
 	else {
-		DESERIALIZE(const double, dataPtr, m_currentTimePoint);
-
 		// TODO CoSimulation-specific deserialization
 	}
-
-	if (!deserializeMap(this, dataPtr, "real", m_realVar))
-		return false;
-	if (!deserializeMap(this, dataPtr, "integer", m_integerVar))
-		return false;
-	if (!deserializeMap(this, dataPtr, "boolean", m_boolVar))
-		return false;
-
-	// special handling for deserialization of string map
-	int mapsize;
-	DESERIALIZE(const int, dataPtr, mapsize);
-	if (mapsize != static_cast<int>(m_stringVar.size())) {
-		logger(fmi2Error, "deserialization", "Bad binary data or invalid/uninitialized model data. string-variable map size mismatch.");
-		return false;
-	}
-	for (int i=0; i<mapsize; ++i) {
-		int valueRef;
-		DESERIALIZE(const int, dataPtr, valueRef);
-		if (m_stringVar.find(valueRef) == m_stringVar.end()) {
-			std::stringstream strm;
-			strm << "Bad binary data or invalid/uninitialized model data. string-variable with value ref "<< valueRef
-				 << " does not exist in real variable map.";
-			logger(fmi2Error, "deserialization", strm.str());
-			return false;
-		}
-		// get length of string
-		int strLen;
-		DESERIALIZE(const int, dataPtr, strLen);
-		// create a string of requested length
-		std::string s(static_cast<size_t>(strLen), ' ');
-		// copy contents of string
-		std::memcpy(&s[0], dataPtr, static_cast<size_t>(strLen)); // do not copy the trailing \0
-		dataPtr += strLen;
-		// check that next character is a \0
-		if (*dataPtr != '\0') {
-			std::stringstream strm;
-			strm << "Bad binary data. string-variable with value ref "<< valueRef
-				 << " does not have a trailing \0.";
-			logger(fmi2Error, "deserialization", strm.str());
-			return false;
-		}
-		++dataPtr;
-		// replace value in map
-		m_stringVar[valueRef] = s;
-	}
-
 	return true;
 }
-
-

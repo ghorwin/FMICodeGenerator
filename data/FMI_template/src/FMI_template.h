@@ -40,6 +40,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define FMI_templateH
 
 #include "fmi2common/InstanceData.h"
+#include "FMI_template_generated.h"
 
 /*! This class wraps all data needed for a single instance of the FMU. */
 class FMI_template : public InstanceData {
@@ -47,7 +48,7 @@ public:
 	/*! Initializes empty instance. */
 	FMI_template();
 
-	/*! Destructor, writes out cached results from Therakles. */
+	/*! Destructor. */
 	~FMI_template();
 
 	/*! Initializes model */
@@ -61,12 +62,36 @@ public:
 	/*! Called from fmi2DoStep(). */
 	virtual void integrateTo(double tCommunicationIntervalEnd);
 
-	// Functions for getting/setting the state
+	// Functions for serialization of user-defined state data (implemented in FMI_template.cpp)
+
+	/*! Returns the number of bytes needed to serialize user-defined state data (states, derivatives,
+		integrator state, ...). Variables published via FMI are serialized already by the generated code.
+	*/
+	size_t userStateSize() const;
+
+	/*! Writes user-defined state data to the memory array and advances dataPtr.
+		Must write exactly userStateSize() bytes.
+	*/
+	void serializeUserState(char * & dataPtr) const;
+
+	/*! Reads user-defined state data from the memory array and advances dataPtr.
+		Must read exactly userStateSize() bytes. Returns false on error.
+	*/
+	bool deserializeUserState(const char * & dataPtr);
+
+	// Generated functions, implemented in FMI_template_generated.cpp (do not remove)
+
+	/*! Initializes all FMI variables with their start values. */
+	void initFMIVariables();
+
+	/*! Copies the current values of all FMI variables into the struct. */
+	void readFMIVariables(FMIVariables & v) const;
+
+	/*! Stores outputs, calculated parameters and local variables from the struct in the FMU. */
+	void writeFMIVariables(const FMIVariables & v);
 
 	/*! This function computes the size needed for full serizalization of
 		the FMU and stores the size in m_fmuStateSize.
-		\note The size includes the leading 8byte for the 64bit integer size
-		of the memory array (for testing purposes).
 	*/
 	virtual void computeFMUStateSize();
 

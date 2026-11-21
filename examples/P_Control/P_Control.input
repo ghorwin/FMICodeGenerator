@@ -1,0 +1,50 @@
+{
+    "modelName": "P_Control",
+    "description": "A stateless P-Controller",
+    "variables": [
+        {
+            "name": "T",
+            "valueRef": 1,
+            "variability": "continuous",
+            "causality": "input",
+            "initial": "approx",
+            "typeID": "Real",
+            "startValue": "293.15",
+            "description": "",
+            "unit": ""
+        },
+        {
+            "name": "P",
+            "valueRef": 2,
+            "variability": "continuous",
+            "causality": "output",
+            "initial": "calculated",
+            "typeID": "Real",
+            "startValue": "0",
+            "description": "",
+            "unit": ""
+        },
+        {
+            "name": "T_limit",
+            "valueRef": 3,
+            "variability": "fixed",
+            "causality": "parameter",
+            "initial": "exact",
+            "typeID": "Real",
+            "startValue": "276.15",
+            "description": "",
+            "unit": ""
+        },
+        {
+            "name": "k_P",
+            "valueRef": 4,
+            "variability": "fixed",
+            "causality": "parameter",
+            "initial": "exact",
+            "typeID": "Real",
+            "startValue": "20000",
+            "description": "",
+            "unit": ""
+        }
+    ]
+}

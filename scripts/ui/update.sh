@@ -6,6 +6,7 @@
 pyuic5 -i 0 WizardPageBasicProperties.ui -o ../Ui_WizardPageBasicProperties.py
 pyuic5 -i 0 WizardPageVariables.ui -o ../Ui_WizardPageVariables.py
 pyuic5 -i 0 WizardPageGenerate.ui -o ../Ui_WizardPageGenerate.py
+pyuic5 -i 0 WizardPageProject.ui -o ../Ui_WizardPageProject.py
 
 
 # also transform the qrc file

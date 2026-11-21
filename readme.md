@@ -58,7 +58,7 @@ cd <FmuModelName>/build
 
 ## System requirements / setup
 
-The script requires Python 3 (3.7 or newer) with the packages `pyqt5` and `send2trash` installed.
+The script requires Python 3 (3.7 or newer) with the packages `pyqt5` and `send2trash` installed. Both dependencies are listed in `requirements.txt`, so a plain `pip install -r requirements.txt` (inside your virtual environment, if you use one) is usually the simplest option.
 
 #### Linux
 
@@ -70,6 +70,13 @@ _Ubuntu 24.04 / 26.04 - Python 3.x_
 > sudo apt install cmake build-essential qt5-qmake qtbase5-dev libqt5core5a libqt5concurrent5 libqt5gui5 libqt5network5 libqt5svg5-dev libqt5xml5 libqt5widgets5 python3 python3-pyqt5 python3-send2trash pyqt5-dev-tools p7zip-full
 ```
 The package `pyqt5-dev-tools` contains the scripts `pyuic5` and `pyrcc5` needed for development of the FMIGenerator itself.
+
+_Fedora 44 - Python 3.x_
+
+```bash
+> sudo dnf install cmake gcc-c++ make qt5-qtbase qt5-qtbase-gui qt5-qtbase-devel python3 PyQt5 python3-send2trash 7zip
+```
+The package `PyQt5` contains the scripts `pyuic5` and `pyrcc5` needed for development of the FMIGenerator itself.
 
 
 #### Mac

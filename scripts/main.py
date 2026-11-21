@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
 # Main application file, basically just executes the wizard.
 #
@@ -44,5 +43,5 @@ from FMIGeneratorWizard import FMIGeneratorWizard
 app = QtWidgets.QApplication(sys.argv)
 wizard = FMIGeneratorWizard()
 wizard.show()
-sys.exit(app.exec_())
+sys.exit(app.exec())
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Implementation of class FMIGenerator
 #
 # This file is part of FMICodeGenerator (https://github.com/ghorwin/FMICodeGenerator)
@@ -34,33 +33,19 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import sys
 import shutil
-from shutil import *
 import uuid
-import time
 import json
 import subprocess
 import datetime
 import platform
-from third_party.send2trash_master.send2trash import send2trash
+from send2trash import send2trash
 
 # The directory name of the template folder
 TEMPLATE_FOLDER_NAME = "FMI_template"
 
 class VarDef:
 	"""Contains all properties of a scalar variable in the model description."""
-	def __init__(self):
-		self.name = ""
-		self.valueRef = -1 # means automatic enumeration of value references
-		self.variability = "" # constant, fixed, tunable, discrete, continuous
-		self.causality = "" # parameter, calculatedParameter, input, output, local, independent
-		self.initial = "" # exact, approx, calculated
-		self.typeID = "" # Real, Integer, Boolean, String
-		self.description = "" # an optional description of the variable's meaning
-		self.unit = "" # the unit, only for Real-type variables
-		self.startValue = ""
-
 	def __init__(self, name, variability, causality, initial, typeID):
 		self.name = name
 		self.valueRef = -1
@@ -172,7 +157,7 @@ class FMIGenerator:
 		# user may have specified "FMI_template" as model name
 		# (which would be weird and break the code, hence a warning)
 		if self.modelName == "FMI_template":
-			printMsg("WARNING: model name is same as template folder name. This may not work!")
+			self.printMsg("WARNING: model name is same as template folder name. This may not work!")
 
 		# store input data into <targetDir>/<modelName>.input so that it can be read again by wizard to
 		# populate input data
@@ -244,19 +229,19 @@ class FMIGenerator:
 			shutil.copytree(templatePath, self.targetDirPath)
 			# Set modified time of newly created folder
 			os.utime(self.targetDirPath, None)
-		except:
-			raise RuntimeError("Cannot copy template directory to target directory")
+		except Exception as e:
+			raise RuntimeError("Cannot copy template directory to target directory: {}".format(e))
 
 		try:
 			# rename files that must be named according as the modelName
-			os.rename(self.targetDirPath + "/" + TEMPLATE_FOLDER_NAME + ".pro",
-					  self.targetDirPath + "/" + self.modelName + ".pro")
-			os.rename(self.targetDirPath + "/src/" + TEMPLATE_FOLDER_NAME + ".cpp",
-					  self.targetDirPath + "/src/" + self.modelName + ".cpp")
-			os.rename(self.targetDirPath + "/src/" + TEMPLATE_FOLDER_NAME + ".h",
-					  self.targetDirPath + "/src/" + self.modelName + ".h")
-		except:
-			raise RuntimeError("Cannot rename template files")
+			os.rename(os.path.join(self.targetDirPath, TEMPLATE_FOLDER_NAME + ".pro"),
+					  os.path.join(self.targetDirPath, self.modelName + ".pro"))
+			os.rename(os.path.join(self.targetDirPath, "src", TEMPLATE_FOLDER_NAME + ".cpp"),
+					  os.path.join(self.targetDirPath, "src", self.modelName + ".cpp"))
+			os.rename(os.path.join(self.targetDirPath, "src", TEMPLATE_FOLDER_NAME + ".h"),
+					  os.path.join(self.targetDirPath, "src", self.modelName + ".h"))
+		except Exception as e:
+			raise RuntimeError("Cannot rename template files: {}".format(e))
 
 
 	def substitutePlaceholders(self):
@@ -269,10 +254,10 @@ class FMIGenerator:
 		"""
 
 		# Generate globally unique identifier
-		guid = uuid.uuid1()
+		guid = uuid.uuid4()
 
-		# Generate time stamp of local date and time
-		localTime = time.strftime('%Y-%m-%dT%I:%M:%SZ',time.localtime())
+		# Generate time stamp (ISO 8601, UTC)
+		localTime = datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
 
 		# We process file after file
 
@@ -286,13 +271,8 @@ class FMIGenerator:
 
 				try:
 					# read file into memory, variable 'data'
-					if sys.version_info[0] < 3:
-						fobj = open(src, 'r')
-						data = fobj.read().decode('utf8')
-					else:
-						fobj = open(src, 'r', encoding='utf-8')
+					with open(src, 'r', encoding='utf-8') as fobj:
 						data = fobj.read()
-					fobj.close()
 				except Exception as e:
 					self.printMsg(str(e))
 					raise RuntimeError("Error reading file: {}".format(src))
@@ -312,13 +292,8 @@ class FMIGenerator:
 
 				# finally, write data back to file
 				try:
-					if sys.version_info[0] < 3:
-						fobj = open(src, 'w')
-						fobj.write(data.encode("utf8"))
-					else:
-						fobj = open(src, 'w',encoding="utf-8")
+					with open(src, 'w', encoding="utf-8") as fobj:
 						fobj.write(data)
-					fobj.close()
 				except Exception as e:
 					self.printMsg("Error writing file: {}".format(str(e)))
 					raise RuntimeError("Error writing file: {}".format(src))
@@ -387,7 +362,7 @@ $$outputUnknowns$$
 			varDefBlock = varDefBlock.replace("$$name$$",var.name)
 
 			if len(var.description) != 0:
-				varDefBlock = varDefBlock.replace("$$desc$$", u'\n            description="{}"'.format(var.description))
+				varDefBlock = varDefBlock.replace("$$desc$$", '\n            description="{}"'.format(var.description))
 			else:
 				varDefBlock = varDefBlock.replace("$$desc$$","")
 
@@ -597,40 +572,32 @@ $$outputUnknowns$$
 			if platform.system() == "Windows":
 
 				# call batch file to build the FMI library
-				pipe = subprocess.Popen(["build_VC_x64.bat"], shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE, cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-				# retrieve output and error messages
-				outputMsg, errorMsg = pipe.communicate()
-				# get return code
-				rc = pipe.returncode
+				result = subprocess.run(["build_VC_x64.bat"], shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE,
+										cwd=buildDir, capture_output=True, text=True)
 
 				# if return code is different from 0, print the error message
-				if rc != 0:
-					self.printMsg(str(outputMsg) + "\n" + str(errorMsg))
+				if result.returncode != 0:
+					self.printMsg(result.stdout + "\n" + result.stderr)
 					raise RuntimeError("Error during compilation of FMU.")
 
 				self.printMsg("Compiled FMU successfully")
 
-				# call batch file to build the FMI library
-				pipe = subprocess.Popen(["deploy.bat"], shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE, cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-				# retrieve output and error messages
-				outputMsg, errorMsg = pipe.communicate()
-				# get return code
-				rc = pipe.returncode
+				# call batch file to deploy the FMI library
+				result = subprocess.run(["deploy.bat"], shell=True, creationflags=subprocess.CREATE_NEW_CONSOLE,
+										cwd=buildDir, capture_output=True, text=True)
 
-				if rc != 0:
-					self.printMsg(str(outputMsg) + "\n" + str(errorMsg))
+				if result.returncode != 0:
+					self.printMsg(result.stdout + "\n" + result.stderr)
 					raise RuntimeError("Error during compilation of FMU")
 
-				self.printMsg("Successfully created {}".format(self.modelName + ".fmu")	)
+				self.printMsg("Successfully created {}".format(self.modelName + ".fmu"))
 
 			else:
 				# shell file execution for Mac & Linux
-				pipe = subprocess.Popen(["bash", './build.sh'], cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-				outputMsg,errorMsg = pipe.communicate()
-				rc = pipe.returncode
+				result = subprocess.run(["bash", "./build.sh"], cwd=buildDir, capture_output=True, text=True)
 
-				if rc != 0:
-					self.printMsg(errorMsg)
+				if result.returncode != 0:
+					self.printMsg(result.stderr)
 					raise RuntimeError("Error during compilation of FMU")
 
 				self.printMsg("Compiled FMU successfully")
@@ -638,15 +605,13 @@ $$outputUnknowns$$
 				# Deployment
 
 				# shell file execution for Mac & Linux
-				deploy = subprocess.Popen(["bash", './deploy.sh'], cwd = buildDir, stdout = subprocess.PIPE, stderr = subprocess.PIPE)
-				outputMsg,errorMsg = deploy.communicate()
-				dc = deploy.returncode
+				deploy = subprocess.run(["bash", "./deploy.sh"], cwd=buildDir, capture_output=True, text=True)
 
-				if dc != 0:
-					self.printMsg(errorMsg)
+				if deploy.returncode != 0:
+					self.printMsg(deploy.stderr)
 					raise RuntimeError("Error during assembly of FMU")
 
-				self.printMsg("Successfully created {}".format(self.modelName + ".fmu")	)
+				self.printMsg("Successfully created {}".format(self.modelName + ".fmu"))
 
 		except Exception as e:
 			self.printMsg(str(e))

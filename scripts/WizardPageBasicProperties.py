@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
 # Implementation of the basic properties wizard page.
 #
@@ -36,7 +35,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import sys
 import os.path
 from PyQt5.QtWidgets import QWidget, QFileDialog, QMessageBox
 from PyQt5.QtCore import pyqtSlot, pyqtSignal, QDir
@@ -50,7 +48,7 @@ class WizardPageBasicProperties(QWidget):
 	loadDefaults = pyqtSignal('QString')
 	
 	def __init__(self):
-		super(WizardPageBasicProperties, self).__init__()
+		super().__init__()
 		self.ui = Ui_WizardPageBasicProperties()
 		self.ui.setupUi(self)
 		self.ui.lineEditTargetDir.setText( os.path.normpath(QDir.home().absolutePath() ) ) 

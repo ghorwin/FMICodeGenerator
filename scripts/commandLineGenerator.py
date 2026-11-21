@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
 # Main script for generating FMU code. This is the command line version which generates a minimalistic
 # barebone of the modelDescription.xml and the implementation files. Currently, command line
@@ -56,10 +55,10 @@ fmiGenerator = FMIGenerator()
 
 # store command line arguments
 fmiGenerator.modelName = args.modelName
-if args.description != None:
+if args.description is not None:
 	fmiGenerator.description = args.description
 else:
-	print ("WARNING: Model description missing.")
+	print("WARNING: Model description missing.")
 
 # setup variables (test code below)
 if False:
@@ -72,8 +71,8 @@ if False:
 try:
 	fmiGenerator.generate()
 except Exception as e:
-	print ("ERROR: Error during FMU generation")
-	print e
+	print("ERROR: Error during FMU generation")
+	print(e)
 	
 
 

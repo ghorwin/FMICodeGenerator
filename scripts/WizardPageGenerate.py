@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
 # Implementation of the final generation page wizard page.
 #
@@ -36,7 +35,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import sys
 import platform
 
 from PyQt5.QtWidgets import QWidget
@@ -46,7 +44,7 @@ from Ui_WizardPageGenerate import Ui_WizardPageGenerate
 
 class WizardPageGenerate(QWidget):
 	def __init__(self):
-		super(WizardPageGenerate, self).__init__()
+		super().__init__()
 		self.ui = Ui_WizardPageGenerate()
 		self.ui.setupUi(self)
 

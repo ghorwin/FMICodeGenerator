@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
 # Implementation of the variable definition wizard page.
 #
@@ -36,7 +35,6 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import sys
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem
 from PyQt5.QtCore import pyqtSlot, Qt
 from PyQt5.QtGui import QFontMetrics
@@ -47,7 +45,7 @@ from FMIGenerator import FMIGenerator, VarDef, varDefFromJson
 
 class WizardPageVariables(QWidget):
 	def __init__(self):
-		super(WizardPageVariables, self).__init__()
+		super().__init__()
 		self.ui = Ui_WizardPageVariables()
 		self.ui.setupUi(self)
 		

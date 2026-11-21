@@ -58,39 +58,33 @@ cd <FmuModelName>/build
 
 ## System requirements / setup
 
-The script runs with Python 2.7 and 3.x.
+The script requires Python 3 (3.7 or newer) with the packages `pyqt5` and `send2trash` installed.
 
 #### Linux
 
 Simply install the python packages and pyqt5.
 
-_Ubuntu 16.04...20.04 - Python 2.7_
-
-```bash
-> sudo apt install cmake build-essential qt5-default qt5-qmake qtcreator python-pyqt5 pyqt5-dev-tools p7zip-full
-```
-The package `pyqt5-dev-tools` contains the scripts `pyuic5` and `pyrcc5` needed for development of the FMIGenerator itself.
-
 _Ubuntu 16.04...20.04 - Python 3.x_
 
 ```bash
-> sudo apt install cmake build-essential qt5-default qt5-qmake qtcreator python3 python3-pyqt5 pyqt5-dev-tools p7zip-full
+> sudo apt install cmake build-essential qt5-default qt5-qmake qtcreator python3 python3-pyqt5 python3-send2trash pyqt5-dev-tools p7zip-full
 ```
+The package `pyqt5-dev-tools` contains the scripts `pyuic5` and `pyrcc5` needed for development of the FMIGenerator itself.
 
 _Ubuntu 21.04... - Python 3.x_
 
 ```bash
-> sudo apt install cmake build-essential qt5-qmake qtbase5-dev libqt5core5a libqt5concurrent5 libqt5gui5 libqt5network5 libqt5svg5-dev libqt5xml5 libqt5widgets5 python3 python3-pyqt5 pyqt5-dev-tools p7zip-full
+> sudo apt install cmake build-essential qt5-qmake qtbase5-dev libqt5core5a libqt5concurrent5 libqt5gui5 libqt5network5 libqt5svg5-dev libqt5xml5 libqt5widgets5 python3 python3-pyqt5 python3-send2trash pyqt5-dev-tools p7zip-full
 ```
 
 
 #### Mac
 
-Use homebrew and/or macports to install python and pyqt5 (or alternatively pip).
+Use homebrew and/or macports to install python, pyqt5 and send2trash (or alternatively pip).
 
 #### Windows
 
-Things are bit more complicated for Windows. While the code can be compiled (thanks to the CMake build system) using quite a few build chains available on windows, the `batch`-scripts are currently expecting a standard Visual Studio 2022 installation and 7zip must be installed with `7za` in the PATH. Also, `cmake` must be in in the PATH. You also need to install PyQt5 (via pip) as dependency of the script.
+Things are bit more complicated for Windows. While the code can be compiled (thanks to the CMake build system) using quite a few build chains available on windows, the `batch`-scripts are currently expecting a standard Visual Studio 2022 installation and 7zip must be installed with `7za` in the PATH. Also, `cmake` must be in in the PATH. You also need to install PyQt5 and send2trash (via pip) as dependencies of the script.
 
 If your setup differs from that, edit the files `build_VC_x64.bat` and `deploy.bat` in directory `data/FMI_template/build` (there are example batch files for different VC versions).
 
@@ -107,5 +101,4 @@ The FMICodeGenerator is provided under a *BSD 3-Clause License*.
     doc                 - documentation, also includes examples
     examples            - example directory structures (this is what the FMI generator should produce)
     scripts             - the actual python scripts
-    scripts/third_party - external library and scripts
     third_party         - external tools like the compliance checker

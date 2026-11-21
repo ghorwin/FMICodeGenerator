@@ -1,5 +1,4 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 
 # The Wizard, that collects all data needed to generate the FMU from the user.
 #
@@ -40,8 +39,7 @@
 import sys
 import os.path
 
-from PyQt5 import QtGui, QtCore, QtWidgets
-from PyQt5.QtCore import QObject, pyqtProperty, pyqtSignal 
+from PyQt5 import QtWidgets
 
 from WizardPageBasicProperties import WizardPageBasicProperties
 from WizardPageVariables import WizardPageVariables
@@ -51,7 +49,7 @@ from FMIGenerator import FMIGenerator, VarDef
 
 class FMIGeneratorWizard(QtWidgets.QWizard):
 	def __init__(self, parent=None):
-		super(FMIGeneratorWizard, self).__init__(parent)
+		super().__init__(parent)
 		basicPropsPage = PageBasicProperties(self)
 		self.addPage(basicPropsPage)
 		self.addPage(PageVariables(self))
@@ -74,7 +72,7 @@ class FMIGeneratorWizard(QtWidgets.QWizard):
 
 class PageBasicProperties(QtWidgets.QWizardPage):
 	def __init__(self, parent=None):
-		super(PageBasicProperties, self).__init__(parent)
+		super().__init__(parent)
 		layout = QtWidgets.QVBoxLayout()
 		self.page = WizardPageBasicProperties()
 		layout.addWidget(self.page)
@@ -116,7 +114,7 @@ class PageBasicProperties(QtWidgets.QWizardPage):
 
 class PageVariables(QtWidgets.QWizardPage):
 	def __init__(self, parent=None):
-		super(PageVariables, self).__init__(parent)
+		super().__init__(parent)
 		layout = QtWidgets.QVBoxLayout()
 		self.page = WizardPageVariables()
 		layout.addWidget(self.page)
@@ -160,7 +158,7 @@ class PageVariables(QtWidgets.QWizardPage):
 
 class PageGenerate(QtWidgets.QWizardPage):
 	def __init__(self, parent=None):
-		super(PageGenerate, self).__init__(parent)
+		super().__init__(parent)
 		layout = QtWidgets.QVBoxLayout()
 		self.page = WizardPageGenerate()
 		layout.addWidget(self.page)
@@ -201,4 +199,4 @@ if __name__ == '__main__':
 	app = QtWidgets.QApplication(sys.argv)
 	wizard = FMIGeneratorWizard()
 	wizard.show()
-	sys.exit(app.exec_())
+	sys.exit(app.exec())

@@ -321,7 +321,7 @@ class FMIGenerator:
 		data = data.replace("$$modelName$$",self.modelName)
 
 		# TODO : substitute remaining placeholders
-		data = data.replace("$$version$$","1.0.0")
+		data = data.replace("$$version$$","1.3.0")
 		data = data.replace("$$author$$","not specified")
 		data = data.replace("$$copyright$$","not specified")
 		data = data.replace("$$license$$","not specified")

@@ -1,0 +1,150 @@
+= User Guide
+include::_settings.adoc[]
+:sectnums:
+
+// DRAFT: outline with content collected from readme.md, AGENTS.md and the old wiki API page
+
+== Overview
+
+Working with the FMI Code Generator follows three steps:
+
+. *Generate* a fully working FMU source code project (wizard or command line).
+. *Implement* the model-specific functionality in the user source file.
+. *Build and deploy* the FMU with the provided build system files and scripts.
+
+Whenever variables change, re-run the generator on the existing project (_update_): the generated files are rewritten, your own code is kept.
+
+== Creating a new FMU project
+
+=== With the graphical wizard
+
+[source,bash]
+----
+python scripts/main.py
+----
+
+On the start page choose _Create a new FMU project_. Then enter
+
+* the model name (also used as FMU identifier and directory name),
+* the target directory and an optional description,
+* the list of variables (inputs, outputs, parameters, locals) with causality, variability, initial value and type.
+
+// TODO: current screenshots of the Qt 6 wizard (start page, basic properties, variables, generate)
+
+Confirming the last page generates the project directory `<target dir>/<model name>` and runs a test build.
+
+=== With the command line generator
+
+[source,bash]
+----
+python scripts/commandLineGenerator.py <modelName> --description "..." \
+    [--target-dir DIR] [--input vars.input] [--no-build] [--overwrite]
+----
+
+// TODO: describe options
+
+== Updating an existing project
+
+When you need to add, remove or modify variables, open the existing project — either with _Open an existing FMU project_ on the wizard start page (recently used projects are listed there), or on the command line:
+
+[source,bash]
+----
+python scripts/commandLineGenerator.py --update <projectDir> [--no-build]
+----
+
+The generator reads `<projectDir>/<modelName>.input`, rewrites the generated files and keeps the value references of existing variables stable. The previous versions of the generated files are saved to `<projectDir>/.backup/<timestamp>/`.
+
+NOTE: Projects created with generator version 1.3 or older (with `#define FMI_...` in the user `.cpp` file) are _legacy projects_. The update writes the new generated files and prints manual migration instructions.
+
+// TODO: describe migration steps
+
+== The generated project
+
+=== Directory structure
+
+// TODO: tree listing of a generated project (e.g. examples/P_Control)
+
+=== Generated files and user files
+
+[cols="2,1,3",options="header"]
+|===
+|File |Owner |Content
+|`data/modelDescription.xml` |generator |FMI model description
+|`src/<model>_generated.h` |generator |value reference defines (`FMI_INPUT_x`, `FMI_OUTPUT_x`, `FMI_PARA_x`, `FMI_LOCAL_x`), `struct FMIVariables`, `SERIALIZE`/`DESERIALIZE` macros
+|`src/<model>_generated.cpp` |generator |GUID, `InstanceData::create()`, variable initialization/read/write, generic FMU state serialization
+|`<model>.input` |generator |project file (JSON) with model name, description and variables
+|`src/<model>.h`, `src/<model>.cpp` |*you* |model implementation
+|`CMakeLists.txt`, `<model>.pro`, `build/*` |*you* |build system files and scripts
+|===
+
+Generator-owned files are overwritten on every update. User files are created once and never touched again.
+
+TIP: The places where your own code goes are marked with *TODO* comments in `src/<model>.cpp`.
+
+=== The project file (`.input`)
+
+// TODO: describe JSON format, example from examples/P_Control/P_Control.input
+
+== Implementing the FMU
+
+// TODO: ModelExchange (updateIfModified), Co-Simulation (integrateTo), init()
+
+=== FMU state serialization
+
+The generated code serializes all FMI variables. Model-specific state is added in three hooks of the user code:
+
+* `userStateSize()`
+* `serializeUserState(char *&)`
+* `deserializeUserState(const char *&)`
+
+The user data is written last; the generated code checks that the byte count matches.
+
+// TODO: example
+
+== Building and deploying
+
+The generated directory contains build system files for CMake and Qt qmake. With CMake you can generate makefiles for various compilers and development environments; with the `.pro` file you can directly start developing in Qt Creator (the FMU code itself is plain C/C++ without Qt dependencies).
+
+Linux/macOS:
+
+[source,bash]
+----
+cd <model>/build
+./build.sh release   # build the FMU in release mode
+./deploy.sh          # package the FMU (zipped directory structure)
+----
+
+Windows: `build_VC_x64.bat` and `deploy.bat`.
+
+You may want to adjust the deploy script to copy your own resource files into the FMU.
+
+== Python API
+
+To use the code generator functionality from other software, use the Python API: create an instance of class `FMIGenerator`, specify its attributes and call `generate()` (or `update(projectDir)` for an existing project).
+
+[source,python]
+----
+# import FMIGenerator class and data types
+from FMIGenerator import *
+
+# create instance of FMIGenerator class
+fmiGen = FMIGenerator()
+
+# specify attributes
+fmiGen.modelName = "MyFirstFMU"
+fmiGen.description = "My first auto-generated FMU. Awesome, right?"
+fmiGen.targetDir = "../fmus"
+# 'targetDir' can be relative path to current working directory
+# or an absolute file path
+
+# add variables to export
+v = VarDef("InputVar1", "continuous", "input", "exact", "Real")
+# valueRef will be given automatically unless specified explicitly
+v.startValue = 15
+fmiGen.variables.append(v)
+
+# now generate the FMU
+fmiGen.generate()
+----
+
+// TODO: document VarDef arguments and update()

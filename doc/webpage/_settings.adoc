@@ -1,0 +1,18 @@
+// Common document attributes, included by every page directly below the document title.
+:toc: left
+:toclevels: 3
+:icons: font
+:iconfont-remote!:
+:source-highlighter: rouge
+:linkcss:
+:copycss!:
+:rouge-css: style
+:stylesdir: css
+:stylesheet: fmicodegen.css
+:docinfo: shared-header
+:imagesdir: images
+:nofooter:
+:experimental:
+:repo-url: https://github.com/ghorwin/FMICodeGenerator
+:fmi-url: https://fmi-standard.org
+:mastersim-url: https://bauklimatik-dresden.de/mastersim

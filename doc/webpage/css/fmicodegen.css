@@ -1,0 +1,39 @@
+/* FMICodeGenerator webpage stylesheet.
+   Builds on the MasterSim manual style (roboto_ubuntu.css -> asciidoctor.css)
+   and adds the site navigation bar shared by all pages. */
+@import url(roboto_ubuntu.css);
+
+:root {
+  --navheight: 3rem;
+}
+
+#sitenav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--navheight);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 0 1rem;
+  background: var(--primarycolor);
+  font-family: "Roboto Condensed", sans-serif;
+  box-shadow: 0 1px 4px rgba(0,0,0,.25);
+  overflow-x: auto;
+  white-space: nowrap;
+}
+#sitenav a { color: var(--white); text-decoration: none; }
+#sitenav a:hover { text-decoration: underline; }
+#sitenav .brand { font-weight: 700; font-size: 1.2em; }
+#sitenav ul { display: flex; gap: 1.2rem; margin: 0; padding: 0; list-style: none; }
+#sitenav li { margin: 0; }
+
+/* push content and the left-side TOC below the fixed navigation bar */
+body { padding-top: var(--navheight); }
+@media screen and (min-width: 768px) {
+  body.toc2 #toc.toc2 { top: var(--navheight); }
+}
+/* anchors must not disappear behind the navigation bar */
+h1, h2, h3, h4, h5, h6, [id] { scroll-margin-top: calc(var(--navheight) + .5rem); }
+
+img { max-width: 100%; height: auto; }

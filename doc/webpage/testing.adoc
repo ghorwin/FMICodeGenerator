@@ -1,0 +1,27 @@
+= Test Scenarios
+include::_settings.adoc[]
+
+// DRAFT: converted from the old wiki
+
+== FMU Compliance Checker testing procedure
+
+The FMUs created by the FMIGenerator are only backbones and lack specific functionality. To test the correct export, we follow this procedure:
+
+. define an FMU with given parameters and variables according to the defined test scenario (see below)
+. generate the FMU directory with the FMIGenerator
+. add C++ code into the FMU source stub
+. build and deploy the `.fmu` file
+. run the file through the compliance checker
+
+The FMI compliance checker is included in the repository as `third_party/FMUChecker-2.0.4-linux64.zip` (a win64 variant is also present).
+
+== Scenarios
+
+xref:tutorial_p_control.adoc[Stateless P-controller]::
+Tests the very basic functionality (if the FMU is well formed and the modelDescription is syntactically correct). No serialization is needed, so there cannot be anything wrong with that. This scenario doubles as the step-by-step tutorial.
+
+xref:scenario_digital_controller.adoc[Stateless digital controller with switching delay]::
+Tests serialization functionality for a model with an internal state (or local variable).
+
+xref:scenario_lotka_volterra.adoc[Lotka-Volterra (Predator-Prey) model]::
+Tests generation of state variables, derivatives, modelDescription formulation and serialization code.

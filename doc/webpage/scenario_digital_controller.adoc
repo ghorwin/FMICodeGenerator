@@ -1,36 +1,43 @@
-# Test scenario: Stateless digital controller with switching delay
+= Test scenario: Stateless digital controller with switching delay
+include::_settings.adoc[]
 
-## Description
+WARNING: Draft, converted from the old GitHub wiki. The code shown here refers to an older generator version (value reference defines and variable initialization in the user `.cpp` file) and must be updated.
+
+
+== Description
 
 In the first test case, the output variables only depend on the input variable and fixed parameters. In this test case, an internal state (local parameter) is used, additionally. This state is only modified through the FMU itself, and thus needs to be correctly stored and restored during FMU setback (rollback) in iterating master algorithms.
 
 To test this, we first go through the FMU generation step-by-step, show the code implementation and then run the FMU through an adaptive step master algorithm.
 
-## FMU Generation
+== FMU Generation
 
 Use the following properties for the FMU generation:
 
-- name: 'digital_control'
-- input var: real, continuous, T (temperature in K)
-- output var: real, continuous, P (heating power in W)
-- parameter: real, fixed, P_on (heating power in W)
-- parameter: real, fixed, T_low (heating on)
-- parameter: real, fixed, T_high (heating off)
-- parameter: real, fixed, delay (min time in [s] between switching events)
-- local: real, time in [s] since last switch
+* name: 'digital_control'
+* input var: real, continuous, T (temperature in K)
+* output var: real, continuous, P (heating power in W)
+* parameter: real, fixed, P_on (heating power in W)
+* parameter: real, fixed, T_low (heating on)
+* parameter: real, fixed, T_high (heating off)
+* parameter: real, fixed, delay (min time in [s] between switching events)
+* local: real, time in [s] since last switch
 
-## Implement controller logic
+== Implement controller logic
 
-Rules to implement: 
+Rules to implement:
 
-     T < T_low and t_since_last_switch > delay:
-         switch heating on, remember last switch time
-     T > T_high and t_since_last_switch > delay:
-         switch heating off, remember last switch time
+....
+ T < T_low and t_since_last_switch > delay:
+     switch heating on, remember last switch time
+ T > T_high and t_since_last_switch > delay:
+     switch heating off, remember last switch time
+....
 
-### Co-Simulation Code
+=== Co-Simulation Code
 
-```c++
+[source,cpp]
+----
 // Co-simulation: time integration
 void digital_control::integrateTo(double tCommunicationIntervalEnd) {
 
@@ -86,7 +93,6 @@ void digital_control::integrateTo(double tCommunicationIntervalEnd) {
     //       heating was switched on/off, updated to
     //       tCommunicationIntervalEnd when switch occurred
 }
-```
+----
 
 The time of last switch between on or off is kept in the local variable `FMI_LOCAL_lastSwitchTime`. We then check, if the next allowed switch time lies within the communication interval and if any of the switch conditions hold. If yes, then we adjust the heating power and update the switch time point in the local variable.
-

@@ -1,3 +1,3 @@
-# Third-party Documentation and Articles
+# Documentation and webpage
 
-This directory holds reference articles and publications about the FMICodeGenerator.
+This directory holds documentation and a user guide (published on github pages) about the FMICodeGenerator.

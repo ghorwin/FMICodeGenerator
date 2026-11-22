@@ -441,15 +441,15 @@ The wizard disables options that the FMI standard does not allow for the selecte
 <span style="color: #24292f;background-color: #f6f8fa">}</span></code></pre>
 </div>
 </div>
-<div class="admonitionblock note">
+<div class="admonitionblock tip">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-note" title="Note"></i>
+<i class="fa icon-tip" title="Tip"></i>
 </td>
 <td class="content">
 <div class="paragraph">
-<p>It may be tempting to just call <code>updateIfModified()</code> from <code>integrateTo()</code>. That doesn&#8217;t work reliably: the flag <code>m_externalInputVarsModified</code> is only set when the master sets an input value. A master that never sets any inputs (like the compliance checker without input data) would then always get the initial output value.</p>
+<p>Since the code is identical, you could also just call <code>updateIfModified()</code> from <code>integrateTo()</code>. We keep the code explicit here, because in models with time integration the two functions usually differ.</p>
 </div>
 </td>
 </tr>

@@ -47,7 +47,7 @@ InstanceData::InstanceData() :
 	m_initializationMode(false),
 	m_modelExchange(true),
 	m_tInput(0),
-	m_externalInputVarsModified(false),
+	m_externalInputVarsModified(true), // ensure outputs are computed in the first update, even if no inputs are set
 	m_fmuStateSize(0)
 {
 }

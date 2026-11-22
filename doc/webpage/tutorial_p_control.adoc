@@ -234,9 +234,9 @@ void P_control::integrateTo(double tCommunicationIntervalEnd) {
 }
 ----
 
-[NOTE]
+[TIP]
 ====
-It may be tempting to just call `updateIfModified()` from `integrateTo()`. That doesn't work reliably: the flag `m_externalInputVarsModified` is only set when the master sets an input value. A master that never sets any inputs (like the compliance checker without input data) would then always get the initial output value.
+Since the code is identical, you could also just call `updateIfModified()` from `integrateTo()`. We keep the code explicit here, because in models with time integration the two functions usually differ.
 ====
 
 === FMU state serialization

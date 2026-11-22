@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.26">
+<title>Installation</title>
+<link rel="stylesheet" href="css/fmicodegen.css">
+<link rel="stylesheet" href="css/font-awesome.css">
+</head>
+<body class="article toc2 toc-left">
+<nav id="sitenav">
+  <a class="brand" href="index.html">FMI Code Generator</a>
+  <ul>
+    <li><a href="installation.html">Installation</a></li>
+    <li><a href="user_guide.html">User Guide</a></li>
+    <li><a href="tutorial_p_control.html">Tutorial</a></li>
+    <li><a href="testing.html">Test Scenarios</a></li>
+    <li><a href="https://github.com/ghorwin/FMICodeGenerator">GitHub</a></li>
+  </ul>
+</nav>
+<div id="header">
+<h1>Installation</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_requirements">Requirements</a></li>
+<li><a href="#_linux">Linux</a>
+<ul class="sectlevel2">
+<li><a href="#_ubuntu_24_04_26_04">Ubuntu 24.04 / 26.04</a></li>
+<li><a href="#_fedora_44">Fedora 44</a></li>
+</ul>
+</li>
+<li><a href="#_macos">macOS</a></li>
+<li><a href="#_windows">Windows</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_requirements">Requirements</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The generator requires Python 3 (3.7 or newer) with the packages <code>pyqt6</code> (Qt 6) and <code>send2trash</code>. Both dependencies are listed in <code>requirements.txt</code>, so a plain</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="bash">pip <span style="color: #953800">install</span> <span style="color: #116329">-r</span> requirements.txt</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>(inside your virtual environment, if you use one) is usually the simplest option.</p>
+</div>
+<div class="paragraph">
+<p>To build the generated FMUs you need a C++ compiler, CMake and a zip tool (<code>7za</code>/<code>7z</code>).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_linux">Linux</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_ubuntu_24_04_26_04">Ubuntu 24.04 / 26.04</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="bash"><span style="color: #953800">sudo </span>apt <span style="color: #953800">install </span>cmake build-essential qmake6 qt6-base-dev python3 python3-pyqt6 <span style="color: #0a3069">\</span>
+    python3-send2trash pyqt6-dev-tools p7zip-full</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The package <code>pyqt6-dev-tools</code> contains the script <code>pyuic6</code>, needed only for development of the FMIGenerator itself.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fedora_44">Fedora 44</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="bash"><span style="color: #953800">sudo </span>dnf <span style="color: #953800">install </span>cmake gcc-c++ make qt6-qtbase qt6-qtbase-gui qt6-qtbase-devel <span style="color: #0a3069">\</span>
+    python3 python3-pyqt6 python3-send2trash 7zip</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The package <code>python3-pyqt6-base</code> (installed with <code>python3-pyqt6</code>) contains the script <code>pyuic6</code>, needed only for development of the FMIGenerator itself.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_macos">macOS</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Use homebrew and/or macports to install python, pyqt6 and send2trash (or alternatively pip).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_windows">Windows</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Things are bit more complicated for Windows. While the code can be compiled (thanks to the CMake build system) using quite a few build chains available on Windows, the batch scripts currently expect a standard Visual Studio 2022 installation, and 7zip must be installed with <code>7za</code> in the <code>PATH</code>. Also, <code>cmake</code> must be in the <code>PATH</code>. You also need to install PyQt6 and send2trash (via pip) as dependencies of the script.</p>
+</div>
+<div class="paragraph">
+<p>If your setup differs from that, edit the files <code>build_VC_x64.bat</code> and <code>deploy.bat</code> in directory <code>data/FMI_template/build</code> (there are example batch files <code>build_VC_x64_vc2015/2019/2022.bat</code> for different VC versions). Do this <strong>before</strong> generating an FMU, since generation copies the template as-is.</p>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

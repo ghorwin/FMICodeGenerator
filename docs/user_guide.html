@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.26">
+<title>User Guide</title>
+<link rel="stylesheet" href="css/fmicodegen.css">
+<link rel="stylesheet" href="css/font-awesome.css">
+</head>
+<body class="article toc2 toc-left">
+<nav id="sitenav">
+  <a class="brand" href="index.html">FMI Code Generator</a>
+  <ul>
+    <li><a href="installation.html">Installation</a></li>
+    <li><a href="user_guide.html">User Guide</a></li>
+    <li><a href="tutorial_p_control.html">Tutorial</a></li>
+    <li><a href="testing.html">Test Scenarios</a></li>
+    <li><a href="https://github.com/ghorwin/FMICodeGenerator">GitHub</a></li>
+  </ul>
+</nav>
+<div id="header">
+<h1>User Guide</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_overview">1. Overview</a></li>
+<li><a href="#_creating_a_new_fmu_project">2. Creating a new FMU project</a>
+<ul class="sectlevel2">
+<li><a href="#_with_the_graphical_wizard">2.1. With the graphical wizard</a></li>
+<li><a href="#_with_the_command_line_generator">2.2. With the command line generator</a></li>
+</ul>
+</li>
+<li><a href="#_updating_an_existing_project">3. Updating an existing project</a></li>
+<li><a href="#_the_generated_project">4. The generated project</a>
+<ul class="sectlevel2">
+<li><a href="#_directory_structure">4.1. Directory structure</a></li>
+<li><a href="#_generated_files_and_user_files">4.2. Generated files and user files</a></li>
+<li><a href="#_the_project_file_input">4.3. The project file (<code>.input</code>)</a></li>
+</ul>
+</li>
+<li><a href="#_implementing_the_fmu">5. Implementing the FMU</a>
+<ul class="sectlevel2">
+<li><a href="#_fmu_state_serialization">5.1. FMU state serialization</a></li>
+</ul>
+</li>
+<li><a href="#_building_and_deploying">6. Building and deploying</a></li>
+<li><a href="#_python_api">7. Python API</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_overview">1. Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Working with the FMI Code Generator follows three steps:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Generate</strong> a fully working FMU source code project (wizard or command line).</p>
+</li>
+<li>
+<p><strong>Implement</strong> the model-specific functionality in the user source file.</p>
+</li>
+<li>
+<p><strong>Build and deploy</strong> the FMU with the provided build system files and scripts.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Whenever variables change, re-run the generator on the existing project (<em>update</em>): the generated files are rewritten, your own code is kept.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_creating_a_new_fmu_project">2. Creating a new FMU project</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_with_the_graphical_wizard">2.1. With the graphical wizard</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="bash">python scripts/main.py</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>On the start page choose <em>Create a new FMU project</em>. Then enter</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>the model name (also used as FMU identifier and directory name),</p>
+</li>
+<li>
+<p>the target directory and an optional description,</p>
+</li>
+<li>
+<p>the list of variables (inputs, outputs, parameters, locals) with causality, variability, initial value and type.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Confirming the last page generates the project directory <code>&lt;target dir&gt;/&lt;model name&gt;</code> and runs a test build.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_with_the_command_line_generator">2.2. With the command line generator</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="bash">python scripts/commandLineGenerator.py &lt;modelName&gt; <span style="color: #116329">--description</span> <span style="color: #0a3069">"..."</span> <span style="color: #0a3069">\</span>
+    <span style="color: #0550ae">[</span><span style="color: #116329">--target-dir</span> DIR] <span style="color: #0550ae">[</span><span style="color: #116329">--input</span> vars.input] <span style="color: #0550ae">[</span><span style="color: #116329">--no-build</span><span style="color: #0550ae">]</span> <span style="color: #0550ae">[</span><span style="color: #116329">--overwrite</span><span style="color: #0550ae">]</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_updating_an_existing_project">3. Updating an existing project</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When you need to add, remove or modify variables, open the existing project — either with <em>Open an existing FMU project</em> on the wizard start page (recently used projects are listed there), or on the command line:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="bash">python scripts/commandLineGenerator.py <span style="color: #116329">--update</span> &lt;projectDir&gt; <span style="color: #0550ae">[</span><span style="color: #116329">--no-build</span><span style="color: #0550ae">]</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The generator reads <code>&lt;projectDir&gt;/&lt;modelName&gt;.input</code>, rewrites the generated files and keeps the value references of existing variables stable. The previous versions of the generated files are saved to <code>&lt;projectDir&gt;/.backup/&lt;timestamp&gt;/</code>.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Projects created with generator version 1.3 or older (with <code>#define FMI_&#8230;&#8203;</code> in the user <code>.cpp</code> file) are <em>legacy projects</em>. The update writes the new generated files and prints manual migration instructions.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_generated_project">4. The generated project</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_directory_structure">4.1. Directory structure</h3>
+
+</div>
+<div class="sect2">
+<h3 id="_generated_files_and_user_files">4.2. Generated files and user files</h3>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 16.6666%;">
+<col style="width: 50.0001%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">File</th>
+<th class="tableblock halign-left valign-top">Owner</th>
+<th class="tableblock halign-left valign-top">Content</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>data/modelDescription.xml</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">generator</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">FMI model description</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>src/&lt;model&gt;_generated.h</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">generator</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">value reference defines (<code>FMI_INPUT_x</code>, <code>FMI_OUTPUT_x</code>, <code>FMI_PARA_x</code>, <code>FMI_LOCAL_x</code>), <code>struct FMIVariables</code>, <code>SERIALIZE</code>/<code>DESERIALIZE</code> macros</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>src/&lt;model&gt;_generated.cpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">generator</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">GUID, <code>InstanceData::create()</code>, variable initialization/read/write, generic FMU state serialization</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>&lt;model&gt;.input</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">generator</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">project file (JSON) with model name, description and variables</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>src/&lt;model&gt;.h</code>, <code>src/&lt;model&gt;.cpp</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>you</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">model implementation</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>CMakeLists.txt</code>, <code>&lt;model&gt;.pro</code>, <code>build/*</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>you</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">build system files and scripts</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>Generator-owned files are overwritten on every update. User files are created once and never touched again.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+The places where your own code goes are marked with <strong>TODO</strong> comments in <code>src/&lt;model&gt;.cpp</code>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_project_file_input">4.3. The project file (<code>.input</code>)</h3>
+
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_implementing_the_fmu">5. Implementing the FMU</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_fmu_state_serialization">5.1. FMU state serialization</h3>
+<div class="paragraph">
+<p>The generated code serializes all FMI variables. Model-specific state is added in three hooks of the user code:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>userStateSize()</code></p>
+</li>
+<li>
+<p><code>serializeUserState(char *&amp;)</code></p>
+</li>
+<li>
+<p><code>deserializeUserState(const char *&amp;)</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The user data is written last; the generated code checks that the byte count matches.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_building_and_deploying">6. Building and deploying</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The generated directory contains build system files for CMake and Qt qmake. With CMake you can generate makefiles for various compilers and development environments; with the <code>.pro</code> file you can directly start developing in Qt Creator (the FMU code itself is plain C/C++ without Qt dependencies).</p>
+</div>
+<div class="paragraph">
+<p>Linux/macOS:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="bash"><span style="color: #953800">cd</span> &lt;model&gt;/build
+./build.sh release   <span style="color: #6e7781"># build the FMU in release mode</span>
+./deploy.sh          <span style="color: #6e7781"># package the FMU (zipped directory structure)</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Windows: <code>build_VC_x64.bat</code> and <code>deploy.bat</code>.</p>
+</div>
+<div class="paragraph">
+<p>You may want to adjust the deploy script to copy your own resource files into the FMU.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_python_api">7. Python API</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To use the code generator functionality from other software, use the Python API: create an instance of class <code>FMIGenerator</code>, specify its attributes and call <code>generate()</code> (or <code>update(projectDir)</code> for an existing project).</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="python"><span style="color: #6e7781"># import FMIGenerator class and data types
+</span><span style="color: #cf222e">from</span> <span style="color: #24292f;background-color: #f6f8fa">FMIGenerator</span> <span style="color: #cf222e">import</span> <span style="color: #0550ae">*</span>
+
+<span style="color: #6e7781"># create instance of FMIGenerator class
+</span><span style="color: #24292f;background-color: #f6f8fa">fmiGen</span> <span style="color: #0550ae">=</span> <span style="color: #953800">FMIGenerator</span><span style="color: #24292f;background-color: #f6f8fa">()</span>
+
+<span style="color: #6e7781"># specify attributes
+</span><span style="color: #24292f;background-color: #f6f8fa">fmiGen</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">modelName</span> <span style="color: #0550ae">=</span> <span style="color: #0a3069">"</span><span style="color: #0a3069">MyFirstFMU</span><span style="color: #0a3069">"</span>
+<span style="color: #24292f;background-color: #f6f8fa">fmiGen</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">description</span> <span style="color: #0550ae">=</span> <span style="color: #0a3069">"</span><span style="color: #0a3069">My first auto-generated FMU. Awesome, right?</span><span style="color: #0a3069">"</span>
+<span style="color: #24292f;background-color: #f6f8fa">fmiGen</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">targetDir</span> <span style="color: #0550ae">=</span> <span style="color: #0a3069">"</span><span style="color: #0a3069">../fmus</span><span style="color: #0a3069">"</span>
+<span style="color: #6e7781"># 'targetDir' can be relative path to current working directory
+# or an absolute file path
+</span>
+<span style="color: #6e7781"># add variables to export
+</span><span style="color: #24292f;background-color: #f6f8fa">v</span> <span style="color: #0550ae">=</span> <span style="color: #953800">VarDef</span><span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #0a3069">"</span><span style="color: #0a3069">InputVar1</span><span style="color: #0a3069">"</span><span style="color: #24292f;background-color: #f6f8fa">,</span> <span style="color: #0a3069">"</span><span style="color: #0a3069">continuous</span><span style="color: #0a3069">"</span><span style="color: #24292f;background-color: #f6f8fa">,</span> <span style="color: #0a3069">"</span><span style="color: #0a3069">input</span><span style="color: #0a3069">"</span><span style="color: #24292f;background-color: #f6f8fa">,</span> <span style="color: #0a3069">"</span><span style="color: #0a3069">exact</span><span style="color: #0a3069">"</span><span style="color: #24292f;background-color: #f6f8fa">,</span> <span style="color: #0a3069">"</span><span style="color: #0a3069">Real</span><span style="color: #0a3069">"</span><span style="color: #24292f;background-color: #f6f8fa">)</span>
+<span style="color: #6e7781"># valueRef will be given automatically unless specified explicitly
+</span><span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">startValue</span> <span style="color: #0550ae">=</span> <span style="color: #0550ae">15</span>
+<span style="color: #24292f;background-color: #f6f8fa">fmiGen</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">variables</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #8250df">append</span><span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">)</span>
+
+<span style="color: #6e7781"># now generate the FMU
+</span><span style="color: #24292f;background-color: #f6f8fa">fmiGen</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #8250df">generate</span><span style="color: #24292f;background-color: #f6f8fa">()</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

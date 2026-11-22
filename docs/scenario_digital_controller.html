@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.26">
+<title>Test scenario: Stateless digital controller with switching delay</title>
+<link rel="stylesheet" href="css/fmicodegen.css">
+<link rel="stylesheet" href="css/font-awesome.css">
+</head>
+<body class="article toc2 toc-left">
+<nav id="sitenav">
+  <a class="brand" href="index.html">FMI Code Generator</a>
+  <ul>
+    <li><a href="installation.html">Installation</a></li>
+    <li><a href="user_guide.html">User Guide</a></li>
+    <li><a href="tutorial_p_control.html">Tutorial</a></li>
+    <li><a href="testing.html">Test Scenarios</a></li>
+    <li><a href="https://github.com/ghorwin/FMICodeGenerator">GitHub</a></li>
+  </ul>
+</nav>
+<div id="header">
+<h1>Test scenario: Stateless digital controller with switching delay</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_description">Description</a></li>
+<li><a href="#_fmu_generation">FMU Generation</a></li>
+<li><a href="#_implement_controller_logic">Implement controller logic</a>
+<ul class="sectlevel2">
+<li><a href="#_co_simulation_code">Co-Simulation Code</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div id="preamble">
+<div class="sectionbody">
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+Draft, converted from the old GitHub wiki. The code shown here refers to an older generator version (value reference defines and variable initialization in the user <code>.cpp</code> file) and must be updated.
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_description">Description</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In the first test case, the output variables only depend on the input variable and fixed parameters. In this test case, an internal state (local parameter) is used, additionally. This state is only modified through the FMU itself, and thus needs to be correctly stored and restored during FMU setback (rollback) in iterating master algorithms.</p>
+</div>
+<div class="paragraph">
+<p>To test this, we first go through the FMU generation step-by-step, show the code implementation and then run the FMU through an adaptive step master algorithm.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_fmu_generation">FMU Generation</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Use the following properties for the FMU generation:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>name: 'digital_control'</p>
+</li>
+<li>
+<p>input var: real, continuous, T (temperature in K)</p>
+</li>
+<li>
+<p>output var: real, continuous, P (heating power in W)</p>
+</li>
+<li>
+<p>parameter: real, fixed, P_on (heating power in W)</p>
+</li>
+<li>
+<p>parameter: real, fixed, T_low (heating on)</p>
+</li>
+<li>
+<p>parameter: real, fixed, T_high (heating off)</p>
+</li>
+<li>
+<p>parameter: real, fixed, delay (min time in [s] between switching events)</p>
+</li>
+<li>
+<p>local: real, time in [s] since last switch</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_implement_controller_logic">Implement controller logic</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Rules to implement:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre> T &lt; T_low and t_since_last_switch &gt; delay:
+     switch heating on, remember last switch time
+ T &gt; T_high and t_since_last_switch &gt; delay:
+     switch heating off, remember last switch time</pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_co_simulation_code">Co-Simulation Code</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="cpp"><span style="color: #6e7781">// Co-simulation: time integration</span>
+<span style="color: #cf222e">void</span> <span style="color: #24292f;background-color: #f6f8fa">digital_control</span><span style="color: #0550ae">::</span><span style="color: #24292f;background-color: #f6f8fa">integrateTo</span><span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">tCommunicationIntervalEnd</span><span style="color: #24292f;background-color: #f6f8fa">)</span> <span style="color: #24292f;background-color: #f6f8fa">{</span>
+
+    <span style="color: #6e7781">// state of FMU before integration:</span>
+    <span style="color: #6e7781">//   m_currentTimePoint = t_IntervalStart;</span>
+    <span style="color: #6e7781">//   m_realVar[FMI_OUTPUT_P]             = current heating power</span>
+    <span style="color: #6e7781">//       (=0, heating is off)</span>
+    <span style="color: #6e7781">//   m_realVar[FMI_LOCAL_lastSwitchTime] = last time point when</span>
+    <span style="color: #6e7781">//       heating was switched on/off</span>
+
+    <span style="color: #6e7781">// get input variables</span>
+    <span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">T</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">m_realVar</span><span style="color: #24292f;background-color: #f6f8fa">[</span><span style="color: #24292f;background-color: #f6f8fa">FMI_INPUT_T</span><span style="color: #24292f;background-color: #f6f8fa">];</span>
+    <span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">P_on</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">m_realVar</span><span style="color: #24292f;background-color: #f6f8fa">[</span><span style="color: #24292f;background-color: #f6f8fa">FMI_PARA_P_on</span><span style="color: #24292f;background-color: #f6f8fa">];</span>
+    <span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">T_low</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">m_realVar</span><span style="color: #24292f;background-color: #f6f8fa">[</span><span style="color: #24292f;background-color: #f6f8fa">FMI_PARA_T_low</span><span style="color: #24292f;background-color: #f6f8fa">];</span>
+    <span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">T_high</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">m_realVar</span><span style="color: #24292f;background-color: #f6f8fa">[</span><span style="color: #24292f;background-color: #f6f8fa">FMI_PARA_T_high</span><span style="color: #24292f;background-color: #f6f8fa">];</span>
+    <span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">delay</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">m_realVar</span><span style="color: #24292f;background-color: #f6f8fa">[</span><span style="color: #24292f;background-color: #f6f8fa">FMI_PARA_delay</span><span style="color: #24292f;background-color: #f6f8fa">];</span>
+    <span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">lastSwitchTime</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">m_realVar</span><span style="color: #24292f;background-color: #f6f8fa">[</span><span style="color: #24292f;background-color: #f6f8fa">FMI_LOCAL_lastSwitchTime</span><span style="color: #24292f;background-color: #f6f8fa">];</span>
+
+    <span style="color: #6e7781">// *** own code starts here</span>
+
+    <span style="color: #6e7781">// we use the end time point of the communication interval to</span>
+    <span style="color: #6e7781">// evaluate the delay criterion</span>
+
+    <span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">P</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">m_realVar</span><span style="color: #24292f;background-color: #f6f8fa">[</span><span style="color: #24292f;background-color: #f6f8fa">FMI_OUTPUT_P</span><span style="color: #24292f;background-color: #f6f8fa">];</span>
+    <span style="color: #cf222e">if</span> <span style="color: #24292f;background-color: #f6f8fa">((</span><span style="color: #24292f;background-color: #f6f8fa">tCommunicationIntervalEnd</span><span style="color: #0550ae">-</span><span style="color: #24292f;background-color: #f6f8fa">lastSwitchTime</span><span style="color: #24292f;background-color: #f6f8fa">)</span> <span style="color: #0550ae">&gt;</span> <span style="color: #24292f;background-color: #f6f8fa">delay</span><span style="color: #24292f;background-color: #f6f8fa">)</span> <span style="color: #24292f;background-color: #f6f8fa">{</span>
+        <span style="color: #cf222e">if</span> <span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #24292f;background-color: #f6f8fa">T</span> <span style="color: #0550ae">&gt;</span> <span style="color: #24292f;background-color: #f6f8fa">T_high</span><span style="color: #24292f;background-color: #f6f8fa">)</span> <span style="color: #24292f;background-color: #f6f8fa">{</span>
+            <span style="color: #24292f;background-color: #f6f8fa">P</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">P_on</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
+            <span style="color: #cf222e">if</span> <span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #24292f;background-color: #f6f8fa">lastSwitchTime</span><span style="color: #0550ae">+</span><span style="color: #24292f;background-color: #f6f8fa">delay</span> <span style="color: #0550ae">&gt;</span> <span style="color: #24292f;background-color: #f6f8fa">m_currentTimePoint</span><span style="color: #24292f;background-color: #f6f8fa">)</span>
+                <span style="color: #24292f;background-color: #f6f8fa">lastSwitchTime</span> <span style="color: #0550ae">+=</span> <span style="color: #24292f;background-color: #f6f8fa">delay</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
+            <span style="color: #cf222e">else</span>
+                <span style="color: #24292f;background-color: #f6f8fa">lastSwitchTime</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">tCommunicationIntervalEnd</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
+        <span style="color: #24292f;background-color: #f6f8fa">}</span>
+        <span style="color: #cf222e">else</span> <span style="color: #8250df">if</span> <span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #24292f;background-color: #f6f8fa">T</span> <span style="color: #0550ae">&lt;</span> <span style="color: #24292f;background-color: #f6f8fa">T_low</span><span style="color: #24292f;background-color: #f6f8fa">)</span> <span style="color: #24292f;background-color: #f6f8fa">{</span>
+            <span style="color: #24292f;background-color: #f6f8fa">P</span> <span style="color: #0550ae">=</span> <span style="color: #0550ae">0</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
+            <span style="color: #cf222e">if</span> <span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #24292f;background-color: #f6f8fa">lastSwitchTime</span><span style="color: #0550ae">+</span><span style="color: #24292f;background-color: #f6f8fa">delay</span> <span style="color: #0550ae">&gt;</span> <span style="color: #24292f;background-color: #f6f8fa">m_currentTimePoint</span><span style="color: #24292f;background-color: #f6f8fa">)</span>
+                <span style="color: #24292f;background-color: #f6f8fa">lastSwitchTime</span> <span style="color: #0550ae">+=</span> <span style="color: #24292f;background-color: #f6f8fa">delay</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
+            <span style="color: #cf222e">else</span>
+                <span style="color: #24292f;background-color: #f6f8fa">lastSwitchTime</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">tCommunicationIntervalEnd</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
+        <span style="color: #24292f;background-color: #f6f8fa">}</span>
+    <span style="color: #24292f;background-color: #f6f8fa">}</span>
+
+    <span style="color: #6e7781">// output variables</span>
+    <span style="color: #24292f;background-color: #f6f8fa">m_realVar</span><span style="color: #24292f;background-color: #f6f8fa">[</span><span style="color: #24292f;background-color: #f6f8fa">FMI_OUTPUT_P</span><span style="color: #24292f;background-color: #f6f8fa">]</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">P</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
+
+    <span style="color: #6e7781">// *** own code ends here</span>
+
+    <span style="color: #24292f;background-color: #f6f8fa">m_currentTimePoint</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">tCommunicationIntervalEnd</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
+
+    <span style="color: #6e7781">// state of FMU after integration:</span>
+    <span style="color: #6e7781">//   m_currentTimePoint = tCommunicationIntervalEnd;</span>
+    <span style="color: #6e7781">//   m_realVar[FMI_OUTPUT_P] = new heating power</span>
+    <span style="color: #6e7781">//   m_realVar[FMI_LOCAL_lastSwitchTime] = last time point when</span>
+    <span style="color: #6e7781">//       heating was switched on/off, updated to</span>
+    <span style="color: #6e7781">//       tCommunicationIntervalEnd when switch occurred</span>
+<span style="color: #24292f;background-color: #f6f8fa">}</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The time of last switch between on or off is kept in the local variable <code>FMI_LOCAL_lastSwitchTime</code>. We then check, if the next allowed switch time lies within the communication interval and if any of the switch conditions hold. If yes, then we adjust the heating power and update the switch time point in the local variable.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

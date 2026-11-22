@@ -3,6 +3,8 @@
    and adds the site navigation bar shared by all pages. */
 @import url(roboto_ubuntu.css);
 
+html { font-size: 112.5%; }   /* 18px instead of 16px; adjust to taste */
+
 :root {
   --navheight: 3rem;
 }

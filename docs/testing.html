@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.26">
+<title>Test Scenarios</title>
+<link rel="stylesheet" href="css/fmicodegen.css">
+<link rel="stylesheet" href="css/font-awesome.css">
+</head>
+<body class="article toc2 toc-left">
+<nav id="sitenav">
+  <a class="brand" href="index.html">FMI Code Generator</a>
+  <ul>
+    <li><a href="installation.html">Installation</a></li>
+    <li><a href="user_guide.html">User Guide</a></li>
+    <li><a href="tutorial_p_control.html">Tutorial</a></li>
+    <li><a href="testing.html">Test Scenarios</a></li>
+    <li><a href="https://github.com/ghorwin/FMICodeGenerator">GitHub</a></li>
+  </ul>
+</nav>
+<div id="header">
+<h1>Test Scenarios</h1>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_fmu_compliance_checker_testing_procedure">FMU Compliance Checker testing procedure</a></li>
+<li><a href="#_scenarios">Scenarios</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_fmu_compliance_checker_testing_procedure">FMU Compliance Checker testing procedure</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The FMUs created by the FMIGenerator are only backbones and lack specific functionality. To test the correct export, we follow this procedure:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>define an FMU with given parameters and variables according to the defined test scenario (see below)</p>
+</li>
+<li>
+<p>generate the FMU directory with the FMIGenerator</p>
+</li>
+<li>
+<p>add C++ code into the FMU source stub</p>
+</li>
+<li>
+<p>build and deploy the <code>.fmu</code> file</p>
+</li>
+<li>
+<p>run the file through the compliance checker</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The FMI compliance checker is included in the repository as <code>third_party/FMUChecker-2.0.4-linux64.zip</code> (a win64 variant is also present).</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_scenarios">Scenarios</h2>
+<div class="sectionbody">
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><a href="tutorial_p_control.html">Stateless P-controller</a></dt>
+<dd>
+<p>Tests the very basic functionality (if the FMU is well formed and the modelDescription is syntactically correct). No serialization is needed, so there cannot be anything wrong with that. This scenario doubles as the step-by-step tutorial.</p>
+</dd>
+<dt class="hdlist1"><a href="scenario_digital_controller.html">Stateless digital controller with switching delay</a></dt>
+<dd>
+<p>Tests serialization functionality for a model with an internal state (or local variable).</p>
+</dd>
+<dt class="hdlist1"><a href="scenario_lotka_volterra.html">Lotka-Volterra (Predator-Prey) model</a></dt>
+<dd>
+<p>Tests generation of state variables, derivatives, modelDescription formulation and serialization code.</p>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

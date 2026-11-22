@@ -58,34 +58,34 @@ cd <FmuModelName>/build
 
 ## System requirements / setup
 
-The script requires Python 3 (3.7 or newer) with the packages `pyqt5` and `send2trash` installed. Both dependencies are listed in `requirements.txt`, so a plain `pip install -r requirements.txt` (inside your virtual environment, if you use one) is usually the simplest option.
+The script requires Python 3 (3.7 or newer) with the packages `pyqt6` (Qt 6) and `send2trash` installed. Both dependencies are listed in `requirements.txt`, so a plain `pip install -r requirements.txt` (inside your virtual environment, if you use one) is usually the simplest option.
 
 #### Linux
 
-Simply install the python packages and pyqt5.
+Simply install the python packages and PyQt6.
 
 _Ubuntu 24.04 / 26.04 - Python 3.x_
 
 ```bash
-> sudo apt install cmake build-essential qt5-qmake qtbase5-dev libqt5core5a libqt5concurrent5 libqt5gui5 libqt5network5 libqt5svg5-dev libqt5xml5 libqt5widgets5 python3 python3-pyqt5 python3-send2trash pyqt5-dev-tools p7zip-full
+> sudo apt install cmake build-essential qmake6 qt6-base-dev python3 python3-pyqt6 python3-send2trash pyqt6-dev-tools p7zip-full
 ```
-The package `pyqt5-dev-tools` contains the scripts `pyuic5` and `pyrcc5` needed for development of the FMIGenerator itself.
+The package `pyqt6-dev-tools` contains the script `pyuic6` needed for development of the FMIGenerator itself.
 
 _Fedora 44 - Python 3.x_
 
 ```bash
-> sudo dnf install cmake gcc-c++ make qt5-qtbase qt5-qtbase-gui qt5-qtbase-devel python3 PyQt5 python3-send2trash 7zip
+> sudo dnf install cmake gcc-c++ make qt6-qtbase qt6-qtbase-gui qt6-qtbase-devel python3 python3-pyqt6 python3-send2trash 7zip
 ```
-The package `PyQt5` contains the scripts `pyuic5` and `pyrcc5` needed for development of the FMIGenerator itself.
+The package `python3-pyqt6-base` (installed with `python3-pyqt6`) contains the script `pyuic6` needed for development of the FMIGenerator itself.
 
 
 #### Mac
 
-Use homebrew and/or macports to install python, pyqt5 and send2trash (or alternatively pip).
+Use homebrew and/or macports to install python, pyqt6 and send2trash (or alternatively pip).
 
 #### Windows
 
-Things are bit more complicated for Windows. While the code can be compiled (thanks to the CMake build system) using quite a few build chains available on windows, the `batch`-scripts are currently expecting a standard Visual Studio 2022 installation and 7zip must be installed with `7za` in the PATH. Also, `cmake` must be in in the PATH. You also need to install PyQt5 and send2trash (via pip) as dependencies of the script.
+Things are bit more complicated for Windows. While the code can be compiled (thanks to the CMake build system) using quite a few build chains available on windows, the `batch`-scripts are currently expecting a standard Visual Studio 2022 installation and 7zip must be installed with `7za` in the PATH. Also, `cmake` must be in in the PATH. You also need to install PyQt6 and send2trash (via pip) as dependencies of the script.
 
 If your setup differs from that, edit the files `build_VC_x64.bat` and `deploy.bat` in directory `data/FMI_template/build` (there are example batch files for different VC versions).
 

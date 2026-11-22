@@ -35,9 +35,11 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from PyQt5.QtWidgets import QWidget, QTableWidgetItem
-from PyQt5.QtCore import pyqtSlot, Qt
-from PyQt5.QtGui import QFontMetrics
+import os.path
+
+from PyQt6.QtWidgets import QWidget, QTableWidgetItem
+from PyQt6.QtCore import pyqtSlot, Qt
+from PyQt6.QtGui import QFontMetrics, QIcon
 
 from Ui_WizardPageVariables import Ui_WizardPageVariables
 
@@ -48,6 +50,11 @@ class WizardPageVariables(QWidget):
 		super().__init__()
 		self.ui = Ui_WizardPageVariables()
 		self.ui.setupUi(self)
+
+		# tool button icons (PyQt6 has no resource compiler, so load them from file)
+		gfxDir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ui", "gfx")
+		self.ui.toolButtonAdd.setIcon(QIcon(os.path.join(gfxDir, "plus.png")))
+		self.ui.toolButtonRemove.setIcon(QIcon(os.path.join(gfxDir, "minus.png")))
 		
 		self.ui.groupBox_2.setEnabled(False) # disabled by default
 		self.variables = []
@@ -73,48 +80,48 @@ class WizardPageVariables(QWidget):
 			var = self.variables[i]
 			
 			item = QTableWidgetItem()
-			item.setFlags( Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+			item.setFlags( Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
 			item.setText(var.name)
 			self.ui.tableWidget.setItem(i, 0, item)
 			
 			item = QTableWidgetItem()
 			item.setText("{}".format(var.valueRef))
-			item.setFlags( Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+			item.setFlags( Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
 			self.ui.tableWidget.setItem(i, 1, item)
 			
 			item = QTableWidgetItem()
 			item.setText(var.variability)
-			item.setFlags( Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+			item.setFlags( Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
 			self.ui.tableWidget.setItem(i, 2, item)
 			
 			item = QTableWidgetItem()
 			item.setText(var.causality)
-			item.setFlags( Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+			item.setFlags( Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
 			self.ui.tableWidget.setItem(i, 3, item)
 			
 			item = QTableWidgetItem()
 			item.setText(var.initial)
-			item.setFlags( Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+			item.setFlags( Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
 			self.ui.tableWidget.setItem(i, 4, item)
 			
 			item = QTableWidgetItem()
 			item.setText(var.typeID)
-			item.setFlags( Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+			item.setFlags( Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
 			self.ui.tableWidget.setItem(i, 5, item)
 
 			item = QTableWidgetItem()
 			item.setText("{}".format(var.startValue))
-			item.setFlags( Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+			item.setFlags( Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
 			self.ui.tableWidget.setItem(i, 6, item)
 
 			item = QTableWidgetItem()
 			item.setText(var.unit)
-			item.setFlags( Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+			item.setFlags( Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
 			self.ui.tableWidget.setItem(i, 7, item)
 
 			item = QTableWidgetItem()
 			item.setText(var.description)
-			item.setFlags( Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+			item.setFlags( Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
 			self.ui.tableWidget.setItem(i, 8, item)
 			
 		self.ui.tableWidget.resizeColumnsToContents()
@@ -247,7 +254,7 @@ class WizardPageVariables(QWidget):
 
 
 	@pyqtSlot(str)
-	def on_comboBoxVariability_currentIndexChanged(self, text):
+	def on_comboBoxVariability_currentTextChanged(self, text):
 		# get current row
 		currentRow = self.ui.tableWidget.currentRow()
 		assert(currentRow >= 0 and currentRow < len(self.variables))
@@ -261,7 +268,7 @@ class WizardPageVariables(QWidget):
 
 
 	@pyqtSlot(str)
-	def on_comboBoxCausality_currentIndexChanged(self, text):
+	def on_comboBoxCausality_currentTextChanged(self, text):
 		# get current row
 		currentRow = self.ui.tableWidget.currentRow()
 		assert(currentRow >= 0 and currentRow < len(self.variables))
@@ -275,7 +282,7 @@ class WizardPageVariables(QWidget):
 
 
 	@pyqtSlot(str)
-	def on_comboBoxInitial_currentIndexChanged(self, text):
+	def on_comboBoxInitial_currentTextChanged(self, text):
 		# get current row
 		currentRow = self.ui.tableWidget.currentRow()
 		assert(currentRow >= 0 and currentRow < len(self.variables))
@@ -289,7 +296,7 @@ class WizardPageVariables(QWidget):
 
 	
 	@pyqtSlot(str)
-	def on_comboBoxTypeID_currentIndexChanged(self, text):
+	def on_comboBoxTypeID_currentTextChanged(self, text):
 		# get current row
 		currentRow = self.ui.tableWidget.currentRow()
 		assert(currentRow >= 0 and currentRow < len(self.variables))

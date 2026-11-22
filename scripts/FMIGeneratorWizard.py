@@ -39,7 +39,7 @@
 import sys
 import os.path
 
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets
 
 from WizardPageProject import WizardPageProject
 from WizardPageBasicProperties import WizardPageBasicProperties
@@ -263,11 +263,11 @@ class PageGenerate(QtWidgets.QWizardPage):
 			self.setTitle("Ready to update FMU project")
 			self.setSubTitle("Only generated files are overwritten in '{}'; previous versions are kept in the "
 							 "'.backup' subdirectory. Your source code is not modified.".format(wizard.projectDir))
-			self.setButtonText(QtWidgets.QWizard.FinishButton, "Update FMU")
+			self.setButtonText(QtWidgets.QWizard.WizardButton.FinishButton, "Update FMU")
 		else:
 			self.setTitle("Ready to generate FMU")
 			self.setSubTitle("")
-			self.setButtonText(QtWidgets.QWizard.FinishButton, "Generate FMU")
+			self.setButtonText(QtWidgets.QWizard.WizardButton.FinishButton, "Generate FMU")
 
 
 	def validatePage(self):

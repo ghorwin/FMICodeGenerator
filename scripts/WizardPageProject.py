@@ -12,8 +12,8 @@
 #
 # see https://github.com/ghorwin/FMICodeGenerator/blob/master/LICENSE for details.
 
-from PyQt5.QtWidgets import QWidget, QFileDialog
-from PyQt5.QtCore import pyqtSlot, QDir
+from PyQt6.QtWidgets import QWidget, QFileDialog
+from PyQt6.QtCore import pyqtSlot, QDir
 
 from Ui_WizardPageProject import Ui_WizardPageProject
 
@@ -45,10 +45,8 @@ class WizardPageProject(QWidget):
 
 	@pyqtSlot()
 	def on_toolButtonBrowseProject_clicked(self):
-		options = QFileDialog.Options()
-		options |= QFileDialog.DontUseNativeDialog
-		options |= QFileDialog.ShowDirsOnly
-		options |= QFileDialog.DontResolveSymlinks
+		options = (QFileDialog.Option.DontUseNativeDialog | QFileDialog.Option.ShowDirsOnly |
+				   QFileDialog.Option.DontResolveSymlinks)
 
 		startDir = self.ui.lineEditProjectDir.text().strip()
 		if not startDir:

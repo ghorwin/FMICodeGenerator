@@ -36,8 +36,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import os.path
-from PyQt5.QtWidgets import QWidget, QFileDialog
-from PyQt5.QtCore import pyqtSlot, QDir
+from PyQt6.QtWidgets import QWidget, QFileDialog
+from PyQt6.QtCore import pyqtSlot, QDir
 
 from Ui_WizardPageBasicProperties import Ui_WizardPageBasicProperties
 
@@ -66,10 +66,8 @@ class WizardPageBasicProperties(QWidget):
 	@pyqtSlot()
 	def on_toolButtonBrowseFilename_clicked(self):
 		# open browse filename dialog
-		options = QFileDialog.Options()
-		options |= QFileDialog.DontUseNativeDialog
-		options |= QFileDialog.ShowDirsOnly
-		options |= QFileDialog.DontResolveSymlinks
+		options = (QFileDialog.Option.DontUseNativeDialog | QFileDialog.Option.ShowDirsOnly |
+				   QFileDialog.Option.DontResolveSymlinks)
 		
 		targetDir = QFileDialog.getExistingDirectory(self, "Select/enter target directory for FMU", QDir.home().absolutePath(),
 		                                                options=options)

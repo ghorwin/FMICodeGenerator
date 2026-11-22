@@ -37,8 +37,8 @@
 
 import platform
 
-from PyQt5.QtWidgets import QWidget
-from PyQt5.QtGui import QFont
+from PyQt6.QtWidgets import QWidget
+from PyQt6.QtGui import QFont
 
 from Ui_WizardPageGenerate import Ui_WizardPageGenerate
 

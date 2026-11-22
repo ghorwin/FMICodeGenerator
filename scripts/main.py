@@ -36,7 +36,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import sys
-from PyQt5 import QtWidgets
+from PyQt6 import QtWidgets
 
 from FMIGeneratorWizard import FMIGeneratorWizard
 

@@ -1,10 +1,10 @@
 # AGENTS.md
 
-This repo is a Python/PyQt5 **code generator**: its product is a generated FMU (FMI2 C++ source tree), not the repo itself. The generator core is `scripts/FMIGenerator.py` (classes `FMIGenerator`, `VarDef`); `generate()` copies `data/FMI_template` to `<targetDir>/<modelName>`, renames files and substitutes the placeholder string `FMI_template` with the model name.
+This repo is a Python/PyQt6 (Qt 6) **code generator**: its product is a generated FMU (FMI2 C++ source tree), not the repo itself. The generator core is `scripts/FMIGenerator.py` (classes `FMIGenerator`, `VarDef`); `generate()` copies `data/FMI_template` to `<targetDir>/<modelName>`, renames files and substitutes the placeholder string `FMI_template` with the model name.
 
 ## Entry points & commands
 
-- GUI wizard: `python scripts/main.py` (needs a display; PyQt5).
+- GUI wizard: `python scripts/main.py` (needs a display; PyQt6).
 - GUI start page: "Create a new FMU project" or "Open an existing FMU project". Opening one skips the basic-properties page and runs `FMIGenerator.update()` instead of `generate()`.
 - CLI, new project: `python scripts/commandLineGenerator.py <modelName> --description "..." [--target-dir DIR] [--input vars.input] [--no-build] [--overwrite]`.
 - CLI, update an existing project: `python scripts/commandLineGenerator.py --update <projectDir> [--no-build]`. This reads `<projectDir>/<modelName>.input`.
@@ -12,13 +12,15 @@ This repo is a Python/PyQt5 **code generator**: its product is a generated FMU (
 
 ## Setup
 
-- Python 3.7+; `pip install -r requirements.txt` (PyQt5, send2trash).
-- `pyuic5`/`pyrcc5` (pyqt5-dev-tools / PyQt5 package) are needed to regenerate UI code (below).
+- Python 3.7+; `pip install -r requirements.txt` (PyQt6, send2trash).
+- `pyuic6` (pyqt6-dev-tools / PyQt6 package) is needed to regenerate UI code (below).
 - No linter, formatter, typechecker, CI, or test framework exists in this repo. Don't assume one.
 
 ## Generated code in-repo — do not edit by hand
 
-`scripts/Ui_*.py` and `scripts/FMIGenerator_rc.py` are generated from `scripts/ui/*.ui` and `scripts/ui/FMIGenerator.qrc`. After changing any `.ui` or `.qrc` file, run `scripts/ui/update.sh` to regenerate them.
+`scripts/Ui_*.py` are generated from `scripts/ui/*.ui`. After changing any `.ui` file, run `scripts/ui/update.sh` to regenerate them. PyQt6 has no resource compiler, so there is no `.qrc` file: icons live in `scripts/ui/gfx/` and are set at runtime in the Python code (`WizardPageVariables.py`), not via Designer resources.
+
+PyQt6 needs fully scoped enums (`Qt.ItemFlag.ItemIsEnabled`, `QWizard.WizardButton.FinishButton`, `QFileDialog.Option.ShowDirsOnly`). Qt 6 has no `QComboBox.currentIndexChanged(str)` overload, so text-based auto-connected slots use `on_<combo>_currentTextChanged`.
 
 ## Template & placeholder conventions
 

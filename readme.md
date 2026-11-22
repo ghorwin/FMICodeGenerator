@@ -5,7 +5,7 @@
 FMU stands for _Functional Mockup Unit_ and FMI for _Functional Mockup Interface_. The latter is an industry standard
 for simulation model runtime coupling, and basically defines an API and a meta data description file and directory structure: see [FMI-Standard webpage](https://fmi-standard.org) for details.
 
-## The Motivation
+## The Motivation - What is the FMI Code Generator 
 
 When you want an **efficient/fast** FMU slave, there's probably no way around a native C/C++ implementation. However, implementing the C interface functions, the data handling, input/output variable handling and advanced features like **saving and restoring the FMU state** is not so simple and straight-forward.
 
@@ -24,6 +24,9 @@ I'm working with FMI since 2009, and also authored the co-simulation master tool
 FMUs generated with the FMI Code Generator and run with _MasterSim_ allow for very efficient simulation coupling (even real-time applications), so give it a try!
 
 ## The (anticipated) use of the FMI Code Generator
+
+![Variable definitions ](doc/webpage/images/VariableDefinition.png)
+![Generator successfully generated and compiled FMU](doc/webpage/images/VariableDefinition.png)
 
 See description of [Test scenario: Stateless P-controller](https://ghorwin.github.io/FMICodeGenerator/tutorial_p_control.html) for a step-by-step tutorial.
 

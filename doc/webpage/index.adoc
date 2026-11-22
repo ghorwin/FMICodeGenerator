@@ -18,14 +18,13 @@ The process of setting up the FMU (core files, `modelDescription.xml`, directory
 
 == Features
 
-// TODO: refine list, add screenshots
 * Graphical wizard (Python/Qt 6) and command line generator
 * Generates FMI 2.0 FMUs for _Model Exchange_ and _Co-Simulation_
-* Generated `modelDescription.xml`, value reference defines and variable handling
+* Generates `modelDescription.xml`, value reference defines and variable handling
 * Generic FMU state serialization (get/set/serialize FMU state) — you only add your model-specific state
 * Re-run the generator to change variables: generated files are updated, *your own code stays untouched*
 * CMake and qmake (Qt Creator) build files, build and deploy scripts for Linux, macOS and Windows
-* Small, readable code without third-party library dependencies
+* Small, readable code **without third-party library dependencies**
 
 == What FMI Code Generator _is not_
 

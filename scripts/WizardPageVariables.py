@@ -44,7 +44,7 @@ from PyQt6.QtGui import QFontMetrics, QIcon
 
 from Ui_WizardPageVariables import Ui_WizardPageVariables
 
-from FMIGenerator import FMIGenerator, VarDef, varDefFromJson
+from FMIGenerator import FMIGenerator, VarDef, varDefFromJson, startValueNeeded, startValueMissing
 
 
 # *** FMI 2.0 rules for valid attribute combinations (FMI 2.0 standard, section 2.2.7) ***
@@ -219,6 +219,8 @@ class WizardPageVariables(QWidget):
 
 		self.setEditFieldsEnabled(False) # disabled by default
 		self.variables = []
+		# set by the wizard when the user confirms that unneeded start values shall be written
+		self.writeUnneededStartValues = False
 
 		# add default variable
 		newVar = VarDef("ResultRootDir", "fixed", "parameter", "exact", "String")
@@ -369,11 +371,23 @@ class WizardPageVariables(QWidget):
 		self.ui.labelUnit.setEnabled(isReal)
 		self.ui.lineEditUnit.setEnabled(isReal)
 
-		# start value is not written for calculated variables and the independent variable
-		hasStart = var.causality == "input" or \
-			(var.causality != "independent" and var.initial != "calculated")
+		# start value is not needed for calculated variables and the independent variable; the field stays
+		# enabled while it holds a value, so that an unneeded value can still be removed
+		hasStart = startValueNeeded(var)
 		self.ui.label_6.setEnabled(hasStart)
-		self.ui.lineEditStart.setEnabled(hasStart)
+		self.ui.lineEditStart.setEnabled(hasStart or len(var.startValue.strip()) != 0)
+		self.updateStartValueHighlight(var)
+
+
+	def updateStartValueHighlight(self, var):
+		"""Highlights the start value field in red if a required start value is missing."""
+		if startValueMissing(var):
+			self.ui.lineEditStart.setStyleSheet("QLineEdit { background-color: #ffc0c0; color: black; }")
+			self.ui.lineEditStart.setToolTip("A start value is required for this variable.")
+		else:
+			self.ui.lineEditStart.setStyleSheet("")
+			self.ui.lineEditStart.setToolTip("" if startValueNeeded(var) else
+				"No start value is needed for this variable, it is ignored by the master.")
 
 
 	def applyVariableDefinition(self, row, var):
@@ -523,6 +537,7 @@ class WizardPageVariables(QWidget):
 		row, var = self.currentVariable()
 		var.startValue = text # conversion to suitable data type is checked later
 		self.setTableCell(row, COL_START, text)
+		self.updateStartValueHighlight(var)
 
 
 	@pyqtSlot(str)

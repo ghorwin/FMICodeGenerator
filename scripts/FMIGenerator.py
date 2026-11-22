@@ -54,6 +54,24 @@ GENERATED_FILE_SUFFIX = "_generated"
 # during a project update.
 BACKUP_DIR_NAME = ".backup"
 
+def startValueNeeded(var):
+	"""Returns True if FMI 2.0 requires a start value for the variable (inputs and all variables that are
+	not calculated during initialization). Calculated variables and the independent variable have none."""
+	if var.causality == "input":
+		return True
+	return var.causality != "independent" and var.initial != "calculated"
+
+
+def startValueMissing(var):
+	"""Returns True if a required start value is empty. An empty String is a valid start value."""
+	return startValueNeeded(var) and var.typeID != "String" and len(var.startValue.strip()) == 0
+
+
+def startValueUnneeded(var):
+	"""Returns True if the variable has a start value although none is needed (it is ignored by the master)."""
+	return not startValueNeeded(var) and len(var.startValue.strip()) != 0
+
+
 class VarDef:
 	"""Contains all properties of a scalar variable in the model description."""
 	def __init__(self, name, variability, causality, initial, typeID):
@@ -141,6 +159,8 @@ class FMIGenerator:
 		numberOfContinuousStates -- number of continuous states in the model (only exposed for ModelExchange functionality)
 		overwrite -- if True, generate() moves an existing target directory to the trash; otherwise
 					 generate() refuses to overwrite an existing directory
+		writeUnneededStartValues -- if True, start values of variables that do not need one (calculated
+					 variables, independent variable) are still written to modelDescription.xml
 		"""
 		self.targetDir = ""
 
@@ -152,6 +172,7 @@ class FMIGenerator:
 
 		self.autobuild = True
 		self.overwrite = False
+		self.writeUnneededStartValues = False
 
 
 	def printMsg(self, text):
@@ -626,11 +647,12 @@ $$outputUnknowns$$
 			else:
 				varDefBlock = varDefBlock.replace("$$unit$$","")
 
-			# inputs always need a start value, the independent variable must not have one
-			if var.causality == "independent" or (var.causality != "input" and var.initial=="calculated"):
-				varDefBlock = varDefBlock.replace("$$start$$","")
-			else:
+			# inputs always need a start value, calculated variables and the independent variable must not
+			# have one (unless explicitly requested)
+			if startValueNeeded(var) or (self.writeUnneededStartValues and startValueUnneeded(var)):
 				varDefBlock = varDefBlock.replace("$$start$$",' start="{}"'.format(var.startValue))
+			else:
+				varDefBlock = varDefBlock.replace("$$start$$","")
 
 			scalarVariableDefs = scalarVariableDefs + "\n" + varDefBlock
 

@@ -45,7 +45,7 @@ from WizardPageProject import WizardPageProject
 from WizardPageBasicProperties import WizardPageBasicProperties
 from WizardPageVariables import WizardPageVariables
 from WizardPageGenerate import WizardPageGenerate
-from FMIGenerator import FMIGenerator, VarDef, findProjectInputFile
+from FMIGenerator import FMIGenerator, VarDef, findProjectInputFile, startValueMissing, startValueUnneeded
 from TooltipPopup import TooltipEventFilter
 
 # page IDs
@@ -245,7 +245,43 @@ class PageVariables(QtWidgets.QWizardPage):
 				return False
 			capitalized_var_names.add(capVarName)
 
+		# required start values must be given
+		missing = [v.name for v in self.page.variables if startValueMissing(v)]
+		if len(missing) != 0:
+			QtWidgets.QMessageBox.critical(self, "Missing start value",
+				"The following variables require a start value: {}".format(", ".join(missing)))
+			self.selectVariable(missing[0])
+			return False
+
+		# start values that are not needed are only written on request
+		unneeded = [v.name for v in self.page.variables if startValueUnneeded(v)]
+		self.page.writeUnneededStartValues = False
+		if len(unneeded) != 0:
+			msgBox = QtWidgets.QMessageBox(QtWidgets.QMessageBox.Icon.Warning, "Unneeded start values",
+				"The following variables have a start value, which is not needed and hence ignored by the "
+				"master: {}\n\nShall these start values still be written to modelDescription.xml?"
+				.format(", ".join(unneeded)), parent=self)
+			btnYes = msgBox.addButton("Yes", QtWidgets.QMessageBox.ButtonRole.YesRole)
+			msgBox.addButton("No", QtWidgets.QMessageBox.ButtonRole.NoRole)
+			btnBack = msgBox.addButton("Back", QtWidgets.QMessageBox.ButtonRole.RejectRole)
+			msgBox.setDefaultButton(btnBack)
+			msgBox.setEscapeButton(btnBack)
+			msgBox.exec()
+			if msgBox.clickedButton() is btnBack:
+				self.selectVariable(unneeded[0])
+				return False
+			self.page.writeUnneededStartValues = msgBox.clickedButton() is btnYes
+
 		return True
+
+
+	def selectVariable(self, name):
+		"""Selects the variable with the given name and focuses the start value field."""
+		for i, var in enumerate(self.page.variables):
+			if var.name == name:
+				self.page.ui.tableWidget.selectRow(i)
+				self.page.ui.lineEditStart.setFocus()
+				return
 
 
 class PageGenerate(QtWidgets.QWizardPage):
@@ -285,6 +321,7 @@ class PageGenerate(QtWidgets.QWizardPage):
 
 		# variables
 		fmiGenerator.variables = wizard.variablesPage().variables
+		fmiGenerator.writeUnneededStartValues = wizard.variablesPage().writeUnneededStartValues
 
 		fmiGenerator.autobuild = self.page.ui.checkBoxTestBuild.isChecked()
 

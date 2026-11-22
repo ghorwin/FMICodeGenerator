@@ -1,0 +1,7 @@
+# Test scenario: Lotka-Volterra (Predator-Prey) Model
+
+## Description
+In this scenario we create two FMUs that contain each a state (the prey and predator species population, respectively). We test the automatic generation of the state variables, derivatives and correct modelDescription writing.
+
+Then, both FMUs are used in an iterative master algorithm (Gauss-Seidel) to check to correct functionality of the automatically generated serialization code.
+

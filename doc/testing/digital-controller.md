@@ -1,0 +1,92 @@
+# Test scenario: Stateless digital controller with switching delay
+
+## Description
+
+In the first test case, the output variables only depend on the input variable and fixed parameters. In this test case, an internal state (local parameter) is used, additionally. This state is only modified through the FMU itself, and thus needs to be correctly stored and restored during FMU setback (rollback) in iterating master algorithms.
+
+To test this, we first go through the FMU generation step-by-step, show the code implementation and then run the FMU through an adaptive step master algorithm.
+
+## FMU Generation
+
+Use the following properties for the FMU generation:
+
+- name: 'digital_control'
+- input var: real, continuous, T (temperature in K)
+- output var: real, continuous, P (heating power in W)
+- parameter: real, fixed, P_on (heating power in W)
+- parameter: real, fixed, T_low (heating on)
+- parameter: real, fixed, T_high (heating off)
+- parameter: real, fixed, delay (min time in [s] between switching events)
+- local: real, time in [s] since last switch
+
+## Implement controller logic
+
+Rules to implement: 
+
+     T < T_low and t_since_last_switch > delay:
+         switch heating on, remember last switch time
+     T > T_high and t_since_last_switch > delay:
+         switch heating off, remember last switch time
+
+### Co-Simulation Code
+
+```c++
+// Co-simulation: time integration
+void digital_control::integrateTo(double tCommunicationIntervalEnd) {
+
+    // state of FMU before integration:
+    //   m_currentTimePoint = t_IntervalStart;
+    //   m_realVar[FMI_OUTPUT_P]             = current heating power
+    //       (=0, heating is off)
+    //   m_realVar[FMI_LOCAL_lastSwitchTime] = last time point when
+    //       heating was switched on/off
+
+    // get input variables
+    double T = m_realVar[FMI_INPUT_T];
+    double P_on = m_realVar[FMI_PARA_P_on];
+    double T_low = m_realVar[FMI_PARA_T_low];
+    double T_high = m_realVar[FMI_PARA_T_high];
+    double delay = m_realVar[FMI_PARA_delay];
+    double lastSwitchTime = m_realVar[FMI_LOCAL_lastSwitchTime];
+
+    // *** own code starts here
+
+    // we use the end time point of the communication interval to
+    // evaluate the delay criterion
+
+    double P = m_realVar[FMI_OUTPUT_P];
+    if ((tCommunicationIntervalEnd-lastSwitchTime) > delay) {
+        if (T > T_high) {
+            P = P_on;
+            if (lastSwitchTime+delay > m_currentTimePoint)
+                lastSwitchTime += delay;
+            else
+                lastSwitchTime = tCommunicationIntervalEnd;
+        }
+        else if (T < T_low) {
+            P = 0;
+            if (lastSwitchTime+delay > m_currentTimePoint)
+                lastSwitchTime += delay;
+            else
+                lastSwitchTime = tCommunicationIntervalEnd;
+        }
+    }
+
+    // output variables
+    m_realVar[FMI_OUTPUT_P] = P;
+
+    // *** own code ends here
+
+    m_currentTimePoint = tCommunicationIntervalEnd;
+
+    // state of FMU after integration:
+    //   m_currentTimePoint = tCommunicationIntervalEnd;
+    //   m_realVar[FMI_OUTPUT_P] = new heating power
+    //   m_realVar[FMI_LOCAL_lastSwitchTime] = last time point when
+    //       heating was switched on/off, updated to
+    //       tCommunicationIntervalEnd when switch occurred
+}
+```
+
+The time of last switch between on or off is kept in the local variable `FMI_LOCAL_lastSwitchTime`. We then check, if the next allowed switch time lies within the communication interval and if any of the switch conditions hold. If yes, then we adjust the heating power and update the switch time point in the local variable.
+

@@ -1,59 +1,127 @@
 = Tutorial: Stateless P-controller
 include::_settings.adoc[]
 
-WARNING: Draft, converted from the old GitHub wiki. The code shown here refers to an older generator version (value reference defines and variable initialization in the user `.cpp` file) and must be updated.
-
 
 == Description
 
-This test case demonstrates/tests the FMICodeGenerator with a very simply P controller. This test also serves as tutorial on the way from the FMICodeGenerator wizard all the way through to the final complete FMU.
+This first tutorial/test case demonstrates the FMICodeGenerator with a very simply P controller. This tutorial shows the entire way from the FMICodeGenerator wizard all the way through to the final complete FMU.
 
-== Generating the FMU
+The controller computes a volumetric heat source using the temperature difference between input temperature and target temperature as controller error and a constant k_P controller parameter.
 
-* run `scripts/main.py` to start the generator
+== Generating the FMU Framework and modelDescription.xml
+
+Run `scripts/main.py` to start the generator tool.
 
 === Basic Properties
 
-* enter *P_Control* as model name
-* select target directory, for example `/home/<username>/FMUs`
-* optionally enter a description
+On the welcome screen, select new FMU:
 
-image::Test1_BasicProps.png[Basic Properties]
+image::Tutorial1_Step1_newFMU.png
+
+On the next wizard page, you may enter the FMU name. Don't use spaces or special characters!
+
+* enter *P_Control* as model name
+* select target directory, for example `/home/<username>/fmus`
+* optionally enter a description
+<username>/fmus
+image::Tutorial1_Step1_nameAndDescription.png[Basic Properties]
+
+Then move on to the next page.
 
 === Variables
 
-* specify the following variables
+On this page you can define all variables, including parameters, input/output variables etc.
 
-[cols=",,,,",options="header",]
+By default, the code generator creates a string parameter named `ResultRootDir` with ID 42. We won't need it in this example, so you can remove it (with the minus-button).
+
+[TIP]
+====
+This parameter is useful (and automatically supported by _MasterSim_) when the slaves generated from this FMU (which may be several) need to write data into their own working directory.
+_MasterSim_ will automatically generate a working directory for each instantiated slave and pass this user-writable path to each of the FMU instances.
+====
+
+Now specify the following variables
+
+[cols=",,,,,,",options="header",]
 |===
-|*Name* |*Unit* |*Causality* |*Variability* |*Initial value*
-|T |K |input |continuous |293.15 (approx)
-|P |W/m3 |output |continuous |0 (calculated)
-|T_limit |K |parameter |fixed |276.15 (exact)
-|k_P |W/m3K |parameter |fixed |20000 (exact)
+|*Name*  |*Causality* |*Variability* | *Initial* | *Type* | *Initial value* |*Unit*
+|T |input |continuous | Real | --- | 20 |C 
+|P |output |continuous | Real | calculated | --- |W/m3 
+|T_limit |parameter |fixed | Real | exakt | 276.15  |K 
+|k_P  |parameter |fixed | Real | exakt | 20000 |W/m3K
 |===
 
 *T* is the sensor temperature, *P* is the heating power, *T_limit* is the temperature threshold below which the heating is turned on.
 
-image::Test1_Variables.png[Variable definitions]
+image::Tutorial1_Step1_variables.png[Variable definitions]
 
 === Generate FMU directory and test-build FMU
 
-* confirm last page of wizard to finish generation
+Confirm last page of wizard to finish generation
 
-image::Test1_GenerationSuccess.png[FMU Generation Log]
+image::Tutorial1_Step1_generationSuccess.png[FMU Generation Log]
 
-You will notice, that *FMIGenerator* did also create a file `/home/<username>/FMUs/P_Control.input`, which is a JSON file holding the input data supplied to the wizard. If you want to run the wizard again, maybe modifying/correcting parameters on the way, the wizard will ask you after entering model name and output path, if the old input data shall be read again.
+The last step of the generator created the following directory structure:
 
-The directory `/home/<username>/FMUs/P_Control` was created with the source code file `/home/<username>/FMUs/P_Control/src/P_Control.cpp` waiting to be completed with the actual FMU functionality.
+[source,]
+----
+─── P_control
+    ├── bin
+    │   ├── debug
+    │   ├── release
+    │   │   ├── P_control.so
+    │   │   └── readme.md
+    │   └── release_x64
+    │       └── readme.md
+    ├── build
+    │   ├── bb-gcc
+    │   │   └── ... (generated build files)
+    │   ├── build.sh
+    │   ├── build_VC_x64_vc2022.bat
+    │   ├── deploy.bat
+    │   ├── deployMac.sh
+    │   ├── deploy.sh
+    │   ├── P_control
+    │   │   ├── binaries
+    │   │   │   └── linux64
+    │   │   │       └── P_control.so
+    │   │   └── modelDescription.xml
+    │   ├── P_control.fmu
+    │   └── readme.md
+    ├── CMakeLists.txt
+    ├── data
+    │   └── modelDescription.xml
+    ├── P_control.input
+    ├── P_control.pro
+    └── src
+        ├── fmi2common
+        │   ├── fmi2Functions_complete.h
+        │   ├── fmi2Functions.cpp
+        │   ├── fmi2Functions.h
+        │   ├── fmi2FunctionTypes.h
+        │   ├── fmi2TypesPlatform.h
+        │   ├── InstanceData.cpp
+        │   └── InstanceData.h
+        ├── P_control.cpp
+        ├── P_control_generated.cpp
+        ├── P_control_generated.h
+        └── P_control.h
+----
+
+You will notice, that *FMIGenerator* did also create a file `/home/<username>/fmus/P_Control/P_control.input`, which is a JSON file holding the input data supplied to the wizard. If you want to run the wizard again, maybe modifying/correcting parameters on the way, the wizard will ask you after entering model name and output path, if the old input data shall be read again.
+
+During the test-build, the directories `/home/<username>/fmus/P_Control/build/P_Control` was created with the assembled FMU content, which then got archived into the file `P_Control.fmu`. 
+
 
 == Implement FMU functionality
 
-To implement the FMU source code, you can use Qt Creator and open the project file `/home/<username>/FMUs/P_Control/P_Control.pro`. This will also give you a convenient way of compiling/debugging your FMU code.
+To implement the FMU source code, you can use Qt Creator and open the project file `/home/<username>/fmus/P_Control/P_Control.pro`. This will also give you a convenient way of compiling/debugging your FMU code.
 
-Alternatively, just open up the file `/home/<username>/FMUs/P_Control/src/P_Control.cpp` in your favourite text editor.
+Alternatively, just open up the file `/home/<username>/fmus/P_Control/src/P_Control.cpp` in your favourite text editor.
 
 === Automatically generated code
+
+TODO : revise the rest of the tutorial
 
 At first you will notice a block of C-defines:
 
@@ -146,7 +214,7 @@ void P_Control::integrateTo(double tCommunicationIntervalEnd) {
 
 If you work with Qt Creator, the modified code can be compiled directly. If everything works, switch to a console window, change into directory
 
-`/home/<username>/FMUs/P_Control/build/`
+`/home/<username>/fmus/P_Control/build/`
 
 and run the script:
 

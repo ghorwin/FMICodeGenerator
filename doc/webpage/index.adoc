@@ -18,6 +18,9 @@ The process of setting up the FMU (core files, `modelDescription.xml`, directory
 
 == Features
 
+image::VariableDefinition.png[width=800px]
+image::GenerationSucccess.png[width=800px]
+
 * Graphical wizard (Python/Qt 6) and command line generator
 * Generates FMI 2.0 FMUs for _Model Exchange_ and _Co-Simulation_
 * Generates `modelDescription.xml`, value reference defines and variable handling

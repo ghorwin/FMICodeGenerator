@@ -26,7 +26,7 @@ FMUs generated with the FMI Code Generator and run with _MasterSim_ allow for ve
 ## The (anticipated) use of the FMI Code Generator
 
 ![Variable definitions ](doc/webpage/images/VariableDefinition.png)
-![Generator successfully generated and compiled FMU](doc/webpage/images/VariableDefinition.png)
+![Generator successfully generated and compiled FMU](doc/webpage/images/GenerationSucccess.png)
 
 See description of [Test scenario: Stateless P-controller](https://ghorwin.github.io/FMICodeGenerator/tutorial_p_control.html) for a step-by-step tutorial.
 

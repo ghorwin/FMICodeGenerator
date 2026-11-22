@@ -26,7 +26,7 @@
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#_description">Description</a></li>
-<li><a href="#_generating_the_fmu">Generating the FMU</a>
+<li><a href="#_generating_the_fmu_framework_and_modeldescription_xml">Generating the FMU Framework and modelDescription.xml</a>
 <ul class="sectlevel2">
 <li><a href="#_basic_properties">Basic Properties</a></li>
 <li><a href="#_variables">Variables</a></li>
@@ -35,8 +35,10 @@
 </li>
 <li><a href="#_implement_fmu_functionality">Implement FMU functionality</a>
 <ul class="sectlevel2">
-<li><a href="#_automatically_generated_code">Automatically generated code</a></li>
+<li><a href="#_generated_code_and_user_code">Generated code and user code</a></li>
 <li><a href="#_implement_modelexchange_functionality">Implement ModelExchange functionality</a></li>
+<li><a href="#_implement_cosimulation_functionality">Implement CoSimulation functionality</a></li>
+<li><a href="#_fmu_state_serialization">FMU state serialization</a></li>
 <li><a href="#_building_the_fmu">Building the FMU</a></li>
 </ul>
 </li>
@@ -50,49 +52,52 @@
 </div>
 </div>
 <div id="content">
-<div id="preamble">
-<div class="sectionbody">
-<div class="admonitionblock warning">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
-</td>
-<td class="content">
-Draft, converted from the old GitHub wiki. The code shown here refers to an older generator version (value reference defines and variable initialization in the user <code>.cpp</code> file) and must be updated.
-</td>
-</tr>
-</table>
-</div>
-</div>
-</div>
 <div class="sect1">
 <h2 id="_description">Description</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This test case demonstrates/tests the FMICodeGenerator with a very simply P controller. This test also serves as tutorial on the way from the FMICodeGenerator wizard all the way through to the final complete FMU.</p>
+<p>This first tutorial (which doubles as a test case) demonstrates the FMICodeGenerator with a very simple P-controller. It covers the whole way from the FMICodeGenerator wizard to the final, tested FMU.</p>
+</div>
+<div class="paragraph">
+<p>The controller computes a volumetric heat source. The controller error is the difference between the target temperature and the input temperature, and the gain is the constant controller parameter <code>k_P</code>:</p>
+</div>
+<div class="literalblock">
+<div class="content">
+<pre>P = k_P * (T_limit - T)    if T &lt; T_limit
+P = 0                      otherwise</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The controller has no internal states. Its output depends only on the current input value and its parameters.</p>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_generating_the_fmu">Generating the FMU</h2>
+<h2 id="_generating_the_fmu_framework_and_modeldescription_xml">Generating the FMU Framework and modelDescription.xml</h2>
 <div class="sectionbody">
-<div class="ulist">
-<ul>
-<li>
-<p>run <code>scripts/main.py</code> to start the generator</p>
-</li>
-</ul>
+<div class="paragraph">
+<p>Run <code>scripts/main.py</code> to start the generator tool.</p>
 </div>
 <div class="sect2">
 <h3 id="_basic_properties">Basic Properties</h3>
+<div class="paragraph">
+<p>On the welcome screen, select <em>Create a new FMU project</em>:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="images/Tutorial1_Step1_newFMU.png" alt="Welcome screen">
+</div>
+</div>
+<div class="paragraph">
+<p>On the next wizard page, enter the FMU name. Don&#8217;t use spaces or special characters, since the name is used for file names and the C++ class name!</p>
+</div>
 <div class="ulist">
 <ul>
 <li>
-<p>enter <strong>P_Control</strong> as model name</p>
+<p>enter <strong>P_control</strong> as model name</p>
 </li>
 <li>
-<p>select target directory, for example <code>/home/&lt;username&gt;/FMUs</code></p>
+<p>select the output directory, for example <code>/home/&lt;username&gt;/fmus</code>. The FMU directory <code>/home/&lt;username&gt;/fmus/P_control</code> is shown below it.</p>
 </li>
 <li>
 <p>optionally enter a description</p>
@@ -101,95 +106,193 @@ Draft, converted from the old GitHub wiki. The code shown here refers to an olde
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/Test1_BasicProps.png" alt="Basic Properties">
+<img src="images/Tutorial1_Step1_nameAndDescription.png" alt="Basic Properties">
 </div>
+</div>
+<div class="paragraph">
+<p>Then move on to the next page.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_variables">Variables</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>specify the following variables</p>
-</li>
-</ul>
+<div class="paragraph">
+<p>On this page you define all variables published by the FMU: parameters, inputs, outputs, etc.</p>
+</div>
+<div class="paragraph">
+<p>By default, the code generator creates a string parameter named <code>ResultRootDir</code> with value reference 42. We don&#8217;t need it in this example, so remove it (with the minus button).</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This parameter is useful (and automatically supported by <em>MasterSim</em>) when the slaves generated from this FMU (which may be several) need to write data into their own working directory.
+<em>MasterSim</em> will automatically generate a working directory for each instantiated slave and pass this user-writable path to each of the FMU instances.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Now specify the following variables:</p>
 </div>
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col style="width: 20%;">
-<col style="width: 20%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 11.1111%;">
+<col style="width: 22.2223%;">
 </colgroup>
 <thead>
 <tr>
-<th class="tableblock halign-left valign-top"><strong>Name</strong></th>
-<th class="tableblock halign-left valign-top"><strong>Unit</strong></th>
-<th class="tableblock halign-left valign-top"><strong>Causality</strong></th>
-<th class="tableblock halign-left valign-top"><strong>Variability</strong></th>
-<th class="tableblock halign-left valign-top"><strong>Initial value</strong></th>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Causality</th>
+<th class="tableblock halign-left valign-top">Variability</th>
+<th class="tableblock halign-left valign-top">Initial</th>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Start value</th>
+<th class="tableblock halign-left valign-top">Unit</th>
+<th class="tableblock halign-left valign-top">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">T</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">K</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">input</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">continuous</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">293.15 (approx)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">---</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Real</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Temperature</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">P</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">W/m3</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">output</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">continuous</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">0 (calculated)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">calculated</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Real</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">---</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">W/m3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A volumetric heat source</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">T_limit</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">K</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">parameter</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fixed</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">276.15 (exact)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">exact</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Real</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">22</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">C</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Target temperature</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">k_P</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">W/m3K</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">parameter</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">fixed</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">20000 (exact)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">exact</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Real</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">20000</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">W/m3K</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Proportionality factor</p></td>
 </tr>
 </tbody>
 </table>
 <div class="paragraph">
-<p><strong>T</strong> is the sensor temperature, <strong>P</strong> is the heating power, <strong>T_limit</strong> is the temperature threshold below which the heating is turned on.</p>
+<p><strong>T</strong> is the sensor temperature, <strong>P</strong> is the heating power, <strong>T_limit</strong> is the temperature threshold below which the heating is turned on, and <strong>k_P</strong> is the controller gain.</p>
+</div>
+<div class="paragraph">
+<p>Leave the value references at -1; the generator then assigns unique value references automatically. The number of continuous states stays at 0, since the controller has no states.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/Test1_Variables.png" alt="Variable definitions">
+<img src="images/Tutorial1_Step1_variables.png" alt="Variable definitions">
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The wizard disables options that the FMI standard does not allow for the selected causality/variability combination. For example, you cannot choose an <em>initial</em> attribute for the input variable.
+</td>
+</tr>
+</table>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_generate_fmu_directory_and_test_build_fmu">Generate FMU directory and test-build FMU</h3>
-<div class="ulist">
-<ul>
-<li>
-<p>confirm last page of wizard to finish generation</p>
-</li>
-</ul>
+<div class="paragraph">
+<p>On the last wizard page, keep the option <em>Test-build FMU after code generation</em> checked and click <em>Generate FMU</em>:</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="images/Test1_GenerationSuccess.png" alt="FMU Generation Log">
+<img src="images/Tutorial1_Step1_generationSuccess.png" alt="FMU Generation Log">
 </div>
 </div>
 <div class="paragraph">
-<p>You will notice, that <strong>FMIGenerator</strong> did also create a file <code>/home/&lt;username&gt;/FMUs/P_Control.input</code>, which is a JSON file holding the input data supplied to the wizard. If you want to run the wizard again, maybe modifying/correcting parameters on the way, the wizard will ask you after entering model name and output path, if the old input data shall be read again.</p>
+<p>The generator has now created the following directory structure:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code>─── P_control
+    ├── bin
+    │   ├── debug
+    │   ├── release
+    │   │   ├── P_control.so
+    │   │   └── readme.md
+    │   └── release_x64
+    │       └── readme.md
+    ├── build
+    │   ├── bb-gcc
+    │   │   └── ... (generated build files)
+    │   ├── build.sh
+    │   ├── build_VC_x64.bat
+    │   ├── build_VC_x64_vc2022.bat
+    │   ├── deploy.bat
+    │   ├── deployMac.sh
+    │   ├── deploy.sh
+    │   ├── P_control
+    │   │   ├── binaries
+    │   │   │   └── linux64
+    │   │   │       └── P_control.so
+    │   │   └── modelDescription.xml
+    │   ├── P_control.fmu
+    │   └── readme.md
+    ├── CMakeLists.txt
+    ├── data
+    │   └── modelDescription.xml
+    ├── P_control.input
+    ├── P_control.pro
+    └── src
+        ├── fmi2common
+        │   ├── fmi2Functions_complete.h
+        │   ├── fmi2Functions.cpp
+        │   ├── fmi2Functions.h
+        │   ├── fmi2FunctionTypes.h
+        │   ├── fmi2TypesPlatform.h
+        │   ├── InstanceData.cpp
+        │   └── InstanceData.h
+        ├── P_control.cpp
+        ├── P_control_generated.cpp
+        ├── P_control_generated.h
+        └── P_control.h</code></pre>
+</div>
 </div>
 <div class="paragraph">
-<p>The directory <code>/home/&lt;username&gt;/FMUs/P_Control</code> was created with the source code file <code>/home/&lt;username&gt;/FMUs/P_Control/src/P_Control.cpp</code> waiting to be completed with the actual FMU functionality.</p>
+<p>During the test build, the shared library <code>bin/release/P_control.so</code> was compiled. The deploy step then assembled the FMU content in the directory <code>build/P_control</code> and zipped it into the file <code>build/P_control.fmu</code>. This FMU is already a valid FMU, but it doesn&#8217;t compute anything useful yet.</p>
+</div>
+<div class="paragraph">
+<p>You will also notice the file <code>/home/&lt;username&gt;/fmus/P_control/P_control.input</code>. This is the project file: a JSON file holding the model name, the description and the variable definitions, including the assigned value references. To change the variables later, start the wizard again, select <em>Open an existing FMU project</em> and choose the directory <code>/home/&lt;username&gt;/fmus/P_control</code>. The generator then updates only the generated files and leaves your own code untouched (see <a href="user_guide.html">User Guide</a>).</p>
 </div>
 </div>
 </div>
@@ -198,15 +301,28 @@ Draft, converted from the old GitHub wiki. The code shown here refers to an olde
 <h2 id="_implement_fmu_functionality">Implement FMU functionality</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To implement the FMU source code, you can use Qt Creator and open the project file <code>/home/&lt;username&gt;/FMUs/P_Control/P_Control.pro</code>. This will also give you a convenient way of compiling/debugging your FMU code.</p>
+<p>To implement the FMU source code, you can use Qt Creator and open the project file <code>/home/&lt;username&gt;/fmus/P_control/P_control.pro</code> (or the <code>CMakeLists.txt</code>). This also gives you a convenient way to compile and debug your FMU code.</p>
 </div>
 <div class="paragraph">
-<p>Alternatively, just open up the file <code>/home/&lt;username&gt;/FMUs/P_Control/src/P_Control.cpp</code> in your favourite text editor.</p>
+<p>Alternatively, just open the file <code>/home/&lt;username&gt;/fmus/P_control/src/P_control.cpp</code> in your favourite text editor.</p>
 </div>
 <div class="sect2">
-<h3 id="_automatically_generated_code">Automatically generated code</h3>
+<h3 id="_generated_code_and_user_code">Generated code and user code</h3>
 <div class="paragraph">
-<p>At first you will notice a block of C-defines:</p>
+<p>The source code in <code>src</code> is split into two parts:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>P_control_generated.h</code> and <code>P_control_generated.cpp</code> hold everything that follows from the variable definitions. These files are <strong>regenerated</strong> whenever you update the project, so don&#8217;t edit them.</p>
+</li>
+<li>
+<p><code>P_control.h</code> and <code>P_control.cpp</code> hold your own code. They are created once and never overwritten by the generator.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In <code>P_control_generated.h</code> you will find a block of C-defines with the value references of all variables:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -217,115 +333,156 @@ Draft, converted from the old GitHub wiki. The code shown here refers to an olde
 </div>
 </div>
 <div class="paragraph">
-<p>Every variable defined in the wizard gets its own unique define that can be used in the code instead of native value references.</p>
-</div>
-<div class="paragraph">
-<p>In the constructor code all the variables are initialized. Normally, you need not change anything here. While the values set here can be modified at will, <strong>you must</strong> insert the variables to the respective data maps here. <code>std::map</code> will automatically insert values at assignment. Note that parameters are handled (stored) just as regular variables.</p>
+<p>The same header also defines the struct <code>FMIVariables</code>, which holds a copy of all published variables. It uses the variable names from the wizard as member names:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="cpp"><span style="color: #6e7781">// initialize input variables and/or parameters</span>
-<span style="color: #24292f;background-color: #f6f8fa">m_realVar</span><span style="color: #24292f;background-color: #f6f8fa">[</span><span style="color: #24292f;background-color: #f6f8fa">FMI_INPUT_T</span><span style="color: #24292f;background-color: #f6f8fa">]</span> <span style="color: #0550ae">=</span> <span style="color: #0550ae">293.15</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
-<span style="color: #24292f;background-color: #f6f8fa">m_realVar</span><span style="color: #24292f;background-color: #f6f8fa">[</span><span style="color: #24292f;background-color: #f6f8fa">FMI_PARA_T_limit</span><span style="color: #24292f;background-color: #f6f8fa">]</span> <span style="color: #0550ae">=</span> <span style="color: #0550ae">276.15</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
-<span style="color: #24292f;background-color: #f6f8fa">m_realVar</span><span style="color: #24292f;background-color: #f6f8fa">[</span><span style="color: #24292f;background-color: #f6f8fa">FMI_PARA_k_P</span><span style="color: #24292f;background-color: #f6f8fa">]</span> <span style="color: #0550ae">=</span> <span style="color: #0550ae">20000</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
-
-<span style="color: #6e7781">// initialize output variables</span>
-<span style="color: #24292f;background-color: #f6f8fa">m_realVar</span><span style="color: #24292f;background-color: #f6f8fa">[</span><span style="color: #24292f;background-color: #f6f8fa">FMI_OUTPUT_P</span><span style="color: #24292f;background-color: #f6f8fa">]</span> <span style="color: #0550ae">=</span> <span style="color: #0550ae">0</span><span style="color: #24292f;background-color: #f6f8fa">;</span></code></pre>
+<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="cpp"><span style="color: #cf222e">struct</span> <span style="color: #953800">FMIVariables</span> <span style="color: #24292f;background-color: #f6f8fa">{</span>
+	<span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">T</span><span style="color: #24292f;background-color: #f6f8fa">;</span> <span style="color: #6e7781">// input, unit: C, Temperature</span>
+	<span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">P</span><span style="color: #24292f;background-color: #f6f8fa">;</span> <span style="color: #6e7781">// output, unit: W/m3, A volumetric heat source</span>
+	<span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">T_limit</span><span style="color: #24292f;background-color: #f6f8fa">;</span> <span style="color: #6e7781">// parameter, unit: C, Target temperature</span>
+	<span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">k_P</span><span style="color: #24292f;background-color: #f6f8fa">;</span> <span style="color: #6e7781">// parameter, unit: W/m3K, Proportionality factor</span>
+<span style="color: #24292f;background-color: #f6f8fa">};</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>The actual initialization code (if needed) goes into the function <code>init()</code>. In this test case we do not need anything here.</p>
+<p><code>P_control_generated.cpp</code> implements the matching member functions of class <code>P_control</code>:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>initFMIVariables()</code></dt>
+<dd>
+<p>sets all variables to their start values; it is called in the constructor in <code>P_control.cpp</code></p>
+</dd>
+<dt class="hdlist1"><code>readFMIVariables(FMIVariables &amp; v)</code></dt>
+<dd>
+<p>copies the current values of all variables into the struct</p>
+</dd>
+<dt class="hdlist1"><code>writeFMIVariables(const FMIVariables &amp; v)</code></dt>
+<dd>
+<p>stores the computed values (outputs, calculated parameters and local variables) from the struct back into the FMU</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>It also contains the GUID of the FMU and the serialization of the FMU state (needed for <code>fmi2GetFMUstate()</code>/<code>fmi2SetFMUstate()</code>).</p>
+</div>
+<div class="paragraph">
+<p>So in your own code you don&#8217;t need to deal with value references at all. You just read all variables into the struct, compute the outputs and write them back.</p>
+</div>
+<div class="paragraph">
+<p>The initialization code (if needed) goes into the function <code>init()</code> in <code>P_control.cpp</code>. In this tutorial we don&#8217;t need anything there.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_implement_modelexchange_functionality">Implement ModelExchange functionality</h3>
 <div class="paragraph">
-<p>The actual P-control code looks like this:</p>
-</div>
-<div class="literalblock">
-<div class="content">
-<pre> P = k_p * (T_limit - T)</pre>
-</div>
-</div>
-<div class="paragraph">
-<p>with an additional check that if T &gt;= T_limit the heating is turned off.</p>
-</div>
-<div class="paragraph">
-<p>The actual control logic is now implemented for ModelExchange, in the function <code>updateIfModified()</code>. The code only gets executed when any of the input variables (including parameters) have changed.</p>
+<p>For ModelExchange, the control logic is implemented in the function <code>updateIfModified()</code>. The code only runs when the master has changed input variables (or the time point, or the states) since the last call. Replace the <code>TODO</code> comment with the controller code:</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="cpp"><span style="color: #6e7781">// model exchange: implementation of derivative and output update</span>
-<span style="color: #cf222e">void</span> <span style="color: #24292f;background-color: #f6f8fa">P_Control</span><span style="color: #0550ae">::</span><span style="color: #24292f;background-color: #f6f8fa">updateIfModified</span><span style="color: #24292f;background-color: #f6f8fa">()</span> <span style="color: #24292f;background-color: #f6f8fa">{</span>
-    <span style="color: #cf222e">if</span> <span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #0550ae">!</span><span style="color: #24292f;background-color: #f6f8fa">m_externalInputVarsModified</span><span style="color: #24292f;background-color: #f6f8fa">)</span>
-        <span style="color: #cf222e">return</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
+<span style="color: #cf222e">void</span> <span style="color: #24292f;background-color: #f6f8fa">P_control</span><span style="color: #0550ae">::</span><span style="color: #24292f;background-color: #f6f8fa">updateIfModified</span><span style="color: #24292f;background-color: #f6f8fa">()</span> <span style="color: #24292f;background-color: #f6f8fa">{</span>
+	<span style="color: #cf222e">if</span> <span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #0550ae">!</span><span style="color: #24292f;background-color: #f6f8fa">m_externalInputVarsModified</span><span style="color: #24292f;background-color: #f6f8fa">)</span>
+		<span style="color: #cf222e">return</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
 
-    <span style="color: #6e7781">// get input variables</span>
-    <span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">T</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">m_realVar</span><span style="color: #24292f;background-color: #f6f8fa">[</span><span style="color: #24292f;background-color: #f6f8fa">FMI_INPUT_T</span><span style="color: #24292f;background-color: #f6f8fa">];</span>
-    <span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">T_limit</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">m_realVar</span><span style="color: #24292f;background-color: #f6f8fa">[</span><span style="color: #24292f;background-color: #f6f8fa">FMI_PARA_T_limit</span><span style="color: #24292f;background-color: #f6f8fa">];</span>
-    <span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">k_P</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">m_realVar</span><span style="color: #24292f;background-color: #f6f8fa">[</span><span style="color: #24292f;background-color: #f6f8fa">FMI_PARA_k_P</span><span style="color: #24292f;background-color: #f6f8fa">];</span>
+	<span style="color: #6e7781">// get current values of all variables</span>
+	<span style="color: #24292f;background-color: #f6f8fa">FMIVariables</span> <span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
+	<span style="color: #24292f;background-color: #f6f8fa">readFMIVariables</span><span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">);</span>
 
-    <span style="color: #6e7781">// *** own code starts here ***</span>
-    <span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">P</span> <span style="color: #0550ae">=</span> <span style="color: #0550ae">0</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
-    <span style="color: #cf222e">if</span> <span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #24292f;background-color: #f6f8fa">T</span> <span style="color: #0550ae">&lt;</span> <span style="color: #24292f;background-color: #f6f8fa">T_limit</span><span style="color: #24292f;background-color: #f6f8fa">)</span>
-        <span style="color: #24292f;background-color: #f6f8fa">P</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">k_P</span><span style="color: #0550ae">*</span><span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #24292f;background-color: #f6f8fa">T_limit</span> <span style="color: #0550ae">-</span> <span style="color: #24292f;background-color: #f6f8fa">T</span><span style="color: #24292f;background-color: #f6f8fa">);</span>
+	<span style="color: #6e7781">// P-controller: heating power is proportional to the temperature difference below the limit</span>
+	<span style="color: #cf222e">if</span> <span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">T</span> <span style="color: #0550ae">&lt;</span> <span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">T_limit</span><span style="color: #24292f;background-color: #f6f8fa">)</span>
+		<span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">P</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">k_P</span><span style="color: #0550ae">*</span><span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">T_limit</span> <span style="color: #0550ae">-</span> <span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">T</span><span style="color: #24292f;background-color: #f6f8fa">);</span>
+	<span style="color: #cf222e">else</span>
+		<span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">P</span> <span style="color: #0550ae">=</span> <span style="color: #0550ae">0</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
 
-    <span style="color: #6e7781">// output variables</span>
-    <span style="color: #24292f;background-color: #f6f8fa">m_realVar</span><span style="color: #24292f;background-color: #f6f8fa">[</span><span style="color: #24292f;background-color: #f6f8fa">FMI_OUTPUT_P</span><span style="color: #24292f;background-color: #f6f8fa">]</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">P</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
-    <span style="color: #6e7781">// *** own code ends here ***</span>
+	<span style="color: #6e7781">// store output variables</span>
+	<span style="color: #24292f;background-color: #f6f8fa">writeFMIVariables</span><span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">);</span>
 
-    <span style="color: #6e7781">// reset externalInputVarsModified flag</span>
-    <span style="color: #24292f;background-color: #f6f8fa">m_externalInputVarsModified</span> <span style="color: #0550ae">=</span> <span style="color: #953800">false</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
+	<span style="color: #6e7781">// reset externalInputVarsModified flag</span>
+	<span style="color: #24292f;background-color: #f6f8fa">m_externalInputVarsModified</span> <span style="color: #0550ae">=</span> <span style="color: #953800">false</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
 <span style="color: #24292f;background-color: #f6f8fa">}</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>With that code in place, ModelExchange functionality is already completed. For Co-Simulation the code is effectively the same, since this simple model does not have a time-dependency (no time integration).</p>
+<p>With that code in place, the ModelExchange functionality is complete.</p>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_implement_cosimulation_functionality">Implement CoSimulation functionality</h3>
 <div class="paragraph">
-<p>We just remove everything from the function <code>integrateTo()</code> and add simply a call to the modelExchange-calculation function.</p>
+<p>For CoSimulation, the master calls <code>fmi2DoStep()</code>, which in turn calls <code>integrateTo()</code>. Since this simple model has no time dependency (no time integration), the code is the same as for ModelExchange: we read the variables, compute the output and write it back.</p>
 </div>
 <div class="listingblock">
 <div class="content">
 <pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="cpp"><span style="color: #6e7781">// Co-simulation: time integration</span>
-<span style="color: #cf222e">void</span> <span style="color: #24292f;background-color: #f6f8fa">P_Control</span><span style="color: #0550ae">::</span><span style="color: #24292f;background-color: #f6f8fa">integrateTo</span><span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">tCommunicationIntervalEnd</span><span style="color: #24292f;background-color: #f6f8fa">)</span> <span style="color: #24292f;background-color: #f6f8fa">{</span>
-    <span style="color: #6e7781">// state of FMU before integration:</span>
-    <span style="color: #6e7781">//   m_currentTimePoint = t_IntervalStart;</span>
+<span style="color: #cf222e">void</span> <span style="color: #24292f;background-color: #f6f8fa">P_control</span><span style="color: #0550ae">::</span><span style="color: #24292f;background-color: #f6f8fa">integrateTo</span><span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #cf222e">double</span> <span style="color: #24292f;background-color: #f6f8fa">tCommunicationIntervalEnd</span><span style="color: #24292f;background-color: #f6f8fa">)</span> <span style="color: #24292f;background-color: #f6f8fa">{</span>
 
-        <span style="color: #6e7781">// *** own code starts here ***</span>
-    <span style="color: #24292f;background-color: #f6f8fa">updateIfModified</span><span style="color: #24292f;background-color: #f6f8fa">();</span> <span style="color: #6e7781">// re-use modelexchange code</span>
-        <span style="color: #6e7781">// *** own code ends here ***</span>
+	<span style="color: #6e7781">// state of FMU before integration:</span>
+	<span style="color: #6e7781">//   m_currentTimePoint = t_IntervalStart;</span>
 
-    <span style="color: #24292f;background-color: #f6f8fa">m_currentTimePoint</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">tCommunicationIntervalEnd</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
+	<span style="color: #6e7781">// get current values of all variables</span>
+	<span style="color: #24292f;background-color: #f6f8fa">FMIVariables</span> <span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
+	<span style="color: #24292f;background-color: #f6f8fa">readFMIVariables</span><span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">);</span>
 
-    <span style="color: #6e7781">// state of FMU after integration:</span>
-    <span style="color: #6e7781">//   m_currentTimePoint = tCommunicationIntervalEnd;</span>
+	<span style="color: #6e7781">// P-controller: heating power is proportional to the temperature difference below the limit</span>
+	<span style="color: #cf222e">if</span> <span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">T</span> <span style="color: #0550ae">&lt;</span> <span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">T_limit</span><span style="color: #24292f;background-color: #f6f8fa">)</span>
+		<span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">P</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">k_P</span><span style="color: #0550ae">*</span><span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">T_limit</span> <span style="color: #0550ae">-</span> <span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">T</span><span style="color: #24292f;background-color: #f6f8fa">);</span>
+	<span style="color: #cf222e">else</span>
+		<span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">.</span><span style="color: #24292f;background-color: #f6f8fa">P</span> <span style="color: #0550ae">=</span> <span style="color: #0550ae">0</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
+
+	<span style="color: #6e7781">// store output variables</span>
+	<span style="color: #24292f;background-color: #f6f8fa">writeFMIVariables</span><span style="color: #24292f;background-color: #f6f8fa">(</span><span style="color: #24292f;background-color: #f6f8fa">v</span><span style="color: #24292f;background-color: #f6f8fa">);</span>
+
+	<span style="color: #24292f;background-color: #f6f8fa">m_currentTimePoint</span> <span style="color: #0550ae">=</span> <span style="color: #24292f;background-color: #f6f8fa">tCommunicationIntervalEnd</span><span style="color: #24292f;background-color: #f6f8fa">;</span>
+
+	<span style="color: #6e7781">// state of FMU after integration:</span>
+	<span style="color: #6e7781">//   m_currentTimePoint = tCommunicationIntervalEnd;</span>
 <span style="color: #24292f;background-color: #f6f8fa">}</span></code></pre>
 </div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>It may be tempting to just call <code>updateIfModified()</code> from <code>integrateTo()</code>. That doesn&#8217;t work reliably: the flag <code>m_externalInputVarsModified</code> is only set when the master sets an input value. A master that never sets any inputs (like the compliance checker without input data) would then always get the initial output value.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_fmu_state_serialization">FMU state serialization</h3>
+<div class="paragraph">
+<p>At the end of <code>P_control.cpp</code> you find the functions <code>userStateSize()</code>, <code>serializeUserState()</code> and <code>deserializeUserState()</code>. The generated code already serializes the time point and all published variables. These functions are only needed for additional model-specific state data, for example the states of your own time integrator. Our controller has no such data, so we leave the functions as they are.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_building_the_fmu">Building the FMU</h3>
 <div class="paragraph">
-<p>If you work with Qt Creator, the modified code can be compiled directly. If everything works, switch to a console window, change into directory</p>
+<p>If you work with Qt Creator, the modified code can be compiled directly. If everything works, open a console window, change into the directory</p>
 </div>
 <div class="paragraph">
-<p><code>/home/&lt;username&gt;/FMUs/P_Control/build/</code></p>
+<p><code>/home/&lt;username&gt;/fmus/P_control/build/</code></p>
 </div>
 <div class="paragraph">
-<p>and run the script:</p>
+<p>and run the build script:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="bash"><span style="color: #0550ae">&gt;</span> ./build.sh</code></pre>
+</div>
 </div>
 <div class="paragraph">
-<p><code>./build.sh</code></p>
+<p>On Windows, run <code>build_VC_x64.bat</code>. It is set up for Visual Studio 2022; for other versions see <a href="installation.html">Installation</a>.</p>
 </div>
 <div class="paragraph">
-<p>or on Windows:</p>
-</div>
-<div class="paragraph">
-<p><code>build_VC_x64.bat</code></p>
-</div>
-<div class="paragraph">
-<p>The code should compile without any problems - otherwise fix potential typing errors.</p>
+<p>The code should compile without problems. Otherwise fix any typos.</p>
 </div>
 </div>
 </div>
@@ -334,19 +491,18 @@ Draft, converted from the old GitHub wiki. The code shown here refers to an olde
 <h2 id="_deploying_the_fmu">Deploying the FMU</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Next run the deployment script:</p>
+<p>Next run the deployment script in the same directory:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="bash"><span style="color: #0550ae">&gt;</span> ./deploy.sh</code></pre>
+</div>
 </div>
 <div class="paragraph">
-<p><code>./deploy.sh</code></p>
+<p>On Windows, run <code>deploy.bat</code>.</p>
 </div>
 <div class="paragraph">
-<p>or on Windows:</p>
-</div>
-<div class="paragraph">
-<p><code>deploy.bat</code></p>
-</div>
-<div class="paragraph">
-<p>Now, <code>P_Control.fmu</code> has been created.</p>
+<p>Now <code>P_control.fmu</code> has been created anew, this time with the controller functionality.</p>
 </div>
 </div>
 </div>
@@ -354,27 +510,27 @@ Draft, converted from the old GitHub wiki. The code shown here refers to an olde
 <h2 id="_test_the_fmu_with_the_compliance_checker">Test the FMU with the Compliance Checker</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>You can now run the FMU through the compliance checker. You can download it from the FMI Tools webpage or extract it from the file <code>third_party/FMUChecker-2.0.4-linux64.zip</code>.</p>
+<p>You can now run the FMU through the FMI compliance checker. You can download it from the <a href="https://fmi-standard.org/tools/">FMI Tools webpage</a> or extract it from the file <code>third_party/FMUChecker-2.0.4-linux64.zip</code> in the FMICodeGenerator repository (a Windows version is there as well).</p>
 </div>
 <div class="paragraph">
-<p>On Linux:</p>
+<p>On Linux, copy <code>fmuCheck.linux64</code> into the <code>build</code> directory and run:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="bash"><span style="color: #0550ae">&gt;</span> fmuCheck.linux64 P_Control.fmu</code></pre>
+<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="bash"><span style="color: #0550ae">&gt;</span> ./fmuCheck.linux64 P_control.fmu</code></pre>
 </div>
 </div>
 <div class="literalblock">
 <div class="content">
 <pre>[INFO][FMUCHK] FMI compliance checker 2.0.4 [FMILibrary: 2.0.3] build date: Nov  6 2017
 [INFO][FMUCHK] Called with following options:
-[INFO][FMUCHK] /home/ghorwin/git/FMICodeGenerator/third_party/FMUChecker-2.0.4-linux64/fmuCheck.linux64 P_Control.fmu
-[INFO][FMUCHK] Will process FMU P_Control.fmu
+[INFO][FMUCHK] ./fmuCheck.linux64 P_control.fmu
+[INFO][FMUCHK] Will process FMU P_control.fmu
 [INFO][FMILIB] XML specifies FMI standard version 2.0
 [INFO][FMI2XML] Found model identifiers for ModelExchange and CoSimulation
-[INFO][FMUCHK] Model name: P_Control
-[INFO][FMUCHK] Model GUID: {674ca730-438c-11e9-a167-247703254bb4}
-[INFO][FMUCHK] Model version: 1.0.0
+[INFO][FMUCHK] Model name: P_control
+[INFO][FMUCHK] Model GUID: {654fa1dd-55cc-40e8-9560-61cfc42b4248}
+[INFO][FMUCHK] Model version: 1.3.0
 [INFO][FMUCHK] FMU kind: ModelExchange and CoSimulation
 [INFO][FMUCHK] The FMU contains:
 0 constants
@@ -395,55 +551,81 @@ Draft, converted from the old GitHub wiki. The code shown here refers to an olde
 [INFO][FMUCHK] No input data provided. In case of simulation initial values from FMU will be used.
 [INFO][FMUCHK] Printing output file header
 "time","P"
-[INFO][FMUCHK] Model identifier for ModelExchange: P_Control
+[INFO][FMUCHK] Model identifier for ModelExchange: P_control
 [INFO][FMILIB] Loading 'linux64' binary with 'default' platform types
 [INFO][FMUCHK] Version returned from ME FMU: '2.0'
 
 [INFO][FMUCHK] Initialized FMU for simulation starting at time 0
 0.0000000000000000E+00,0.0000000000000000E+00
-2.0000000000000000E-02,0.0000000000000000E+00
-4.0000000000000001E-02,0.0000000000000000E+00
+2.0000000000000000E-02,4.0000000000000000E+04
+4.0000000000000001E-02,4.0000000000000000E+04
 .
 .
 .
-9.9999999999998757E+00,0.0000000000000000E+00
-1.0000000000000000E+01,0.0000000000000000E+00
+9.9999999999998757E+00,4.0000000000000000E+04
+1.0000000000000000E+01,4.0000000000000000E+04
 [INFO][FMUCHK] Simulation finished successfully at time 10
-[INFO][FMUCHK] Model identifier for CoSimulation: P_Control
+[INFO][FMUCHK] Model identifier for CoSimulation: P_control
 [INFO][FMILIB] Loading 'linux64' binary with 'default' platform types
 [INFO][FMUCHK] Version returned from CS FMU:   2.0
 [INFO][FMUCHK] Initialized FMU for simulation starting at time 0
-1.0000000000000000E+01,0.0000000000000000E+00
+1.0000000000000000E+01,4.0000000000000000E+04
 [INFO][FMUCHK] Simulation finished successfully at time 10
 FMU check summary:
 FMU reported:
-    0 warning(s) and error(s)
+	0 warning(s) and error(s)
 Checker reported:
-    0 Warning(s)
-    0 Error(s)</pre>
+	0 Warning(s)
+	0 Error(s)</pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Of course, currently, the actual functionality hasn&#8217;t been triggered yet, since input data was not supplied.</p>
+<p>Your GUID will be different, since each generated FMU gets its own unique GUID.</p>
 </div>
 <div class="paragraph">
-<p>So, as a next test, we provide input temperatures and monitor the calculated heating load.</p>
+<p>Without input data, the checker uses the start values from the <code>modelDescription.xml</code>. With T = 20 °C and T_limit = 22 °C, the controller computes a constant heating power of P = 20000 · (22 - 20) = 40000 W/m3. The first output line at time 0 is written before the first evaluation and still shows the initial value 0.</p>
+</div>
+<div class="paragraph">
+<p>As a next test, we provide a time series of input temperatures and monitor the calculated heating power.</p>
 </div>
 <div class="sect2">
 <h3 id="_running_the_compliance_checker_with_reference_input_data">Running the compliance checker with reference input data</h3>
 <div class="paragraph">
-<p>We can generate input data using another simulation model. Here, I&#8217;ve done a Co-Simulation with another model, monitored the exchanged data and composed a <code>csv</code> file in the format requested by the FMI Compliance checker.</p>
+<p>The input data was obtained from a co-simulation with another model: the exchanged data was recorded and written into a <code>csv</code> file in the format expected by the FMI compliance checker. It covers 10 days (864000 s) with outdoor-like temperatures between about -4 °C and 5 °C.</p>
 </div>
 <div class="paragraph">
-<p>Download the file <a href="data/P_Control_in.csv">P_Control_in.csv</a> and copy it into the directory with the fmu. Then run the compliance checker with the following command line (Linux):</p>
+<p>Download the file <a href="data/P_control_in.csv">P_control_in.csv</a> and copy it into the directory with the FMU. Then run the compliance checker with the following command line (Linux):</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="bash"><span style="color: #0550ae">&gt;</span> ./fmuCheck.linux64 <span style="color: #116329">-i</span> P_Control_in.csv <span style="color: #116329">-h</span> 120 <span style="color: #116329">-s</span> 864000 <span style="color: #116329">-o</span> P_Control_cc.csv P_Control.fmu</code></pre>
+<pre class="rouge highlight" style="color: #24292f;background-color: #f6f8fa"><code data-lang="bash"><span style="color: #0550ae">&gt;</span> ./fmuCheck.linux64 <span style="color: #116329">-i</span> P_control_in.csv <span style="color: #116329">-h</span> 120 <span style="color: #116329">-s</span> 864000 <span style="color: #116329">-o</span> P_control_cc.csv P_control.fmu</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>You should get an output as in the reference result file <a href="data/P_Control_cc.csv">P_Control_cc.csv</a>.</p>
+<p>The options mean:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1"><code>-i P_control_in.csv</code></dt>
+<dd>
+<p>input data file</p>
+</dd>
+<dt class="hdlist1"><code>-h 120</code></dt>
+<dd>
+<p>step size of 120 s</p>
+</dd>
+<dt class="hdlist1"><code>-s 864000</code></dt>
+<dd>
+<p>simulation end time (10 days)</p>
+</dd>
+<dt class="hdlist1"><code>-o P_control_cc.csv</code></dt>
+<dd>
+<p>output file with the computed results</p>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>You should get the same output as in the reference result file <a href="data/P_control_cc.csv">P_control_cc.csv</a>. Since all input temperatures are below T_limit = 22 °C, the heating stays turned on all the time, and P varies between 340000 W/m3 and about 527000 W/m3. To see the controller switch off, open the project in the wizard again, lower the start value of <code>T_limit</code> (for example to 3 °C), then rebuild and redeploy the FMU and repeat the test.</p>
 </div>
 </div>
 </div>

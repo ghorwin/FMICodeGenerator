@@ -41,7 +41,7 @@ import os.path
 
 from PyQt6 import QtWidgets
 
-from WizardPageProject import WizardPageProject
+from WizardPageProject import WizardPageProject, addRecentProject
 from WizardPageBasicProperties import WizardPageBasicProperties
 from WizardPageVariables import WizardPageVariables
 from WizardPageGenerate import WizardPageGenerate
@@ -98,6 +98,7 @@ class PageProject(QtWidgets.QWizardPage):
 		layout.addWidget(self.page)
 		self.setLayout(layout)
 		self.setTitle("FMU project")
+		self.page.recentProjectActivated.connect(lambda: self.wizard().next())
 
 
 	def nextId(self):
@@ -298,8 +299,7 @@ class PageGenerate(QtWidgets.QWizardPage):
 		self.page.ui.plainTextEditLog.clear()
 		if wizard.mode == MODE_UPDATE:
 			self.setTitle("Ready to update FMU project")
-			self.setSubTitle("Only generated files are overwritten in '{}'; previous versions are kept in the "
-							 "'.backup' subdirectory. Your source code is not modified.".format(wizard.projectDir))
+			self.setSubTitle("Only generated files are overwritten in '{}'. Your source code is not modified.".format(wizard.projectDir))
 			self.setButtonText(QtWidgets.QWizard.WizardButton.FinishButton, "Update FMU")
 		else:
 			self.setTitle("Ready to generate FMU")
@@ -337,6 +337,9 @@ class PageGenerate(QtWidgets.QWizardPage):
 			self.page.ui.plainTextEditLog.setPlainText(msgs)
 			QtWidgets.QMessageBox.critical(self, "FMI Generation Error", "Some error occurred during FMI generation:\n{}".format(str(e)))
 			return False
+
+		# remember project directory in list of recently generated FMU projects
+		addRecentProject(fmiGenerator.targetDirPath)
 
 		if wizard.mode == MODE_UPDATE:
 			QtWidgets.QMessageBox.information(self, "FMU Update Completed",

@@ -5,7 +5,7 @@ This repo is a Python/PyQt6 (Qt 6) **code generator**: its product is a generate
 ## Entry points & commands
 
 - GUI wizard: `python scripts/main.py` (needs a display; PyQt6).
-- GUI start page: "Create a new FMU project" or "Open an existing FMU project". Opening one skips the basic-properties page and runs `FMIGenerator.update()` instead of `generate()`.
+- GUI start page: "Create a new FMU project" or "Open an existing FMU project". Opening one skips the basic-properties page and runs `FMIGenerator.update()` instead of `generate()`. After every successful generate/update in the GUI, the project directory is stored in `QSettings("BKDS","FmiCodeGenerator")` under the key `RecentProjects` (max. 10 entries, see `WizardPageProject.py`), and the start page offers these entries as a list.
 - CLI, new project: `python scripts/commandLineGenerator.py <modelName> --description "..." [--target-dir DIR] [--input vars.input] [--no-build] [--overwrite]`.
 - CLI, update an existing project: `python scripts/commandLineGenerator.py --update <projectDir> [--no-build]`. This reads `<projectDir>/<modelName>.input`.
 - To script generation with variables: instantiate `FMIGenerator`, append `VarDef(name, variability, causality, initial, typeID)` entries to `fmiGenerator.variables`, and call `generate()` or `update(projectDir)`.

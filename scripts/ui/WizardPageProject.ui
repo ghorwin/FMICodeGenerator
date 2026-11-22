@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
+    <width>549</width>
     <height>300</height>
    </rect>
   </property>
@@ -56,30 +56,35 @@
     </layout>
    </item>
    <item>
-    <widget class="QLabel" name="labelInfo">
-     <property name="text">
-      <string>The project directory must contain the file &lt;model name&gt;.input that was written when the FMU project was generated. When updating a project, only generated files (modelDescription.xml, &lt;model name&gt;_generated.h/.cpp) are overwritten; your own source code is not modified.</string>
-     </property>
-     <property name="wordWrap">
-      <bool>true</bool>
-     </property>
-     <property name="margin">
+    <layout class="QVBoxLayout" name="verticalLayoutRecent">
+     <property name="leftMargin">
       <number>20</number>
      </property>
-    </widget>
-   </item>
-   <item>
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
+     <item>
+      <widget class="QLabel" name="labelRecentProjects">
+       <property name="text">
+        <string>Recently generated FMU projects (click to select, double-click to open):</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QListWidget" name="listWidgetRecentProjects">
+       <property name="alternatingRowColors">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="labelInfo">
+       <property name="text">
+        <string>The project directory must contain the file &lt;model name&gt;.input that was written when the FMU project was generated. When updating a project, only generated files (modelDescription.xml, &lt;model name&gt;_generated.h/.cpp) are overwritten; your own source code is not modified.</string>
+       </property>
+       <property name="wordWrap">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

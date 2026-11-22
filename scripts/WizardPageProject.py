@@ -12,17 +12,49 @@
 #
 # see https://github.com/ghorwin/FMICodeGenerator/blob/master/LICENSE for details.
 
-from PyQt6.QtWidgets import QWidget, QFileDialog
-from PyQt6.QtCore import pyqtSlot, QDir
+import os
+
+from PyQt6.QtWidgets import QWidget, QFileDialog, QListWidgetItem
+from PyQt6.QtCore import pyqtSlot, pyqtSignal, QDir, QSettings, Qt
 
 from Ui_WizardPageProject import Ui_WizardPageProject
 
+# settings key holding the list of recently generated/updated FMU project directories
+RECENT_PROJECTS_KEY = "RecentProjects"
+MAX_RECENT_PROJECTS = 10
+
+
+def appSettings():
+	return QSettings("BKDS", "FmiCodeGenerator")
+
+
+def recentProjects():
+	"""Returns the list of recently generated/updated project directories (most recent first)."""
+	value = appSettings().value(RECENT_PROJECTS_KEY, [])
+	if value is None:
+		return []
+	if isinstance(value, str): # QSettings may return a single entry as plain string
+		value = [value]
+	return [str(v) for v in value if v]
+
+
+def addRecentProject(projectDir):
+	"""Puts the project directory at the top of the recent projects list (max. 10 entries)."""
+	projectDir = os.path.normpath(os.path.abspath(projectDir))
+	projects = [p for p in recentProjects() if os.path.normpath(p) != projectDir]
+	projects.insert(0, projectDir)
+	appSettings().setValue(RECENT_PROJECTS_KEY, projects[:MAX_RECENT_PROJECTS])
+
 
 class WizardPageProject(QWidget):
+	# emitted when a recent project is double-clicked (wizard proceeds to next page)
+	recentProjectActivated = pyqtSignal()
+
 	def __init__(self):
 		super().__init__()
 		self.ui = Ui_WizardPageProject()
 		self.ui.setupUi(self)
+		self.populateRecentProjects()
 		self.updateEnabledState()
 		self.show()
 
@@ -36,6 +68,35 @@ class WizardPageProject(QWidget):
 		self.ui.labelProjectDir.setEnabled(enabled)
 		self.ui.lineEditProjectDir.setEnabled(enabled)
 		self.ui.toolButtonBrowseProject.setEnabled(enabled)
+		self.ui.labelRecentProjects.setEnabled(enabled)
+		self.ui.listWidgetRecentProjects.setEnabled(enabled)
+		self.ui.labelInfo.setEnabled(enabled)
+
+
+	def populateRecentProjects(self):
+		"""Fills the list widget with recent project directories that still exist."""
+		self.ui.listWidgetRecentProjects.clear()
+		for projectDir in recentProjects():
+			if not os.path.isdir(projectDir):
+				continue
+			item = QListWidgetItem(projectDir)
+			item.setData(Qt.ItemDataRole.UserRole, projectDir)
+			item.setToolTip(projectDir)
+			self.ui.listWidgetRecentProjects.addItem(item)
+		hasItems = self.ui.listWidgetRecentProjects.count() > 0
+		self.ui.labelRecentProjects.setVisible(hasItems)
+		self.ui.listWidgetRecentProjects.setVisible(hasItems)
+
+
+	@pyqtSlot(QListWidgetItem)
+	def on_listWidgetRecentProjects_itemClicked(self, item):
+		self.ui.lineEditProjectDir.setText(item.data(Qt.ItemDataRole.UserRole))
+
+
+	@pyqtSlot(QListWidgetItem)
+	def on_listWidgetRecentProjects_itemDoubleClicked(self, item):
+		self.ui.lineEditProjectDir.setText(item.data(Qt.ItemDataRole.UserRole))
+		self.recentProjectActivated.emit()
 
 
 	@pyqtSlot(bool)

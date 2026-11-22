@@ -43,8 +43,15 @@ from TooltipPopup import TooltipEventFilter
 
 app = QtWidgets.QApplication(sys.argv)
 # show widget tooltips in the custom tooltip card
-app.installEventFilter(TooltipEventFilter(app))
+tooltipFilter = TooltipEventFilter(app)
+app.installEventFilter(tooltipFilter)
 wizard = FMIGeneratorWizard()
 wizard.show()
-sys.exit(app.exec())
+res = app.exec()
+# Tear down in a defined order: otherwise Python destroys the wizard and the application in arbitrary
+# order at interpreter shutdown, and the widgets' destruction events are routed to the (already
+# finalized) Python event filter, which segfaults.
+app.removeEventFilter(tooltipFilter)
+del wizard
+sys.exit(res)
 

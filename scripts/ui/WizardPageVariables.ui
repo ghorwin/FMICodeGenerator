@@ -52,12 +52,12 @@
         </column>
         <column>
          <property name="text">
-          <string>Variability</string>
+          <string>Causality</string>
          </property>
         </column>
         <column>
          <property name="text">
-          <string>Causality</string>
+          <string>Variability</string>
          </property>
         </column>
         <column>
@@ -179,72 +179,13 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="0" column="0">
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Variability:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QRadioButton" name="radioButtonVariabilityConstant">
-          <property name="text">
-           <string>constant</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButtonVariabilityFixed">
-          <property name="text">
-           <string>fixed</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButtonVariabilityTunable">
-          <property name="text">
-           <string>tunable</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButtonVariabilityDiscrete">
-          <property name="text">
-           <string>discrete</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QRadioButton" name="radioButtonVariabilityContinuous">
-          <property name="text">
-           <string>continuous</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacerVariability">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item row="1" column="0">
        <widget class="QLabel" name="label_4">
         <property name="text">
          <string>Causality:</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="0" column="1">
        <layout class="QHBoxLayout" name="horizontalLayoutCausality">
         <item>
          <widget class="QRadioButton" name="radioButtonCausalityParameter">
@@ -290,6 +231,65 @@
         </item>
         <item>
          <spacer name="horizontalSpacerCausality">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Variability:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QRadioButton" name="radioButtonVariabilityConstant">
+          <property name="text">
+           <string>constant</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonVariabilityFixed">
+          <property name="text">
+           <string>fixed</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonVariabilityTunable">
+          <property name="text">
+           <string>tunable</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonVariabilityDiscrete">
+          <property name="text">
+           <string>discrete</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonVariabilityContinuous">
+          <property name="text">
+           <string>continuous</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacerVariability">
           <property name="orientation">
            <enum>Qt::Orientation::Horizontal</enum>
           </property>

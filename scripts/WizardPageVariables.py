@@ -66,7 +66,7 @@ VARIABILITY_PRIORITY = ["continuous", "discrete", "fixed", "tunable", "constant"
 NO_INITIAL_CAUSALITIES = ["input", "independent"]
 
 # Table column indexes
-COL_NAME, COL_VALUEREF, COL_VARIABILITY, COL_CAUSALITY, COL_INITIAL, COL_TYPE, COL_START, COL_UNIT, COL_DESC = range(9)
+COL_NAME, COL_VALUEREF, COL_CAUSALITY, COL_VARIABILITY, COL_INITIAL, COL_TYPE, COL_START, COL_UNIT, COL_DESC = range(9)
 
 
 def validVariabilities(causality, typeID):
@@ -269,12 +269,21 @@ class WizardPageVariables(QWidget):
 		self.ui.tableWidget.setRowCount(len(self.variables))
 		for i in range(len(self.variables)):
 			var = self.variables[i]
-			texts = [var.name, "{}".format(var.valueRef), var.variability, var.causality, displayedInitial(var),
-					 var.typeID, "{}".format(var.startValue), var.unit, var.description]
-			for col in range(len(texts)):
+			texts = {
+				COL_NAME        : var.name,
+				COL_VALUEREF    : "{}".format(var.valueRef),
+				COL_CAUSALITY   : var.causality,
+				COL_VARIABILITY : var.variability,
+				COL_INITIAL     : displayedInitial(var),
+				COL_TYPE        : var.typeID,
+				COL_START       : "{}".format(var.startValue),
+				COL_UNIT        : var.unit,
+				COL_DESC        : var.description
+			}
+			for col, text in texts.items():
 				item = QTableWidgetItem()
 				item.setFlags( Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
-				item.setText(texts[col])
+				item.setText(text)
 				self.ui.tableWidget.setItem(i, col, item)
 
 		self.ui.tableWidget.resizeColumnsToContents()

@@ -48,7 +48,7 @@
 # FMU-specific variables - set by code generator
 FMU_SHARED_LIB_NAME=libFMI_template
 FMU_SHARED_LIB_TARGET_NAME=FMI_template
-FMU_SHARED_LIB_VERSION=1.0.0
+FMU_SHARED_LIB_VERSION=2.0.0
 
 BUILD_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 CMAKELISTSDIR=$(pwd)/..

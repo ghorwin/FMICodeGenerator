@@ -38,7 +38,7 @@ else {
 #DEFINES += FMI2_FUNCTION_PREFIX=FMI_template_
 
 unix|mac {
-	VER_MAJ = 1
+	VER_MAJ = 2
 	VER_MIN = 0
 	VER_PAT = 0
 	VERSION = $${VER_MAJ}.$${VER_MIN}.$${VER_PAT}

@@ -31,7 +31,7 @@ target_link_libraries( ${PROJECT_NAME}
 )
 
 # Library version strings set by code generator
-set( SO_VERSION_MAJOR 1)
+set( SO_VERSION_MAJOR 2)
 set( SO_VERSION_MINOR 0)
 set( SO_VERSION_PATCH 0)
 set( SO_VERSION_STRING

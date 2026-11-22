@@ -574,8 +574,7 @@ class FMIGenerator:
 			name="$$name$$"$$desc$$
 			valueReference="$$valueRef$$"
 			variability="$$variability$$"
-			causality="$$causality$$"
-			initial="$$initial$$">
+			causality="$$causality$$"$$initial$$>
 			<$$typeID$$$$start$$$$unit$$/>
 		</ScalarVariable>
 		"""
@@ -614,7 +613,11 @@ $$outputUnknowns$$
 
 			varDefBlock = varDefBlock.replace("$$variability$$",var.variability)
 			varDefBlock = varDefBlock.replace("$$causality$$",var.causality)
-			varDefBlock = varDefBlock.replace("$$initial$$",var.initial)
+			# FMI 2.0: inputs and the independent variable must not have an initial attribute
+			if var.causality in ["input", "independent"]:
+				varDefBlock = varDefBlock.replace("$$initial$$","")
+			else:
+				varDefBlock = varDefBlock.replace("$$initial$$",'\n\t\t\tinitial="{}"'.format(var.initial))
 
 			varDefBlock = varDefBlock.replace("$$typeID$$",var.typeID)
 
@@ -623,7 +626,8 @@ $$outputUnknowns$$
 			else:
 				varDefBlock = varDefBlock.replace("$$unit$$","")
 
-			if var.initial=="calculated":
+			# inputs always need a start value, the independent variable must not have one
+			if var.causality == "independent" or (var.causality != "input" and var.initial=="calculated"):
 				varDefBlock = varDefBlock.replace("$$start$$","")
 			else:
 				varDefBlock = varDefBlock.replace("$$start$$",' start="{}"'.format(var.startValue))

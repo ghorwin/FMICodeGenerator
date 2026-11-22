@@ -39,8 +39,11 @@ import sys
 from PyQt6 import QtWidgets
 
 from FMIGeneratorWizard import FMIGeneratorWizard
+from TooltipPopup import TooltipEventFilter
 
 app = QtWidgets.QApplication(sys.argv)
+# show widget tooltips in the custom tooltip card
+app.installEventFilter(TooltipEventFilter(app))
 wizard = FMIGeneratorWizard()
 wizard.show()
 sys.exit(app.exec())

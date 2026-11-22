@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1102</width>
-    <height>539</height>
+    <width>1336</width>
+    <height>1035</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,10 +23,10 @@
       <item row="0" column="0" rowspan="3">
        <widget class="QTableWidget" name="tableWidget">
         <property name="selectionMode">
-         <enum>QAbstractItemView::SingleSelection</enum>
+         <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
         </property>
         <property name="selectionBehavior">
-         <enum>QAbstractItemView::SelectRows</enum>
+         <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
         </property>
         <property name="rowCount">
          <number>0</number>
@@ -110,7 +110,7 @@
       <item row="2" column="1">
        <spacer name="verticalSpacer">
         <property name="orientation">
-         <enum>Qt::Vertical</enum>
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -124,214 +124,301 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="title">
+      <string>General properties</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>Name:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="lineEditName"/>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="label_2">
+        <property name="text">
+         <string>Value reference (-1 for auto):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QSpinBox" name="spinBoxValueRef">
+        <property name="minimum">
+         <number>-1</number>
+        </property>
+        <property name="maximum">
+         <number>9999</number>
+        </property>
+        <property name="value">
+         <number>-1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_9">
+        <property name="text">
+         <string>Description:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="3">
+       <widget class="QLineEdit" name="lineEditDescription"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="QGroupBox" name="groupBox_2">
      <property name="title">
-      <string>Properties</string>
+      <string>Variable definition</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="2" column="0">
-       <widget class="QLabel" name="labelUnit">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Unit:</string>
+         <string>Variability:</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Start value:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="0" colspan="3">
-       <layout class="QGridLayout" name="gridLayout_2">
-        <item row="2" column="3">
-         <widget class="QComboBox" name="comboBoxCausality">
-          <property name="currentIndex">
-           <number>4</number>
-          </property>
-          <item>
-           <property name="text">
-            <string>parameter</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>calculatedParameter</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>input</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>output</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>local</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>independent</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QSpinBox" name="spinBoxValueRef">
-          <property name="minimum">
-           <number>-1</number>
-          </property>
-          <property name="maximum">
-           <number>9999</number>
-          </property>
-          <property name="value">
-           <number>-1</number>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label">
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QRadioButton" name="radioButtonVariabilityConstant">
           <property name="text">
-           <string>Name:</string>
+           <string>constant</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_2">
+        <item>
+         <widget class="QRadioButton" name="radioButtonVariabilityFixed">
           <property name="text">
-           <string>Value reference (-1 for auto):</string>
+           <string>fixed</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="3">
-         <widget class="QComboBox" name="comboBoxInitial">
-          <item>
-           <property name="text">
-            <string>exact</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>approx</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>calculated</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QLabel" name="label_4">
+        <item>
+         <widget class="QRadioButton" name="radioButtonVariabilityTunable">
           <property name="text">
-           <string>Causality:</string>
+           <string>tunable</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="3">
-         <widget class="QComboBox" name="comboBoxVariability">
-          <property name="currentIndex">
-           <number>4</number>
-          </property>
-          <item>
-           <property name="text">
-            <string>constant</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>fixed</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>tunable</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>discrete</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>continuous</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="QLabel" name="label_5">
+        <item>
+         <widget class="QRadioButton" name="radioButtonVariabilityDiscrete">
           <property name="text">
-           <string>Initial:</string>
+           <string>discrete</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="label_3">
+        <item>
+         <widget class="QRadioButton" name="radioButtonVariabilityContinuous">
           <property name="text">
-           <string>Variability:</string>
+           <string>continuous</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="lineEditName"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>Description:</string>
+        <item>
+         <spacer name="horizontalSpacerVariability">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
           </property>
-         </widget>
-        </item>
-        <item row="1" column="1" colspan="3">
-         <widget class="QLineEdit" name="lineEditDescription"/>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </item>
-      <item row="1" column="2">
-       <widget class="QComboBox" name="comboBoxTypeID">
-        <item>
-         <property name="text">
-          <string>Real</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Integer</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Boolean</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>String</string>
-         </property>
-        </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>Causality:</string>
+        </property>
        </widget>
       </item>
-      <item row="3" column="2">
-       <widget class="QLineEdit" name="lineEditStart"/>
+      <item row="1" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayoutCausality">
+        <item>
+         <widget class="QRadioButton" name="radioButtonCausalityParameter">
+          <property name="text">
+           <string>parameter</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonCausalityCalculatedParameter">
+          <property name="text">
+           <string>calculatedParameter</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonCausalityInput">
+          <property name="text">
+           <string>input</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonCausalityOutput">
+          <property name="text">
+           <string>output</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonCausalityLocal">
+          <property name="text">
+           <string>local</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonCausalityIndependent">
+          <property name="text">
+           <string>independent</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacerCausality">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
-      <item row="1" column="0">
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Initial:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayoutInitial">
+        <item>
+         <widget class="QRadioButton" name="radioButtonInitialExact">
+          <property name="text">
+           <string>exact</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonInitialApprox">
+          <property name="text">
+           <string>approx</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonInitialCalculated">
+          <property name="text">
+           <string>calculated</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacerInitial">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="3" column="0">
        <widget class="QLabel" name="label_7">
         <property name="text">
          <string>Type:</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="2">
+      <item row="3" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayoutType">
+        <item>
+         <widget class="QRadioButton" name="radioButtonTypeReal">
+          <property name="text">
+           <string>Real</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonTypeInteger">
+          <property name="text">
+           <string>Integer</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonTypeBoolean">
+          <property name="text">
+           <string>Boolean</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="radioButtonTypeString">
+          <property name="text">
+           <string>String</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacerType">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="labelUnit">
+        <property name="text">
+         <string>Unit:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
        <widget class="QLineEdit" name="lineEditUnit"/>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>Start value:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QLineEdit" name="lineEditStart"/>
       </item>
      </layout>
     </widget>

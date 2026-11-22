@@ -46,6 +46,7 @@ from WizardPageBasicProperties import WizardPageBasicProperties
 from WizardPageVariables import WizardPageVariables
 from WizardPageGenerate import WizardPageGenerate
 from FMIGenerator import FMIGenerator, VarDef, findProjectInputFile
+from TooltipPopup import TooltipEventFilter
 
 # page IDs
 PAGE_PROJECT = 0
@@ -312,6 +313,8 @@ class PageGenerate(QtWidgets.QWizardPage):
 
 if __name__ == '__main__':
 	app = QtWidgets.QApplication(sys.argv)
+	# show widget tooltips in the custom tooltip card
+	app.installEventFilter(TooltipEventFilter(app))
 	wizard = FMIGeneratorWizard()
 	wizard.show()
 	sys.exit(app.exec())
